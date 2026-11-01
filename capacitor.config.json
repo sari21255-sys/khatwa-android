@@ -2,10 +2,10 @@
   "appId": "com.khatwa.app",
   "appName": "خطوة",
   "webDir": "www",
-  "backgroundColor": "#5a1424",
+  "backgroundColor": "#000000",
   "android": { "allowMixedContent": false },
   "plugins": {
-    "SplashScreen": { "launchShowDuration": 1200, "backgroundColor": "#5a1424", "showSpinner": false, "launchAutoHide": false },
-    "StatusBar": { "style": "DARK", "backgroundColor": "#5a1424" }
+    "SplashScreen": { "launchShowDuration": 1200, "backgroundColor": "#000000", "showSpinner": false, "launchAutoHide": false },
+    "StatusBar": { "style": "DARK", "backgroundColor": "#000000" }
   }
 }
