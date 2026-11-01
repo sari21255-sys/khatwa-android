@@ -1,0 +1,62 @@
+name: Build Android
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      HAS_KS: ${{ secrets.KEYSTORE_B64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - uses: android-actions/setup-android@v3
+      - name: Install
+        run: |
+          npm install
+          pip install pillow
+      - name: Generate Android project
+        run: |
+          npx cap add android
+          python3 scripts/patch_android.py
+          npx cap sync android
+      - name: Build debug APK (installable directly)
+        working-directory: android
+        run: ./gradlew assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: khatwa-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Publish APK as a downloadable release link
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk khatwa.apk
+          gh release view latest >/dev/null 2>&1 || gh release create latest --title "خطوة — آخر نسخة" --notes "حمّل khatwa.apk وثبّته على هاتفك" --latest
+          gh release upload latest khatwa.apk --clobber
+      - name: Build signed release AAB (for Google Play)
+        if: env.HAS_KS == 'true'
+        working-directory: android
+        env:
+          KS_B64: ${{ secrets.KEYSTORE_B64 }}
+          KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KS_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          ./gradlew bundleRelease \
+            -Pandroid.injected.signing.store.file="$RUNNER_TEMP/release.jks" \
+            -Pandroid.injected.signing.store.password="$KS_PASS" \
+            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$KEY_PASS"
+      - uses: actions/upload-artifact@v4
+        if: env.HAS_KS == 'true'
+        with:
+          name: khatwa-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab

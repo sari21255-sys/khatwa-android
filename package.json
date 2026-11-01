@@ -1,0 +1,27 @@
+{
+  "name": "khatwa-android",
+  "version": "1.0.0",
+  "private": true,
+  "description": "خطوة — غلاف Capacitor للأندرويد",
+  "scripts": {
+    "prepare-www": "bash scripts/prepare-www.sh",
+    "android:add": "npx cap add android",
+    "android:sync": "npx cap sync android",
+    "android:patch": "python3 scripts/patch_android.py",
+    "android:open": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/app": "^7.0.0",
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/filesystem": "^7.0.0",
+    "@capacitor/local-notifications": "^7.0.0",
+    "@capacitor/share": "^7.0.0",
+    "@capacitor/splash-screen": "^7.0.0",
+    "@capacitor/status-bar": "^7.0.0",
+    "@capgo/capacitor-health": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0"
+  }
+}

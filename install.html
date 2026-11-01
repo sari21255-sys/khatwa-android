@@ -1,0 +1,8 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>تثبيت خطوة</title><link rel="icon" href="icons/icon-192.png"><style>body{font-family:system-ui,sans-serif;background:#5a1424;color:#fff;margin:0;padding:24px 16px;line-height:1.9}main{max-width:520px;margin:0 auto}img{width:84px;height:84px;border-radius:22px;display:block;margin:8px auto}h1{text-align:center;margin:8px 0 4px}p.s{text-align:center;opacity:.8;margin:0 0 20px}.c{background:rgba(255,255,255,.1);border-radius:20px;padding:16px;margin:12px 0}a.b,button.b{display:block;width:100%;box-sizing:border-box;text-align:center;background:#fff;color:#5a1424;border:0;border-radius:14px;padding:14px;font:700 16px inherit;text-decoration:none;margin-top:10px}ol{padding-inline-start:20px;margin:6px 0}</style></head><body><main>
+<img src="icons/icon-192.png" alt=""><h1>خطوة</h1><p class="s">تمرينك وتغذيتك ونومك في تطبيق واحد</p>
+<div class="c"><b>تطبيق أندرويد (APK)</b> — مع ربط الساعة والإشعارات في الخلفية
+<a class="b" id="apk" href="khatwa.apk" download>تنزيل خطوة للأندرويد</a>
+<ol><li>افتح الملف بعد التنزيل.</li><li>إذا سأل الهاتف، اسمح بالتثبيت من هذا المتصفح.</li><li>افتح خطوة، ثم من «ربط الساعات» اضغط «تفعيل الربط».</li></ol></div>
+<div class="c"><b>أو ثبّته من المتصفح مباشرة</b> (بدون ملف)
+<button class="b" id="pwa" hidden>تثبيت التطبيق</button><div id="hint" style="opacity:.8;font-size:14px">في Chrome: القائمة ⋮ ثم «تثبيت التطبيق».</div></div>
+</main><script>var e;addEventListener('beforeinstallprompt',function(x){x.preventDefault();e=x;var b=document.getElementById('pwa');b.hidden=false;document.getElementById('hint').hidden=true;b.onclick=function(){e.prompt()}})</script></body></html>
