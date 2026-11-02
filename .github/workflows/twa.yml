@@ -26,7 +26,10 @@ jobs:
           npm i -g @bubblewrap/cli
           mkdir -p ~/.bubblewrap
           echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_HOME\"}" > ~/.bubblewrap/config.json
+          echo "ANDROID_HOME=$ANDROID_HOME"; ls "$ANDROID_HOME"
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "build-tools;35.0.0" "platforms;android-35" >/dev/null
+          ls "$ANDROID_HOME/build-tools" "$ANDROID_HOME/platforms"
       - name: Prepare project
         run: |
           mkdir build && cd build
@@ -45,7 +48,6 @@ jobs:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ env.KS_PASS }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ env.KS_PASS }}
         run: |
-          bubblewrap update --skipVersionUpgrade || true
           bubblewrap build --skipPwaValidation
           keytool -list -v -keystore android.keystore -storepass "$KS_PASS" | grep "SHA256:" | head -1 | tee fingerprint.txt
       - uses: actions/upload-artifact@v4
