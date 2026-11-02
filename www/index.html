@@ -1,5 +1,5 @@
 <!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#fafafa"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="خطوة"><title>خطوة</title>
+<meta name="color-scheme" content="light"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#fafafa"><link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="خطوة"><title>خطوة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Cairo:wght@300;400;600;700;800;900&display=swap">
@@ -647,6 +647,11 @@ html body .lw{color:#fff}
 html body .phero.np{background:linear-gradient(#5a5a5e,#111)!important}
 html body .tmv{font-size:58px;letter-spacing:-.02em}
 html body .banner-red,html body .planhd{background:#000}
+html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-y:contain}
+html body{touch-action:manipulation;overscroll-behavior-y:contain}
+html body button,html body .chip,html body a{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+html body input,html body textarea{-webkit-user-select:text;user-select:text}
+html body .top{padding-top:max(6px,env(safe-area-inset-top,0px))}
 </style>
 <script src="config.js"></script>
 
@@ -785,6 +790,7 @@ async function bootPwa(){
  if(CFG.aiUrl||CFG.syncUrl){if(!SYNC.token){SYNC.token=genToken();try{localStorage.setItem('fit_sync',SYNC.token)}catch(e){}}}
  if(CFG.aiUrl){SM=proxySample();SMI=true}
  if(CFG.syncUrl){const r=await syncPull();SYNC.st=r==='err'?'err':'ok';if(r==='pulled'){render()}else if(r!=='err'){await syncPush()}}
+ try{const g=new URLSearchParams(location.search).get('go');if(['dash','train','food','pg','me'].indexOf(g)>=0){S.tab=g;S.sub=null}}catch(e){}
  render()}
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();INST=e;if(S.prof.ob&&S.tab==='me'&&!S.sub)render()});
 window.addEventListener('appinstalled',()=>{INST=null});
