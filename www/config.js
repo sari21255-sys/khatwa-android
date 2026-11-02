@@ -1,5 +1,9 @@
-/* إعدادات التطبيق — عدّل القيمتين بعد نشر الـWorker (اتركهما فارغتين للعمل بدون خادم) */
+/* إعدادات التطبيق */
 window.APP_CONFIG={
-  aiUrl:"",   // مثال: "https://sari-api.YOURNAME.workers.dev/api/ai"
-  syncUrl:""  // مثال: "https://sari-api.YOURNAME.workers.dev/api/state"
+  aiUrl:"",
+  syncUrl:"",
+  sbUrl:"",          // رابط مشروع Supabase، مثال: https://xxxx.supabase.co
+  sbKey:"",          // المفتاح العام (anon public)
+  supportEmail:"",   // بريد الاستفسارات
+  storeUrl:""        // رابط صفحة التطبيق في المتجر
 };
