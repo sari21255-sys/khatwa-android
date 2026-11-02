@@ -50,7 +50,8 @@ jobs:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ env.KS_PASS }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ env.KS_PASS }}
         run: |
-          bubblewrap build --skipPwaValidation
+          yes y | bubblewrap update --skipVersionUpgrade
+          yes y | bubblewrap build --skipPwaValidation
           keytool -list -v -keystore android.keystore -storepass "$KS_PASS" | grep "SHA256:" | head -1 | tee fingerprint.txt
       - uses: actions/upload-artifact@v4
         with:
