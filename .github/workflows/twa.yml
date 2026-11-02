@@ -30,6 +30,8 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
           "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "build-tools;35.0.0" "platforms;android-35" >/dev/null
           ls "$ANDROID_HOME/build-tools" "$ANDROID_HOME/platforms"
+          [ -e "$ANDROID_HOME/tools" ] || sudo ln -s "$ANDROID_HOME/cmdline-tools/latest" "$ANDROID_HOME/tools"
+          ls "$ANDROID_HOME/tools/bin" | head -3
       - name: Prepare project
         run: |
           mkdir build && cd build
