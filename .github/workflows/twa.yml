@@ -1,0 +1,56 @@
+name: Build TWA (Bubblewrap)
+on:
+  workflow_dispatch:
+    inputs:
+      host:
+        description: "نطاق موقعك بدون https (مثال: khatwa.netlify.app)"
+        required: true
+      version_code:
+        description: "رقم الإصدار (يزيد مع كل رفع للمتجر)"
+        default: "1"
+permissions:
+  contents: write
+jobs:
+  twa:
+    runs-on: ubuntu-latest
+    env:
+      HAS_KS: ${{ secrets.KEYSTORE_B64 != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - name: Install Bubblewrap
+        run: |
+          npm i -g @bubblewrap/cli
+          mkdir -p ~/.bubblewrap
+          echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_HOME\"}" > ~/.bubblewrap/config.json
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+      - name: Prepare project
+        run: |
+          mkdir build && cd build
+          python3 ../twa/make_manifest.py "${{ inputs.host }}" "${{ inputs.version_code }}"
+          if [ "$HAS_KS" = "true" ]; then
+            echo "${{ secrets.KEYSTORE_B64 }}" | base64 -d > android.keystore
+            echo "KS_PASS=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+            sed -i "s/\"alias\": \"khatwa\"/\"alias\": \"${{ secrets.KEY_ALIAS }}\"/" twa-manifest.json
+          else
+            keytool -genkeypair -v -keystore android.keystore -alias khatwa -keyalg RSA -keysize 2048 -validity 10000 -storepass testpass123 -keypass testpass123 -dname "CN=Khatwa Test"
+            echo "KS_PASS=testpass123" >> $GITHUB_ENV
+          fi
+      - name: Build
+        working-directory: build
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ env.KS_PASS }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ env.KS_PASS }}
+        run: |
+          bubblewrap update --skipVersionUpgrade || true
+          bubblewrap build --skipPwaValidation
+          keytool -list -v -keystore android.keystore -storepass "$KS_PASS" | grep "SHA256:" | head -1 | tee fingerprint.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: khatwa-twa-test
+          path: |
+            build/app-release-signed.apk
+            build/fingerprint.txt
