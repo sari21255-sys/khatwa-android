@@ -3,7 +3,7 @@
 
 create table if not exists public.profiles(
   id uuid primary key references auth.users(id) on delete cascade,
-  display_name text not null default 'عضو',
+  display_name text not null default 'عضو' check (char_length(display_name) between 1 and 40),
   created_at timestamptz not null default now());
 
 create table if not exists public.posts(
@@ -48,6 +48,9 @@ create table if not exists public.notifications(
   read boolean not null default false,
   created_at timestamptz not null default now());
 create index if not exists notif_user on public.notifications(user_id,created_at desc);
+create index if not exists comments_post on public.comments(post_id,created_at);
+create index if not exists likes_user on public.likes(user_id);
+create index if not exists posts_user on public.posts(user_id,created_at desc);
 
 create table if not exists public.user_settings(
   user_id uuid primary key default auth.uid() references auth.users(id) on delete cascade,
@@ -128,13 +131,49 @@ create trigger comments_aiud after insert or delete on public.comments for each 
 create or replace function public.on_report() returns trigger
 language plpgsql security definer set search_path=public as $$
 begin
-  if (select count(*) from public.reports where post_id=new.post_id)>=3 then
+  if (select count(*) from public.reports r join public.profiles p on p.id=r.user_id where r.post_id=new.post_id and p.created_at<now()-interval '1 day')>=3 then
     update public.posts set hidden=true where id=new.post_id;
   end if;
   return null;
 end $$;
 drop trigger if exists reports_ai on public.reports;
 create trigger reports_ai after insert on public.reports for each row execute function public.on_report();
+
+create or replace function public.limit_comments() returns trigger
+language plpgsql security definer set search_path=public as $$
+begin
+  if (select count(*) from public.comments where user_id=new.user_id and created_at>now()-interval '1 hour')>=40 then
+    raise exception 'تجاوزت الحد المسموح، حاول لاحقًا';
+  end if;
+  return new;
+end $$;
+drop trigger if exists comments_limit on public.comments;
+create trigger comments_limit before insert on public.comments for each row execute function public.limit_comments();
+
+create or replace function public.limit_likes() returns trigger
+language plpgsql security definer set search_path=public as $$
+begin
+  if (select count(*) from public.likes where user_id=new.user_id and post_id is not null)>=5000 then
+    raise exception 'تجاوزت الحد المسموح';
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists likes_limit on public.likes;
+create trigger likes_limit before insert on public.likes for each row execute function public.limit_likes();
+
+-- منع تعديل اسم المؤلف المخزَّن من العميل: يُحدَّث تلقائيًا عند تغيير اسم العرض
+create or replace function public.sync_author() returns trigger
+language plpgsql security definer set search_path=public as $$
+begin
+  if new.display_name is distinct from old.display_name then
+    update public.posts set author=new.display_name where user_id=new.id;
+    update public.comments set author=new.display_name where user_id=new.id;
+  end if;
+  return new;
+end $$;
+drop trigger if exists profiles_author_sync on public.profiles;
+create trigger profiles_author_sync after update on public.profiles for each row execute function public.sync_author();
 
 -- حذف الحساب (مطلوب في Google Play)
 create or replace function public.delete_my_account() returns void
@@ -163,7 +202,7 @@ create policy profiles_upd on public.profiles for update to authenticated using 
 drop policy if exists posts_read on public.posts;
 create policy posts_read on public.posts for select to authenticated using (hidden=false or user_id=auth.uid());
 drop policy if exists posts_ins on public.posts;
-create policy posts_ins on public.posts for insert to authenticated with check (user_id=auth.uid());
+create policy posts_ins on public.posts for insert to authenticated with check (user_id=auth.uid() and likes=0 and comments=0 and hidden=false);
 drop policy if exists posts_del on public.posts;
 create policy posts_del on public.posts for delete to authenticated using (user_id=auth.uid());
 
@@ -188,6 +227,8 @@ drop policy if exists notif_read on public.notifications;
 create policy notif_read on public.notifications for select to authenticated using (user_id=auth.uid());
 drop policy if exists notif_upd on public.notifications;
 create policy notif_upd on public.notifications for update to authenticated using (user_id=auth.uid()) with check (user_id=auth.uid());
+revoke update on public.notifications from authenticated;
+grant update(read) on public.notifications to authenticated;
 drop policy if exists notif_del on public.notifications;
 create policy notif_del on public.notifications for delete to authenticated using (user_id=auth.uid());
 

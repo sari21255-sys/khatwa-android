@@ -46,4 +46,10 @@ try:
     print('icons ok')
 except Exception as e:
     print('icons skipped:',e)
+# رقم الإصدار تلقائيًا من رقم تشغيل الـCI (يزداد في كل بناء، وهو شرط Google Play)
+G=A/'app/build.gradle'
+if G.exists():
+    n=int(os.environ.get('GITHUB_RUN_NUMBER','1'))
+    g=G.read_text();g=re.sub(r'versionCode\s+\d+','versionCode %d'%(100+n),g);g=re.sub(r'versionName\s+"[^"]*"','versionName "1.0.%d"'%n,g);G.write_text(g)
+    print('versionCode',100+n)
 print('patched')

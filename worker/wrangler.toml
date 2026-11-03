@@ -1,0 +1,12 @@
+name = "sari-api"
+main = "ai-proxy.js"
+compatibility_date = "2025-01-01"
+
+[[kv_namespaces]]
+binding = "STATE"
+id = "ضع_معرّف_KV_هنا"
+
+[vars]
+# نطاقات مسموح لها باستدعاء الوسيط، مفصولة بفاصلة. أضف نطاق موقعك. لا تستعمل * في الإنتاج.
+ALLOW_ORIGIN = "https://localhost,capacitor://localhost"
+AI_DAILY_CAP = "500"

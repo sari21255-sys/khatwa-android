@@ -1,0 +1,31 @@
+name: Tests
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      pg:
+        image: postgres:16
+        env: { POSTGRES_PASSWORD: pg }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Worker tests
+        run: node tests/worker.test.mjs
+      - name: App tests (Playwright)
+        run: |
+          npm i -g playwright
+          npx playwright install --with-deps chromium
+          NODE_PATH="$(npm root -g)" node tests/app.e2e.js
+      - name: Supabase schema + RLS tests
+        env: { PGPASSWORD: pg }
+        run: |
+          psql -h localhost -U postgres -v ON_ERROR_STOP=1 -q -f supabase/tests/00_mock_supabase.sql
+          psql -h localhost -U postgres -q -f supabase/tests/01_rls_and_limits.sql
