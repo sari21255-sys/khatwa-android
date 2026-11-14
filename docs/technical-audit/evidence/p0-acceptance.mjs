@@ -83,6 +83,6 @@ try{
  await c3.close();
  // أصل غير مسموح و"*" مرفوضان (اختبارات الوحدة للوسيط؛ هنا فحص المصدر)
  const wsrc=fs.readFileSync(ROOT+'worker/ai-proxy.js','utf8');rec('P0-06c','الوسيط لا يقبل ALLOW_ORIGIN=* ولا يعيد ACAO:* (مصدر + اختبار الوحدة)',!/indexOf\('\*'\)/.test(wsrc)&&/ok=!!og&&al\.indexOf\(og\)>=0/.test(wsrc),'tests/worker.test.mjs يغطي السلوك','P2');
-}catch(e){console.log('EXCEPTION',e.stack.split('\n').slice(0,4).join(' | '));rec('P0-run','تنفيذ السكربت اكتمل بلا استثناء',false,String(e.message).slice(0,200),'P1')}finally{await b.close();st.close();try{wk.close()}catch(e){}
+}catch(e){console.log('EXCEPTION',e.stack.split('\n').slice(0,4).join(' | '));if(process.env.GITHUB_ACTIONS)console.log('::error title=exception::'+e.stack.split('\n').slice(0,3).join(' | ').slice(0,400));rec('P0-run','تنفيذ السكربت اكتمل بلا استثناء',false,String(e.message).slice(0,200),'P1')}finally{await b.close();st.close();try{wk.close()}catch(e){}
  fs.writeFileSync(new URL('./p0/results-p0.json',import.meta.url).pathname,JSON.stringify(results,null,1));
- const fail=results.filter(r=>r.result==='FAIL');console.log('\n'+results.filter(r=>r.result==='PASS').length+' PASS / '+fail.length+' FAIL');process.exit(fail.length?1:0)}
+ const fail=results.filter(r=>r.result==='FAIL');if(process.env.GITHUB_ACTIONS)fail.forEach(r=>console.log('::error title='+r.id+'::'+String(r.evidence).replace(/[\r\n]+/g,' ').slice(0,400)));console.log('\n'+results.filter(r=>r.result==='PASS').length+' PASS / '+fail.length+' FAIL');process.exit(fail.length?1:0)}

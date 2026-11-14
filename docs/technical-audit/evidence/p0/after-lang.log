@@ -1,0 +1,5 @@
+(node:3558) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/claude/khatwa-android/worker/ai-proxy.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/claude/khatwa-android/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{"bi":{"ar":1177,"la":566,"cls":""},"ar":{"ar":1177,"la":566,"cls":""},"en":{"ar":258,"la":992,"cls":"en1"}} []
