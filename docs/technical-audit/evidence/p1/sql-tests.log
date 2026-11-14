@@ -1,0 +1,531 @@
+psql:supabase/schema.sql:69: NOTICE:  trigger "on_auth_user_created" for relation "auth.users" does not exist, skipping
+psql:supabase/schema.sql:78: NOTICE:  trigger "posts_author" for relation "public.posts" does not exist, skipping
+psql:supabase/schema.sql:80: NOTICE:  trigger "comments_author" for relation "public.comments" does not exist, skipping
+psql:supabase/schema.sql:91: NOTICE:  trigger "posts_limit" for relation "public.posts" does not exist, skipping
+psql:supabase/schema.sql:110: NOTICE:  trigger "likes_aiud" for relation "public.likes" does not exist, skipping
+psql:supabase/schema.sql:128: NOTICE:  trigger "comments_aiud" for relation "public.comments" does not exist, skipping
+psql:supabase/schema.sql:139: NOTICE:  trigger "reports_ai" for relation "public.reports" does not exist, skipping
+psql:supabase/schema.sql:150: NOTICE:  trigger "comments_limit" for relation "public.comments" does not exist, skipping
+psql:supabase/schema.sql:162: NOTICE:  trigger "likes_limit" for relation "public.likes" does not exist, skipping
+psql:supabase/schema.sql:175: NOTICE:  trigger "profiles_author_sync" for relation "public.profiles" does not exist, skipping
+psql:supabase/schema.sql:197: NOTICE:  policy "profiles_read" for relation "public.profiles" does not exist, skipping
+psql:supabase/schema.sql:199: NOTICE:  policy "profiles_upd" for relation "public.profiles" does not exist, skipping
+psql:supabase/schema.sql:202: NOTICE:  policy "posts_read" for relation "public.posts" does not exist, skipping
+psql:supabase/schema.sql:204: NOTICE:  policy "posts_ins" for relation "public.posts" does not exist, skipping
+psql:supabase/schema.sql:206: NOTICE:  policy "posts_del" for relation "public.posts" does not exist, skipping
+psql:supabase/schema.sql:209: NOTICE:  policy "likes_read" for relation "public.likes" does not exist, skipping
+psql:supabase/schema.sql:211: NOTICE:  policy "likes_ins" for relation "public.likes" does not exist, skipping
+psql:supabase/schema.sql:213: NOTICE:  policy "likes_del" for relation "public.likes" does not exist, skipping
+psql:supabase/schema.sql:216: NOTICE:  policy "comments_read" for relation "public.comments" does not exist, skipping
+psql:supabase/schema.sql:218: NOTICE:  policy "comments_ins" for relation "public.comments" does not exist, skipping
+psql:supabase/schema.sql:220: NOTICE:  policy "comments_del" for relation "public.comments" does not exist, skipping
+psql:supabase/schema.sql:223: NOTICE:  policy "reports_ins" for relation "public.reports" does not exist, skipping
+psql:supabase/schema.sql:226: NOTICE:  policy "notif_read" for relation "public.notifications" does not exist, skipping
+psql:supabase/schema.sql:228: NOTICE:  policy "notif_upd" for relation "public.notifications" does not exist, skipping
+psql:supabase/schema.sql:232: NOTICE:  policy "notif_del" for relation "public.notifications" does not exist, skipping
+psql:supabase/schema.sql:235: NOTICE:  policy "settings_all" for relation "public.user_settings" does not exist, skipping
+ as_user 
+---------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ delete_my_account 
+-------------------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+        result        
+----------------------
+ ALL RLS TESTS PASSED
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+                                                                                                                                                                                        ex                                                                                                                                                                                        
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "cursor": 4, "applied": 1, "ignored": 0, "records": [{"d": "dev1", "k": "meals", "r": "2026-11-01", "s": 2, "v": [{"n": "بيض"}], "x": false, "ts": 1001}, {"d": "dev2", "k": "bw", "r": "2026-11-02", "s": 3, "v": {"w": 84}, "x": false, "ts": 2000}, {"d": "dev2", "k": "bw", "r": "2026-11-01", "s": 4, "v": {"w": 83}, "x": false, "ts": 3000}]}
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+                                                                                                                                                                                  ex                                                                                                                                                                                   
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "cursor": 5, "applied": 1, "ignored": 0, "records": [{"d": "dev2", "k": "bw", "r": "2026-11-02", "s": 3, "v": {"w": 84}, "x": false, "ts": 2000}, {"d": "dev2", "k": "bw", "r": "2026-11-01", "s": 4, "v": {"w": 83}, "x": false, "ts": 3000}, {"d": "dev1", "k": "meals", "r": "2026-11-01", "s": 5, "v": null, "x": true, "ts": 4000}]}
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+                                                                                                                                                                                       ex                                                                                                                                                                                        
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "cursor": 6, "applied": 1, "ignored": 0, "records": [{"d": "dev2", "k": "bw", "r": "2026-11-02", "s": 3, "v": {"w": 84}, "x": false, "ts": 2000}, {"d": "dev2", "k": "bw", "r": "2026-11-01", "s": 4, "v": {"w": 83}, "x": false, "ts": 3000}, {"d": "dev2", "k": "meals", "r": "2026-11-01", "s": 6, "v": [{"n": "رز"}], "x": false, "ts": 4500}]}
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+                                                                                                                                                                                                                              ex                                                                                                                                                                                                                               
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "cursor": 7, "applied": 1, "ignored": 0, "records": [{"d": "dev2", "k": "bw", "r": "2026-11-02", "s": 3, "v": {"w": 84}, "x": false, "ts": 2000}, {"d": "dev2", "k": "bw", "r": "2026-11-01", "s": 4, "v": {"w": 83}, "x": false, "ts": 3000}, {"d": "dev2", "k": "meals", "r": "2026-11-01", "s": 6, "v": [{"n": "رز"}], "x": false, "ts": 4500}, {"d": "dev1", "k": "x1", "r": "a", "s": 7, "v": null, "x": true, "ts": 5000}]}
+(1 row)
+
+                                                                                                                                                                                                                                 ex                                                                                                                                                                                                                                 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "cursor": 8, "applied": 1, "ignored": 0, "records": [{"d": "dev2", "k": "bw", "r": "2026-11-02", "s": 3, "v": {"w": 84}, "x": false, "ts": 2000}, {"d": "dev2", "k": "bw", "r": "2026-11-01", "s": 4, "v": {"w": 83}, "x": false, "ts": 3000}, {"d": "dev2", "k": "meals", "r": "2026-11-01", "s": 6, "v": [{"n": "رز"}], "x": false, "ts": 4500}, {"d": "dev1", "k": "x1", "r": "a", "s": 8, "v": {"a": 1}, "x": false, "ts": 5000}]}
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+                                                                                                                                                                                                                                 ex                                                                                                                                                                                                                                 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "cursor": 9, "applied": 1, "ignored": 0, "records": [{"d": "dev2", "k": "bw", "r": "2026-11-01", "s": 4, "v": {"w": 83}, "x": false, "ts": 3000}, {"d": "dev2", "k": "meals", "r": "2026-11-01", "s": 6, "v": [{"n": "رز"}], "x": false, "ts": 4500}, {"d": "dev1", "k": "x1", "r": "a", "s": 8, "v": {"a": 1}, "x": false, "ts": 5000}, {"d": "dev2", "k": "bw", "r": "2026-11-02", "s": 9, "v": {"w": 80}, "x": false, "ts": 9000}]}
+(1 row)
+
+                                                                                                                                                                                                                                 ex                                                                                                                                                                                                                                 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "cursor": 9, "applied": 0, "ignored": 1, "records": [{"d": "dev2", "k": "bw", "r": "2026-11-01", "s": 4, "v": {"w": 83}, "x": false, "ts": 3000}, {"d": "dev2", "k": "meals", "r": "2026-11-01", "s": 6, "v": [{"n": "رز"}], "x": false, "ts": 4500}, {"d": "dev1", "k": "x1", "r": "a", "s": 8, "v": {"a": 1}, "x": false, "ts": 5000}, {"d": "dev2", "k": "bw", "r": "2026-11-02", "s": 9, "v": {"w": 80}, "x": false, "ts": 9000}]}
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+                                                                                     ex                                                                                     
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "cursor": 1, "applied": 1, "ignored": 0, "records": [{"d": "b1", "k": "bw", "r": "2026-11-01", "s": 1, "v": {"w": 70}, "x": false, "ts": 10}]}
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ delete_my_account 
+-------------------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+         result          
+-------------------------
+ ALL P1 SQL TESTS PASSED
+(1 row)
+
+              set_config              
+--------------------------------------
+ 00000000-0000-0000-0000-0000000000f1
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+              set_config              
+--------------------------------------
+ 00000000-0000-0000-0000-0000000000f1
+(1 row)
+
+ delete_my_account 
+-------------------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+        result        
+----------------------
+ ROLLBACK TEST PASSED
+(1 row)
+

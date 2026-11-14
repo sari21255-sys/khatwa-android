@@ -1,0 +1,6 @@
+PASS quota user cap under 40 parallel requests (5)
+PASS global cap under 60 parallel requests (7)
+PASS all 25 distinct records stored (25)
+PASS shared record: newest ts wins (24) (24)
+PASS seq values unique (t)
+PASS meta seq equals highest seq (t)
