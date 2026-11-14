@@ -7,9 +7,9 @@ const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..'),WWW=R
 const results=[];const rec=(id,name,ok,ev)=>{results.push({id,name,result:ok?'PASS':'FAIL',evidence:ev});console.log((ok?'PASS ':'FAIL ')+id+' '+name+(ok?'':' — '+ev))};
 const sb=await startMock(8791);
 // وسيط قديم (وضع الانتقال) بذاكرة KV لاختبار ترحيل اللقطات القديمة
-const kvm=new Map();const KV={get:async(k,t)=>{const v=kvm.get(k);return v==null?null:(t==='json'?JSON.parse(v):v)},put:async(k,v)=>kvm.set(k,String(v)),delete:async k=>{kvm.delete(k)}};
+let failMig=false;const kvm=new Map();const KV={get:async(k,t)=>{const v=kvm.get(k);return v==null?null:(t==='json'?JSON.parse(v):v)},put:async(k,v)=>kvm.set(k,String(v)),delete:async k=>{kvm.delete(k)}};
 const wenv={STATE:KV,ANTHROPIC_API_KEY:'k',ALLOW_ORIGIN:'http://127.0.0.1:8790',AUTH_MODE:'transition'};
-const wk=http.createServer((q,res)=>{const ch=[];q.on('data',c=>ch.push(c));q.on('end',async()=>{const r=await W.fetch(new Request('http://w'+q.url,{method:q.method,headers:q.headers,body:['GET','HEAD'].includes(q.method)?undefined:Buffer.concat(ch)}),wenv);const h={};r.headers.forEach((v,k)=>h[k]=v);res.writeHead(r.status,h);res.end(Buffer.from(await r.arrayBuffer()))})}).listen(8792);
+const wk=http.createServer((q,res)=>{const ch=[];q.on('data',c=>ch.push(c));q.on('end',async()=>{if(failMig&&q.method==='POST'&&q.url.endsWith('/api/migrated')){res.writeHead(500);return res.end('x')}const r=await W.fetch(new Request('http://w'+q.url,{method:q.method,headers:q.headers,body:['GET','HEAD'].includes(q.method)?undefined:Buffer.concat(ch)}),wenv);const h={};r.headers.forEach((v,k)=>h[k]=v);res.writeHead(r.status,h);res.end(Buffer.from(await r.arrayBuffer()))})}).listen(8792);
 const MIME={'.html':'text/html; charset=utf-8','.js':'text/javascript','.json':'application/json','.webmanifest':'application/manifest+json','.png':'image/png','.svg':'image/svg+xml'};
 const st=http.createServer((q,res)=>{let f=q.url.split('?')[0];if(f==='/')f='/index.html';
  if(f==='/config.js'){res.writeHead(200,{'content-type':'text/javascript'});return res.end(`window.APP_CONFIG={${cfgMode==='full'?'sbUrl:"http://127.0.0.1:8791",sbKey:"anon",':''}syncUrl:"http://127.0.0.1:8792/api/state",aiUrl:"http://127.0.0.1:8792/api/ai"};`)}
@@ -91,6 +91,44 @@ try{
   await n.fill('#olem',lem);await n.fill('#olpw','legacypass123');await n.click('[data-a=lglogin]');await n.waitForFunction(()=>!!SYNC.token);
   await n.click('[data-a=rsmig]');await n.waitForFunction(()=>RSM.migrated===1,null,{timeout:8000});const v=await get(n,"S.bw['2026-09-09']");const frozen=await fetch('http://127.0.0.1:8792/api/state',{method:'PUT',headers:{Authorization:'Bearer '+tk,Origin:'http://127.0.0.1:8790'},body:JSON.stringify(st)});
   rec('MIG-04','حساب مزامنة قديم (بريد وكلمة مرور) على جهاز جديد: الدخول من الإعدادات ثم النقل يجلب بياناته ويجمّد النسخة القديمة',v===91&&frozen.status===410&&!!reg.token,JSON.stringify({v,frozen:frozen.status}));await n.ctx.close()}
+ /* ---- F1: البيانات المرحّلة تصل السحابة فعلًا (جهاز 1 يرحّل، جهاز 2 فارغ يستقبل) ---- */
+ {const LT='http://127.0.0.1:8792',O={Origin:'http://127.0.0.1:8790'};
+  const mkLegacy=async(tag)=>{const o2=await fetch(LT+'/api/register',{method:'POST',headers:{'content-type':'application/json',...O,'CF-Connecting-IP':'7.7.'+(Date.now()%200)+'.'+Math.floor(Math.random()*200)},body:JSON.stringify({email:email('f1'+tag),password:'legacypass123'})});const tk=(await o2.json()).token;
+   const st=await d1.evaluate(()=>JSON.parse(JSON.stringify(S)));st.ts=Date.now()-86400000;st.bw={'2026-08-01':71,'2026-08-02':72};st.meals={'2026-08-01':[{n:'قديمة',kcal:9}]};st.lib=[{id:'f1_lib',n:'قديمة',kcal:1,p:1,c:1,f:1}];
+   await fetch(LT+'/api/state',{method:'PUT',headers:{Authorization:'Bearer '+tk,...O},body:JSON.stringify(st)});return tk};
+  const cnt=u=>Number(dbq(`select count(*) from public.sync_records where user_id='${u}'`));
+  const tk=await mkLegacy('a');const em=email('f1u');
+  const m1=await device();await m1.evaluate(SEED);await m1.evaluate(t=>{SYNC.token=t;localStorage.setItem('fit_sync',t)},tk);await up(m1,em);const u1=await uidOf(m1);
+  await edit(m1,"S.bw['2026-08-02']=69");  // تعديل محلي أحدث من اللقطة
+  // (أ) استيراد ثم انقطاع الشبكة: لا تأكيد، المرحلة محفوظة، السجلات معلّقة
+  await m1.evaluate(()=>rsLegacyImport());const pend0=await get(m1,"Object.values(RSM.rec).filter(e=>e.p).length");
+  await m1.route('**/127.0.0.1:8791/**',r=>r.abort());const off=await m1.evaluate(()=>ACT.rsmig());const stOff=await get(m1,"({stage:RSM.mig&&RSM.mig.stage,mig:RSM.migrated||0,p:Object.values(RSM.rec).filter(e=>e.p).length,msg:UI.msg})");const srvOff=cnt(u1);
+  rec('F1-01','بعد الاستيراد وانقطاع الشبكة: لا يُعلَن اكتمال، تبقى المرحلة «imported» والسجلات معلّقة، ولا شيء على الخادم',stOff.stage==='imported'&&!stOff.mig&&stOff.p>=pend0&&pend0>3&&srvOff===0&&/رفع/.test(stOff.msg),JSON.stringify({pend0,stOff,srvOff}));
+  // (ب) إعادة التحميل بلا شبكة: الحالة تبقى
+  await m1.reload();await m1.waitForFunction(()=>typeof RSM!=='undefined');const afterReload=await get(m1,"({stage:RSM.mig&&RSM.mig.stage,p:Object.values(RSM.rec).filter(e=>e.p).length,bw:S.bw['2026-08-01']})");
+  rec('F1-02','إعادة التحميل تحفظ مرحلة الترحيل والسجلات المعلّقة والبيانات المحلية',afterReload.stage==='imported'&&afterReload.p>=pend0&&afterReload.bw===71,JSON.stringify(afterReload));
+  // (ج) عودة الشبكة + رفض التجميد: الرفع يتم لكن الاكتمال لا يُعلَن
+  await m1.unroute('**/127.0.0.1:8791/**');failMig=true;await m1.evaluate(()=>ACT.rsmig());
+  const stFz=await get(m1,"({stage:RSM.mig&&RSM.mig.stage,mig:RSM.migrated||0,p:Object.values(RSM.rec).filter(e=>e.p).length,msg:UI.msg})");const srvFz=cnt(u1);
+  rec('F1-03','رفض طلب التجميد: البيانات على الخادم، المرحلة «uploaded»، لا اكتمال، والرسالة تذكر المرحلة',stFz.stage==='uploaded'&&!stFz.mig&&stFz.p===0&&srvFz>=pend0&&/تجميد/.test(stFz.msg),JSON.stringify({stFz,srvFz}));
+  // (د) جهاز 2 فارغ على الحساب نفسه يستقبل المرحَّل ويبقى التعديل الأحدث (قبل التجميد)
+  const m2=await device();await login(m2,em);await sync(m2);
+  const d2s=await get(m2,"({a:S.bw['2026-08-01'],b:S.bw['2026-08-02'],meal:(S.meals['2026-08-01']||[]).length,lib:S.lib.filter(x=>x.id==='f1_lib').length})");
+  rec('F1-04','جهاز ثانٍ بسجل محلي فارغ على الحساب نفسه يستقبل السجلات المرحّلة ويبقى التعديل الأحدث (69 لا 72)',d2s.a===71&&d2s.b===69&&d2s.meal===1&&d2s.lib===1,JSON.stringify(d2s));
+  // (هـ) إعادة المحاولة بعد زوال الرفض تكمل التجميد دون تكرار سجلات
+  failMig=false;const before=cnt(u1);await m1.evaluate(()=>ACT.rsmig());const fin=await get(m1,"({stage:RSM.mig&&RSM.mig.stage,mig:RSM.migrated||0,msg:UI.msg})");
+  const fr=await fetch(LT+'/api/state',{method:'PUT',headers:{Authorization:'Bearer '+tk,...O},body:'{}'});
+  rec('F1-05','إعادة المحاولة بعد الرفض تكمل التجميد: المرحلة «frozen» والنسخة القديمة 410، وعدد السجلات على الخادم لم يتغير',fin.stage==='frozen'&&fin.mig===1&&fr.status===410&&cnt(u1)===before,JSON.stringify({fin,fr:fr.status,before,after:cnt(u1)}));
+  // (و) تكرار الترحيل بعد الاكتمال لا يغيّر شيئًا
+  const s1=await get(m1,"JSON.stringify([Object.entries(S.bw).sort(),S.meals,S.lib.length])"),c1=cnt(u1);await m1.evaluate(()=>ACT.rsmig());await sync(m1);await sync(m2);
+  const s2=await get(m1,"JSON.stringify([Object.entries(S.bw).sort(),S.meals,S.lib.length])"),s3=await get(m2,"JSON.stringify([Object.entries(S.bw).sort(),S.meals,S.lib.length])");
+  rec('F1-06','تكرار الترحيل بعد الاكتمال لا يضاعف ولا يغيّر: لا تغيير محليًا ولا على الخادم ولا على الجهاز الثاني',s1===s2&&s2===s3&&cnt(u1)===c1,JSON.stringify({c1,c2:cnt(u1),s1:s1.slice(0,150),s2:s2.slice(0,150),s3:s3.slice(0,150)}));
+  // (ز) تعديل أحدث على الخادم من جهاز آخر قبل رفع المرحَّل: يبقى الأحدث
+  const tk2=await mkLegacy('b'),em2=email('f1v');const n1=await device();await n1.evaluate(SEED);await up(n1,em2);await n1.evaluate(t=>{SYNC.token=t},tk2);
+  const n2=await device();await login(n2,em2);await sync(n2);await edit(n2,"S.bw['2026-08-01']=55");await sync(n2);  // الخادم فيه 55 أحدث من اللقطة
+  await n1.evaluate(()=>ACT.rsmig());const g1=await get(n1,"S.bw['2026-08-01']");await sync(n2);const g2=await get(n2,"S.bw['2026-08-01']");
+  rec('F1-07','سجل أحدث موجود على الخادم يغلب المرحَّل: الجهازان ينتهيان على 55 والترحيل يكتمل',g1===55&&g2===55&&(await get(n1,"RSM.migrated"))===1,JSON.stringify({g1,g2}));
+  for(const x of [m1,m2,n1,n2])await x.ctx.close()}
  /* ---- حذف نسخة المزامنة: جهاز قديم لا يعيد رفعها ---- */
  {const uid=await uidOf(d1);const before=dbq(`select count(*) from public.sync_records where user_id='${uid}'`);
   await d1.evaluate(()=>ACT.rsdel());const after=dbq(`select count(*) from public.sync_records where user_id='${uid}'`),pausedD1=await get(d1,"RS.pause");
