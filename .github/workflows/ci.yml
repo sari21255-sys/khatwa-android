@@ -57,6 +57,16 @@ jobs:
         with: { python-version: '3.12' }
       - name: Generated files match the committed ones
         run: python tools/build.py --check
+      - name: Diagnostics on failure (annotations only)
+        if: failure()
+        shell: python
+        run: |
+          import subprocess,sys,tempfile,os,hashlib
+          for f in ['app/fitness-tracker.html','app/head.html','www/index.html','pwa/index.html','pwa/_headers','tools/build.sha256']:
+              b=open(f,'rb').read()
+              print('::error::'+f+' bytes='+str(len(b))+' CR='+str(b.count(b'\r'))+' sha='+hashlib.sha256(b).hexdigest()[:16])
+          r=subprocess.run([sys.executable,'tools/build.py','--check'],capture_output=True)
+          print('::error::rc='+str(r.returncode)+' out='+r.stdout.decode('utf-8','replace').replace('\n',' | ')[:500]+' err='+r.stderr.decode('utf-8','replace').replace('\n',' | ')[-500:])
       - name: No CR in generated files, and SHA-256 equals tools/build.sha256 (same bytes on every OS)
         shell: python
         run: |

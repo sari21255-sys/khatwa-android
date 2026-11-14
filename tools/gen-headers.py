@@ -4,6 +4,8 @@
 - يقرأ pwa/config.js ويضيف أصول (origins) aiUrl وsyncUrl وsbUrl إلى connect-src.
 يُشغَّل بعد كل تعديل على index.html/install.html/privacy.html/config.js:  python3 tools/gen-headers.py pwa"""
 import base64,hashlib,re,sys,glob,os
+try: sys.stdout.reconfigure(encoding='utf-8',errors='replace'); sys.stderr.reconfigure(encoding='utf-8',errors='replace')
+except Exception: pass
 from urllib.parse import urlparse
 d=sys.argv[1] if len(sys.argv)>1 else 'pwa'
 hashes=[]
