@@ -51,6 +51,9 @@ select pg_temp.must_fail($$select public.sync_exchange(1,0,'[{"k":"Bad Kind","r"
 select pg_temp.must_fail($$select public.sync_exchange(1,0,'{"a":1}')$$,'not array');
 select pg_temp.must_fail($$select public.sync_exchange(1,0,'[{"k":"a","r":"a","ts":1,"d":"d"}]')$$,'upsert without data');
 
+select pg_temp.must_fail($$select public.sync_exchange(1,0,'[{"k":"bw","r":"future","v":1,"ts":99999999999999,"d":"d"}]')$$,'future timestamp rejected');
+select pg_temp.must_fail($$select public.sync_exchange(1,0,'[{"k":"bw","r":"neg","v":1,"ts":-5,"d":"d"}]')$$,'negative timestamp rejected');
+
 -- عزل المستخدمين
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000b1','11111111-1111-1111-1111-1111111111b1');
 select pg_temp.eq(jsonb_array_length((pg_temp.ex(null,0,'[]'))->'records'),0,'B sees nothing of A');

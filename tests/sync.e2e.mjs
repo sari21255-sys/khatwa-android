@@ -107,6 +107,16 @@ try{
  {const e6=email('q'),e7=email('r');const x=await device();await x.evaluate(SEED);await up(x,e6);await edit(x,"S.bw['2026-11-13']=77");await sync(x);
   await x.evaluate(async e=>{await SB.out();await SB.up(e,'password123','t')},e7);const r=await sync(x);const acct=await get(x,"RS.acct"),u2=await uidOf(x),rows=dbq(`select count(*) from public.sync_records where user_id='${u2}'`);
   rec('ACC-01','تسجيل دخول حساب آخر على جهاز فيه بيانات حساب سابق: لا رفع تلقائي ولا خلط، ويُطلب قرار المستخدم',r==='acct'&&acct===1&&rows==='0',JSON.stringify({r,acct,rows}));await x.ctx.close()}
+ /* ---- سكون: بلا تعديلات لا ترسل المزامنة شيئًا (لا تذبذب بين الأجهزة) ---- */
+ {await sync(d1);await sync(d2);await sync(d1);await sync(d2);const uid=await uidOf(d2);const s0=dbq(`select seq from public.sync_meta where user_id='${uid}'`);
+  for(let i=0;i<3;i++){await sync(d1);await sync(d2)}const s1=dbq(`select seq from public.sync_meta where user_id='${uid}'`),p1=await get(d1,"rsPend()"),p2=await get(d2,"rsPend()");
+  rec('RS-10','بلا تعديلات جديدة: لا سجلات معلّقة ولا كتابات على الخادم عبر مزامنات متكررة من الجهازين',s0===s1&&p1===0&&p2===0,JSON.stringify({s0,s1,p1,p2}))}
+ /* ---- انقطاع الشبكة عند انتهاء الرمز لا يُخرج المستخدم ---- */
+ {const x=await device();await x.evaluate(SEED);await up(x,email('o'));await sync(x);await x.evaluate(()=>{SB.ses.expires_at=Math.floor(Date.now()/1000)-5});await x.ctx.route('**/auth/v1/**',r=>r.abort());await edit(x,"S.bw['2026-11-21']=55");const r=await sync(x);const ses=await get(x,"!!SB.ses"),err=await get(x,"RS.err");await x.ctx.unroute('**/auth/v1/**');const r2=await sync(x);
+  rec('SES-03','انقطاع الشبكة وقت تجديد الرمز: تبقى الجلسة (لا تسجيل خروج)، وتنجح المزامنة لاحقًا',r==='err'&&ses===true&&err==='net'&&r2==='ok',JSON.stringify({r,ses,err,r2}));await x.ctx.close()}
+ /* ---- ساعة متقدمة جدًا ترفضها المزامنة بوضوح ---- */
+ {const x=await device();await x.evaluate(SEED);await up(x,email('c'));await sync(x);await x.evaluate(()=>{const o=Date.now;Date.now=()=>o()+3*864e5});await edit(x,"S.bw['2026-11-22']=54");const r=await sync(x);const err=await get(x,"RS.err");
+  rec('CLK-01','ساعة جهاز متقدمة بأيام: يرفضها الخادم (لا تفوز بكل التعارضات) وتظهر رسالة واضحة والبيانات محلية سليمة',r==='err'&&err==='clock'&&(await get(x,"S.bw['2026-11-22']"))===54,JSON.stringify({r,err}));await x.ctx.close()}
  /* ---- واجهة الحذف والمسح: التأكيد المزدوج، والمسح المحلي مستقل عن السحابة ---- */
  {const e8=email('u');const w=await device();await w.evaluate(SEED);await up(w,e8);await edit(w,"S.bw['2026-11-15']=58");await sync(w);const uid=await uidOf(w);
   await w.evaluate(()=>{S.tab='me';S.sub='set';render()});const html=await w.evaluate(()=>document.body.innerText);

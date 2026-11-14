@@ -1058,7 +1058,7 @@ function rsChanges(cur){const ch=[];for(const key in RSM.rec){const e=RSM.rec[ke
 /* قاعدة الفوز مطابقة لـSQL: (ts الأعلى) ثم التعديل يغلب الحذف ثم dev الأكبر */
 const rsWins=(ts,x,d,ts2,x2,d2)=>ts!==ts2?ts>ts2:x!==x2?!x:d>d2;
 function rsPut(r){const k=r.k,v=r.v;
- if(k==='cfg'){const n=(v&&v.e!=null)?String(v.e):r.r;if(RSB.indexOf(n)>=0)return null;if(r.x){delete S[n];return 0}S[n]=cleanData(v&&v.v);return S[n]===undefined?0:S[n]}
+ if(k==='cfg'){const n=(v&&v.e!=null)?String(v.e):r.r;if(RSB.indexOf(n)>=0||RSX[n])return null;if(r.x){delete S[n];return 0}S[n]=cleanData(v&&v.v);return S[n]===undefined?0:S[n]}
  if(!RSK.test(k)||RSX[k])return null;
  if(r.x){const c=S[k],id=r.r;if(Array.isArray(c)){const i=c.findIndex(x=>x&&rsRid(String(x.id))===id);if(i>=0)c.splice(i,1)}else if(c&&typeof c==='object'){const e=Object.keys(c).find(n=>rsRid(n)===id);if(e!==undefined)delete c[e]}return 0}
  if(!v||typeof v!=='object')return null;const e=String(v.e),val=cleanData(v.v);if(RSB.indexOf(e)>=0)return null;
@@ -1073,10 +1073,10 @@ function rsApply(recs){let n=0;
   RSM.rec[key]={h:x?0:rsH(JSON.stringify(val)),t:+r.ts,x:x?1:0};n++}
  if(n){try{norm();localStorage.setItem('fit1',JSON.stringify(S))}catch(e){lg(e)}}
  return n}
-async function rsCall(body){if(!(await SB.fresh()))throw{code:'auth'};
+async function rsCall(body){if(!(await SB.fresh()))throw{code:SB.ses?'net':'auth'};
  const r=await fetch(CFG.sbUrl+'/rest/v1/rpc/sync_exchange',{method:'POST',headers:SB.hd(1),body:JSON.stringify(body)});
  if(r.status===401||r.status===403)throw{code:'auth'};
- if(!r.ok){let m='';try{m=(await r.json()).message||''}catch(e){lg(e)}if(/session revoked|not signed in/.test(m))throw{code:'auth'};throw{code:'http',s:r.status}}
+ if(!r.ok){let m='';try{m=(await r.json()).message||''}catch(e){lg(e)}if(/session revoked|not signed in/.test(m))throw{code:'auth'};throw{code:'http',s:r.status,m}}
  return r.json()}
 async function rsSync(){
  if(!rsOn())return 'off';if(RS.busy){RS.again=1;return 'busy'}RS.busy=1;RS.err='';let out='ok';
@@ -1092,7 +1092,7 @@ async function rsSync(){
    pulled+=rsApply(j.records||[]);RSM.cursor=j.cursor;rsSave();
    if(!j.more&&ch.length<500)break}
   RS.last=Date.now();SYNC.st='ok';if(pulled){S.ts=Date.now();render()}
- }catch(e){out='err';SYNC.st='err';RS.err=e&&e.code==='auth'?'auth':'net'}
+ }catch(e){out='err';SYNC.st='err';RS.err=e&&e.code==='auth'?'auth':(e&&/bad_ts/.test(e.m||''))?'clock':'net'}
  finally{RS.busy=0;if(RS.again){RS.again=0;setTimeout(rsSync,300)}}
  return out}
 const rsSoon=ms=>{if(!rsOn())return;clearTimeout(RST);RST=setTimeout(rsSync,ms||1500)};
@@ -4111,7 +4111,7 @@ function rsCard(){
  let h='<div class="card"><h2>'+ic('watch')+'المزامنة السحابية والبيانات</h2>';
  if(!SB.ses){h+='<div class="mu" style="margin-bottom:8px">سجّل الدخول بحسابك لتتزامن بياناتك بين أجهزتك، والمساعد الذكي يعمل بالحساب نفسه. بدون حساب تبقى بياناتك على هذا الجهاز فقط.</div><button class="btn sm" data-a="sub" data-v="comm">تسجيل الدخول</button>'}
  else{
-  const pend=rsPend(),st=RS.pause?'متوقفة على هذا الجهاز':RS.err==='auth'?'انتهت الجلسة، سجّل الدخول من جديد':RS.err==='net'?'تعذّر الاتصال، التعديلات محفوظة وستُرسل لاحقًا':RS.last?'آخر مزامنة '+ago(RS.last):'لم تتم مزامنة بعد';
+  const pend=rsPend(),st=RS.pause?'متوقفة على هذا الجهاز':RS.err==='auth'?'انتهت الجلسة، سجّل الدخول من جديد':RS.err==='clock'?'ساعة جهازك غير مضبوطة (متقدمة كثيرًا). صحّح التاريخ والوقت ثم أعد المحاولة':RS.err==='net'?'تعذّر الاتصال، التعديلات محفوظة وستُرسل لاحقًا':RS.last?'آخر مزامنة '+ago(RS.last):'لم تتم مزامنة بعد';
   h+='<div class="mu">الحساب: <b dir="ltr">'+esc(SB.email())+'</b></div><div class="tag'+(RS.err||RS.pause?' bad':'')+'" style="margin:8px 0">'+esc(st)+(pend?' · '+pend+' تعديل بانتظار الإرسال':'')+'</div>';
   if(RS.acct)h+='<div class="mu" style="margin-bottom:8px">هذا الجهاز يحوي بيانات حساب آخر. لن تُرفع إلى هذا الحساب دون موافقتك.</div><div class="row"><button class="btn sm" data-a="rsacctup">ارفع بيانات هذا الجهاز إلى هذا الحساب</button><button class="btn sm ghost" data-a="rsacctwipe">امسح هذا الجهاز وحمّل بيانات الحساب</button></div>';
   else if(RS.reset)h+='<div class="mu" style="margin-bottom:8px">حُذفت النسخة السحابية من جهاز آخر. بيانات هذا الجهاز لم تُمس ولم تُرفع.</div><div class="row"><button class="btn sm" data-a="rsadopt">ارفع بيانات هذا الجهاز كنسخة جديدة</button><button class="btn sm ghost" data-a="rskeep">أبقِها على هذا الجهاز فقط</button></div>';
@@ -4257,7 +4257,7 @@ const SB={
  hd(a){return{apikey:CFG.sbKey,'Content-Type':'application/json',Authorization:'Bearer '+((a&&this.ses)?this.ses.access_token:CFG.sbKey)}},
  async raw(p,o){const r=await fetch(CFG.sbUrl+p,o);let j=null;try{j=await r.json()}catch(e){lg(e)}if(!r.ok)throw new Error((j&&(j.msg||j.message||j.error_description||j.error))||('HTTP '+r.status));return j},
  set(j){if(j&&j.access_token)this.ses={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(j.expires_in||3600),user:j.user||(this.ses&&this.ses.user)};else this.ses=null;try{this.ses?localStorage.setItem('fit_sb',JSON.stringify(this.ses)):localStorage.removeItem('fit_sb')}catch(e){lg(e)}},
- async fresh(){if(!this.ses)return false;if(this.ses.expires_at*1000-Date.now()>6e4)return true;try{this.set(await this.raw('/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:this.hd(),body:JSON.stringify({refresh_token:this.ses.refresh_token})}));return true}catch(e){this.set(null);return false}},
+ async fresh(){if(!this.ses)return false;if(this.ses.expires_at*1000-Date.now()>6e4)return true;try{this.set(await this.raw('/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:this.hd(),body:JSON.stringify({refresh_token:this.ses.refresh_token})}));return true}catch(e){if(!(e instanceof TypeError))this.set(null);return false}},
  async up(e,p,n){const j=await this.raw('/auth/v1/signup',{method:'POST',headers:this.hd(),body:JSON.stringify({email:e,password:p,data:{display_name:n}})});if(j&&j.access_token)this.set(j);return j},
  async in(e,p){this.set(await this.raw('/auth/v1/token?grant_type=password',{method:'POST',headers:this.hd(),body:JSON.stringify({email:e,password:p})}))},
  async out(){try{await this.raw('/auth/v1/logout',{method:'POST',headers:this.hd(1)})}catch(e){lg(e)}this.set(null)},
