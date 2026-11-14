@@ -19,7 +19,8 @@ const SEED=`S.prof.ob=1;S.prof.name='اختبار';S.prof.sex='m';S.prof.age=30;
 async function device(){const c=await b.newContext({viewport:{width:390,height:844}});const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));await p.goto(A+'/');await p.waitForFunction(()=>typeof S!=='undefined'&&typeof rsSync==='function');p.errs=errs;p.ctx=c;return p}
 const email=n=>`u${Date.now()}${n}@test.invalid`;
 const edit=async(p,js)=>{await p.evaluate(js+';save();0');await p.waitForTimeout(300)};
-const sync=p=>p.evaluate(()=>rsSync());
+/* ينتظر انتهاء أي مزامنة جارية (مثل مزامنة الإقلاع بعد إعادة التحميل) قبل أن يشغّل مزامنته، وإلا ردّ rsSync بـ«busy» دون عمل */
+const sync=p=>p.evaluate(async()=>{const idle=async()=>{for(let i=0;i<100&&RS.busy;i++)await new Promise(r=>setTimeout(r,100))};await idle();const o=await rsSync();await idle();return o});
 const get=(p,expr)=>p.evaluate(expr);
 const up=(p,e)=>p.evaluate(e=>SB.up(e,'password123','t').then(()=>1),e);
 const login=(p,e)=>p.evaluate(e=>SB.in(e,'password123').then(()=>1),e);
@@ -94,34 +95,31 @@ try{
  /* ---- F-TIE: تعادل التوقيت والحذف بين جهازين: الطرفان يحسمان بالقاعدة نفسها (الجهاز الأكبر يفوز) ---- */
  {const em=email('tie');const X=await device();await X.evaluate(SEED);await up(X,em);await sync(X);const u=await uidOf(X);const Y=await device();await login(Y,em);await sync(Y);
   const dx=await get(X,'RSM.dev'),dy=await get(Y,'RSM.dev'),xWins=dx>dy,[W1,L1]=xWins?[X,Y]:[Y,X];
-  const T=Date.now();for(const p of[X,Y])await p.clock.setFixedTime(T);
+  const T0=Date.now()+30000;let tn=0;const tie=async k=>{const v=T0+(++tn)*10000;for(const p of[X,Y])await p.evaluate(([k,v])=>{const e=RSM.rec['bw\u0001'+k];e.t=v;RSLT=Math.max(RSLT,v);rsSave()},[k,v])};
   const srv=k=>dbq(`select data->>'v' from public.sync_records where user_id='${u}' and kind='bw' and rid='${k}'`);
   const pend=p=>get(p,"Object.values(RSM.rec).filter(e=>e.p).length");
   const loc=(p,k)=>get(p,`S.bw['${k}']`);
   const state=async k=>({x:await loc(X,k),y:await loc(Y,k),s:Number(await srv(k)),px:await pend(X),py:await pend(Y)});
   const same=(st,v)=>st.x===v&&st.y===v&&st.s===v&&st.px===0&&st.py===0;
   // أ) X يصل الخادم أولًا ثم Y
-  await edit(X,"S.bw['2026-09-10']=61");await edit(Y,"S.bw['2026-09-10']=62");const tsx=await get(X,"RSM.rec['bw\\u00012026-09-10'].t"),tsy=await get(Y,"RSM.rec['bw\\u00012026-09-10'].t");
+  await edit(X,"S.bw['2026-09-10']=61");await edit(Y,"S.bw['2026-09-10']=62");await tie('2026-09-10');const tsx=await get(X,"RSM.rec['bw\\u00012026-09-10'].t"),tsy=await get(Y,"RSM.rec['bw\\u00012026-09-10'].t");
   await sync(X);await sync(Y);await sync(X);const v1=xWins?61:62,a=await state('2026-09-10');
   rec('TIE-01','توقيتان متطابقان لقيمتين مختلفتين (X ثم Y): الجهازان والخادم على قيمة الجهاز الأكبر ولا انتظار باقٍ',tsx===tsy&&same(a,v1),JSON.stringify({tsx,tsy,xWins,a}));
   // ب) عكس ترتيب وصول الطلبين
-  await edit(X,"S.bw['2026-09-11']=71");await edit(Y,"S.bw['2026-09-11']=72");await sync(Y);await sync(X);await sync(Y);const v2=xWins?71:72,b=await state('2026-09-11');
-  rec('TIE-02','عكس ترتيب وصول الطلبين (Y ثم X): النتيجة نفسها (قيمة الجهاز الأكبر) على الجهازين والخادم',same(b,v2),JSON.stringify({xWins,b}));
+  await edit(X,"S.bw['2026-09-11']=71");await edit(Y,"S.bw['2026-09-11']=72");await tie('2026-09-11');const t2x=await get(X,"RSM.rec['bw\\u00012026-09-11'].t"),t2y=await get(Y,"RSM.rec['bw\\u00012026-09-11'].t");await sync(Y);await sync(X);await sync(Y);const v2=xWins?71:72,b=await state('2026-09-11');
+  rec('TIE-02','عكس ترتيب وصول الطلبين (Y ثم X): النتيجة نفسها (قيمة الجهاز الأكبر) على الجهازين والخادم',same(b,v2),JSON.stringify({xWins,dx,dy,t2x,t2y,b}));
   // ج) إعادة التحميل ثم المزامنة: لا يتغير شيء ولا ينتظر شيء
   for(const p of[X,Y]){await p.reload();await p.waitForFunction(()=>typeof RSM!=='undefined');await p.waitForTimeout(800)}await sync(X);await sync(Y);
   const c1=await state('2026-09-10'),c2=await state('2026-09-11');
   rec('TIE-03','بعد إعادة تحميل الجهازين ومزامنة جديدة: القيم والانتظار كما هي',same(c1,v1)&&same(c2,v2),JSON.stringify({c1,c2}));
   // د) ضياع الرد: الخاسر يرسل أولًا بعد وصول الفائز، يضيع ردّ الخادم، ثم يعيد
-  const Tn=Date.now();for(const p of[X,Y])await p.clock.setFixedTime(Tn);
-  await edit(X,"S.bw['2026-09-12']=81");await edit(Y,"S.bw['2026-09-12']=82");await sync(W1);
+  await edit(X,"S.bw['2026-09-12']=81");await edit(Y,"S.bw['2026-09-12']=82");await tie('2026-09-12');await sync(W1);
   await L1.route('**/rest/v1/rpc/sync_exchange',async r=>{await r.fetch();await r.abort()});const lostRes=await sync(L1);await L1.unroute('**/rest/v1/rpc/sync_exchange');
   const mid=await pend(L1);await sync(L1);await sync(W1);const v3=xWins?81:82,d=await state('2026-09-12');
   rec('TIE-04','ضياع ردّ الخادم عند الجهاز الخاسر ثم إعادة الإرسال: يستقر الجهازان والخادم على الفائز ويُسوّى الانتظار',same(d,v3),JSON.stringify({lostRes,mid,d}));
   // هـ) حذف مقابل تعديل بالتوقيت نفسه: التعديل يغلب الحذف على الجهازين والخادم
-  const Tm=Date.now();for(const p of[X,Y])await p.clock.setFixedTime(Tm);
   await edit(X,"S.bw['2026-09-13']=91");await sync(X);await sync(Y);
-  const Tz=Date.now();for(const p of[X,Y])await p.clock.setFixedTime(Tz);
-  await edit(X,"S.bw['2026-09-13']=92");await edit(Y,"delete S.bw['2026-09-13']");
+  await edit(X,"S.bw['2026-09-13']=92");await edit(Y,"delete S.bw['2026-09-13']");await tie('2026-09-13');
   const tx2=await get(X,"RSM.rec['bw\\u00012026-09-13'].t"),ty2=await get(Y,"RSM.rec['bw\\u00012026-09-13'].t");
   await sync(Y);await sync(X);await sync(Y);const e1=await state('2026-09-13');
   rec('TIE-05','تعديل وحذف بالتوقيت نفسه: التعديل يغلب في الجهازين والخادم',tx2===ty2&&e1.x===92&&e1.y===92&&e1.s===92&&e1.px===0&&e1.py===0,JSON.stringify({tx2,ty2,e1}));

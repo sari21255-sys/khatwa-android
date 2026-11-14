@@ -142,6 +142,16 @@ update public.quota_settings set user_max=100,global_max=500 where bucket='ai';
 set role authenticated;
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1','11111111-1111-1111-1111-1111111111a1');
 
+-- تعادل التوقيت: يفوز dev الأكبر بترتيب البايتات (كما في JavaScript) أيًّا كان ترتيب الوصول وأيًّا كان ترتيب القاعدة اللغوي
+select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1','11111111-1111-1111-1111-1111111111a1');
+select (public.start_new_sync()->>'epoch')::int as ep \gset
+select public.sync_exchange(:ep,0,'[{"k":"bw","r":"tie1","v":{"w":1},"ts":777,"d":"Bdev"}]');
+select pg_temp.eq((public.sync_exchange(:ep,0,'[{"k":"bw","r":"tie1","v":{"w":2},"ts":777,"d":"aDev"}]')->>'applied')::int,1,'aDev (byte order greater than Bdev) wins the tie');
+select public.sync_exchange(:ep,0,'[{"k":"bw","r":"tie2","v":{"w":2},"ts":777,"d":"aDev"}]');
+select pg_temp.eq((public.sync_exchange(:ep,0,'[{"k":"bw","r":"tie2","v":{"w":1},"ts":777,"d":"Bdev"}]')->>'applied')::int,0,'Bdev loses the tie in the reverse arrival order');
+select pg_temp.eq((select (r->'v'->>'w') from jsonb_array_elements(public.sync_exchange(:ep,0,'[]')->'records') r where r->>'r'='tie1'),'2','tie1 holds aDev value');
+select pg_temp.eq((select (r->'v'->>'w') from jsonb_array_elements(public.sync_exchange(:ep,0,'[]')->'records') r where r->>'r'='tie2'),'2','tie2 holds aDev value');
+select pg_temp.must_fail($$select public.sync_exchange(:ep,0,'[{"k":"bw","r":"x","v":{"w":1},"ts":5,"d":"bad dev!"}]')$$,'dev must be ASCII id');
 -- حذف الحساب: يحذف السجلات والعدادات ويمنع جهازًا قديمًا (مفتاح الكتابة يفشل بـFK)
 select public.delete_my_account();
 reset role;

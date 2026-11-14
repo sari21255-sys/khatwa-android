@@ -15,7 +15,7 @@ create table if not exists public.sync_records(
   rid text not null check (length(rid) between 1 and 120),
   data jsonb,
   ts bigint not null,
-  dev text not null check (length(dev) between 1 and 40),
+  dev text not null check (dev ~ '^[A-Za-z0-9_.-]{1,40}$'),
   del boolean not null default false,
   seq bigint not null,
   primary key(user_id,kind,rid));
@@ -63,10 +63,11 @@ begin
     if v_kind is null or v_rid is null or v_ts is null or v_dev is null then raise exception 'bad_change' using errcode='22023'; end if;
     -- ساعة جهاز متقدمة كثيرًا كانت ستفوز بكل التعارضات: نرفض (لا نقصّ حتى لا يتعارض الصدى مع ما يحفظه الجهاز)
     if v_ts<0 or v_ts>(extract(epoch from clock_timestamp())*1000)::bigint+86400000 then raise exception 'bad_ts' using errcode='22023'; end if;
-    if v_kind !~ '^[a-z0-9_]{1,40}$' or length(v_rid) not between 1 and 120 or length(v_dev) not between 1 and 40 then raise exception 'bad_change' using errcode='22023'; end if;
+    if v_kind !~ '^[a-z0-9_]{1,40}$' or length(v_rid) not between 1 and 120 or v_dev !~ '^[A-Za-z0-9_.-]{1,40}$' then raise exception 'bad_change' using errcode='22023'; end if;
     if v_del then v_data:=null; elsif v_data is null or pg_column_size(v_data)>200000 then raise exception 'bad_change' using errcode='22023'; end if;
     select * into ex from public.sync_records where user_id=uid and kind=v_kind and rid=v_rid;
-    if not found or (v_ts, not v_del, v_dev) > (ex.ts, not ex.del, ex.dev) then
+    -- dev يُقارَن بترتيب البايتات (collate "C") ليطابق مقارنة JavaScript على أي ترتيب لغوي للقاعدة (Supabase افتراضيًا en_US.UTF-8)
+    if not found or (v_ts, not v_del, v_dev collate "C") > (ex.ts, not ex.del, ex.dev collate "C") then
       m.seq:=m.seq+1;
       insert into public.sync_records(user_id,kind,rid,data,ts,dev,del,seq) values(uid,v_kind,v_rid,v_data,v_ts,v_dev,v_del,m.seq)
         on conflict(user_id,kind,rid) do update set data=excluded.data,ts=excluded.ts,dev=excluded.dev,del=excluded.del,seq=excluded.seq;
