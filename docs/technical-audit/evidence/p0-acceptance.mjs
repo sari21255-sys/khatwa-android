@@ -2,6 +2,7 @@
 // الاستعمال: NODE_PATH=$(npm root -g) node p0-acceptance.mjs      (يبني نسخة اختبار من pwa/ ويطبّق _headers كما يفعل Netlify)
 import fs from 'node:fs';import path from 'node:path';import cp from 'node:child_process';
 const ROOT=path.resolve(new URL('../../../',import.meta.url).pathname)+'/';
+const SWV=(fs.readFileSync(ROOT+'pwa/sw.js','utf8').match(/khatwa-v\d+/)||['?'])[0];   // إصدار الكاش الحالي من sw.js
 const TMP='/tmp/p0site';fs.rmSync(TMP,{recursive:true,force:true});fs.cpSync(ROOT+'pwa',TMP,{recursive:true});
 fs.writeFileSync(TMP+'/config.js','window.APP_CONFIG={aiUrl:"http://127.0.0.1:8788/api/ai",syncUrl:"http://127.0.0.1:8788/api/state",sbUrl:"",sbKey:"",supportEmail:"",storeUrl:""};\n');
 cp.execSync(`python3 ${ROOT}tools/gen-headers.py ${TMP}`,{stdio:'pipe'});
@@ -50,7 +51,7 @@ try{
  await q.goto(A+'/');await q.waitForFunction(()=>typeof S!=='undefined');await q.evaluate(seed);
  await q.waitForFunction(async()=>{const r=await navigator.serviceWorker.getRegistration();return !!(r&&r.active)},null,{timeout:15000});await q.waitForTimeout(1500);
  const pre=await q.evaluate(async()=>({keys:await caches.keys(),eq:!!(await caches.match('eq-db.js')),idx:!!(await caches.match('index.html'))}));
- rec('T10c-1','بعد التثبيت: eq-db.js وindex.html في الكاش، والكاش القديم v63 حُذف',pre.eq&&pre.idx&&pre.keys.length===1&&pre.keys[0]==='khatwa-v64',JSON.stringify(pre),'P2');
+ rec('T10c-1','بعد التثبيت: eq-db.js وindex.html في الكاش، والكاش القديم حُذف (المفتاح الوحيد هو إصدار sw.js الحالي)',pre.eq&&pre.idx&&pre.keys.length===1&&pre.keys[0]===SWV,JSON.stringify(pre),'P2');
  await q.close();await c2.setOffline(true);
  const q2=await c2.newPage();const w3=watch(q2);await q2.goto(A+'/');await q2.waitForFunction(()=>typeof S!=='undefined',null,{timeout:15000});await q2.evaluate(seed);
  const off=await q2.evaluate(async()=>{S.tab='ex';S.sub='nau';render();for(let i=0;i<60&&NAUS<2&&NAUS!==3;i++)await new Promise(r=>setTimeout(r,100));const n=NAUR.length;
@@ -59,7 +60,7 @@ try{
  rec('T10c','قاعدة الأجهزة دون اتصال بعد التثبيت: تحميل + بحث + تصفية بالعضلة + فتح تفاصيل جهاز',off.status===2&&off.machines>800&&off.searchHits>0&&off.chestHits>0&&off.detailOpens,JSON.stringify(off)+' | js_errors='+JSON.stringify(w3.err),'P2');
  await c2.setOffline(false);await q2.reload();await q2.waitForFunction(()=>typeof S!=='undefined');await q2.evaluate(seed);
  const back=await q2.evaluate(async()=>{const k=await caches.keys();const r=await fetch('eq-db.js',{cache:'no-store'});return{keys:k,status:r.status,ok:typeof S!=='undefined'}});
- rec('T10c-2','عودة الاتصال: لا تعارض كاش (مفتاح واحد v64) والتطبيق يعمل',back.keys.length===1&&back.keys[0]==='khatwa-v64'&&back.status===200&&back.ok,JSON.stringify(back)+' | js_errors='+JSON.stringify(w3.err),'P2');
+ rec('T10c-2','عودة الاتصال: لا تعارض كاش (مفتاح واحد هو إصدار sw.js الحالي) والتطبيق يعمل',back.keys.length===1&&back.keys[0]===SWV&&back.status===200&&back.ok,JSON.stringify(back)+' | js_errors='+JSON.stringify(w3.err),'P2');
  // فشل التحميل: رسالة واضحة وإعادة محاولة تعمل
  const fail=await q2.evaluate(async()=>{NAUS=3;NAUR=[];S.tab='ex';S.sub='nau';render();const msg=document.querySelector('.emp')?.textContent||'';const hasRetry=!!document.querySelector('[data-a="nauretry"]');ACT.nauretry();for(let i=0;i<60&&NAUS<2;i++)await new Promise(r=>setTimeout(r,100));return{msg:msg.slice(0,60),hasRetry,after:NAUS,machines:NAUR.length}});
  rec('T10c-3','فشل تحميل القاعدة: رسالة واضحة وزر إعادة محاولة يستعيدها',fail.hasRetry&&fail.after===2&&fail.machines>800,JSON.stringify(fail),'P3');

@@ -1,0 +1,114 @@
+[
+ {
+  "id": "T20-320",
+  "name": "لا فيض أفقي على 320px عبر 29 شاشة",
+  "result": "PASS",
+  "evidence": "لا فيض، لا أخطاء",
+  "severity": ""
+ },
+ {
+  "id": "T20-360",
+  "name": "لا فيض أفقي على 360px عبر 29 شاشة",
+  "result": "PASS",
+  "evidence": "لا فيض، لا أخطاء",
+  "severity": ""
+ },
+ {
+  "id": "T20-390",
+  "name": "لا فيض أفقي على 390px عبر 29 شاشة",
+  "result": "PASS",
+  "evidence": "لا فيض، لا أخطاء",
+  "severity": ""
+ },
+ {
+  "id": "T20-412",
+  "name": "لا فيض أفقي على 412px عبر 29 شاشة",
+  "result": "PASS",
+  "evidence": "لا فيض، لا أخطاء",
+  "severity": ""
+ },
+ {
+  "id": "T20-768",
+  "name": "لا فيض أفقي على 768px عبر 29 شاشة",
+  "result": "PASS",
+  "evidence": "لا فيض، لا أخطاء",
+  "severity": ""
+ },
+ {
+  "id": "T20-1024",
+  "name": "لا فيض أفقي على 1024px عبر 29 شاشة",
+  "result": "PASS",
+  "evidence": "لا فيض، لا أخطاء",
+  "severity": ""
+ },
+ {
+  "id": "T20-1280",
+  "name": "لا فيض أفقي على 1280px عبر 29 شاشة",
+  "result": "PASS",
+  "evidence": "لا فيض، لا أخطاء",
+  "severity": ""
+ },
+ {
+  "id": "T21a",
+  "name": "لغة واتجاه الصفحة والـviewport",
+  "result": "PASS",
+  "evidence": "{\"lang\":\"ar\",\"dir\":\"rtl\",\"vp\":\"width=device-width,initial-scale=1,viewport-fit=cover\",\"zoomBlocked\":false}",
+  "severity": ""
+ },
+ {
+  "id": "T21b",
+  "name": "أزرار بلا اسم قابل للقراءة",
+  "result": "PASS",
+  "evidence": "0 من 216 (تراكمية عبر 7 تبويبات)",
+  "severity": ""
+ },
+ {
+  "id": "T21c",
+  "name": "أهداف لمس أصغر من 32px",
+  "result": "PASS",
+  "evidence": "4 عنصر",
+  "severity": ""
+ },
+ {
+  "id": "T21d",
+  "name": "صور بلا alt / حقول بلا تسمية",
+  "result": "PASS",
+  "evidence": "صور:0 حقول:0",
+  "severity": ""
+ },
+ {
+  "id": "T22a",
+  "name": "manifest: حقول إلزامية وأيقونات 192/512 وmaskable والملفات موجودة",
+  "result": "PASS",
+  "evidence": "{\"miss\":[],\"has192\":true,\"has512\":true,\"mask\":true,\"filesOk\":true,\"display\":\"standalone\",\"start\":\"./index.html?source=pwa\"}",
+  "severity": ""
+ },
+ {
+  "id": "T22b",
+  "name": "ترويسات الأمان في _headers (CSP، X-Content-Type-Options، Referrer-Policy)",
+  "result": "PASS",
+  "evidence": "  X-Content-Type-Options: nosniff |   Referrer-Policy: strict-origin-when-cross-origin |   X-Frame-Options: DENY |   Strict-Transport-Security: max-age=31536000; includeSubDomains |   Permissions-Policy: camera=(self), microphone=(self), geolocation=(self), payment=(), usb=(), bluetooth=(), serial=(",
+  "severity": ""
+ },
+ {
+  "id": "T23a",
+  "name": "حجم ملف التطبيق",
+  "result": "PASS",
+  "evidence": "1597 KB (index.html، غير مضغوط)",
+  "severity": ""
+ },
+ {
+  "id": "T23b",
+  "name": "أداء الرسم والحفظ مع بيانات سنتين (730 يومًا)",
+  "result": "PASS",
+  "evidence": "{\"renderMs\":10.2,\"renderBigMs\":11.6,\"progMs\":8.5,\"saveMs\":5.6,\"stateKB\":275,\"quotaOK\":true,\"heapMB\":10,\"dom\":404}",
+  "severity": ""
+ },
+ {
+  "id": "T24",
+  "name": "أوضاع اللغة الثلاثة ترسم الرئيسية بلا أخطاء",
+  "result": "PASS",
+  "evidence": "{\"nobi\":1860,\"en1\":1860,\"bi\":1860}",
+  "severity": ""
+ }
+]

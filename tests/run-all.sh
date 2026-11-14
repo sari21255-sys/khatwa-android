@@ -4,3 +4,5 @@ cd "$(dirname "$0")/.."
 echo "== الوسيط =="; node tests/worker.test.mjs
 echo "== التطبيق =="; NODE_PATH="$(npm root -g)" node tests/app.e2e.js
 echo "== قبول P0 =="; NODE_PATH="$(npm root -g)" node docs/technical-audit/evidence/p0-acceptance.mjs
+echo "== هوية الوسيط (P1) =="; node tests/worker.p1.test.mjs
+if [ -n "${PSQL:-}" ]; then echo "== مزامنة السجلات (جهازان + Postgres) =="; NODE_PATH="$(npm root -g)" node tests/sync.e2e.mjs; else echo "(تخطي sync.e2e: عيّن PSQL)"; fi

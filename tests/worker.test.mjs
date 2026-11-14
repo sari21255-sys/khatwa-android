@@ -1,7 +1,7 @@
 // node tests/worker.test.mjs  — اختبار الوسيط بذاكرة KV وهمية وAnthropic وهمي
 import W from '../worker/ai-proxy.js';
 let pass=0,fail=0;const ok=(c,m)=>{c?pass++:fail++;console.log((c?'  ok   ':'  FAIL ')+m)};
-const kv=()=>{const m=new Map();return{get:async(k,t)=>{const v=m.get(k);return v==null?null:(t==='json'?JSON.parse(v):v)},put:async(k,v)=>m.set(k,String(v))}};
+const kv=()=>{const m=new Map();return{get:async(k,t)=>{const v=m.get(k);return v==null?null:(t==='json'?JSON.parse(v):v)},put:async(k,v)=>m.set(k,String(v)),delete:async k=>{m.delete(k)}}};
 const env=(o={})=>({STATE:kv(),ANTHROPIC_API_KEY:'k',ALLOW_ORIGIN:'https://app.example',AI_DAILY_CAP:'3',...o});
 globalThis.fetch=async()=>new Response(JSON.stringify({content:[{text:'مرحبا'}]}),{status:200});
 const call=(e,path,{method='GET',body,tok,origin='https://app.example',ip='1.1.1.1'}={})=>W.fetch(new Request('https://w.test'+path,{method,headers:{'Origin':origin,'CF-Connecting-IP':ip,...(tok?{Authorization:'Bearer '+tok}:{}),'Content-Type':'application/json'},body:body?JSON.stringify(body):undefined}),e);
