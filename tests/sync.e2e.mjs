@@ -12,9 +12,9 @@ const wenv={STATE:KV,ANTHROPIC_API_KEY:'k',ALLOW_ORIGIN:'http://127.0.0.1:8790',
 const wk=http.createServer((q,res)=>{const ch=[];q.on('data',c=>ch.push(c));q.on('end',async()=>{const r=await W.fetch(new Request('http://w'+q.url,{method:q.method,headers:q.headers,body:['GET','HEAD'].includes(q.method)?undefined:Buffer.concat(ch)}),wenv);const h={};r.headers.forEach((v,k)=>h[k]=v);res.writeHead(r.status,h);res.end(Buffer.from(await r.arrayBuffer()))})}).listen(8792);
 const MIME={'.html':'text/html; charset=utf-8','.js':'text/javascript','.json':'application/json','.webmanifest':'application/manifest+json','.png':'image/png','.svg':'image/svg+xml'};
 const st=http.createServer((q,res)=>{let f=q.url.split('?')[0];if(f==='/')f='/index.html';
- if(f==='/config.js'){res.writeHead(200,{'content-type':'text/javascript'});return res.end(`window.APP_CONFIG={sbUrl:"http://127.0.0.1:8791",sbKey:"anon",syncUrl:"http://127.0.0.1:8792/api/state",aiUrl:"http://127.0.0.1:8792/api/ai"};`)}
+ if(f==='/config.js'){res.writeHead(200,{'content-type':'text/javascript'});return res.end(`window.APP_CONFIG={${cfgMode==='full'?'sbUrl:"http://127.0.0.1:8791",sbKey:"anon",':''}syncUrl:"http://127.0.0.1:8792/api/state",aiUrl:"http://127.0.0.1:8792/api/ai"};`)}
  const p=path.join(WWW,f);if(!p.startsWith(WWW)||!fs.existsSync(p)||fs.statSync(p).isDirectory()){res.writeHead(404);return res.end()}res.writeHead(200,{'content-type':MIME[path.extname(p)]||'application/octet-stream'});res.end(fs.readFileSync(p))}).listen(8790);
-const A='http://127.0.0.1:8790';const b=await chromium.launch();
+let cfgMode='full';const A='http://127.0.0.1:8790';const b=await chromium.launch();
 const SEED=`S.prof.ob=1;S.prof.name='اختبار';S.prof.sex='m';S.prof.age=30;S.prof.ht=178;S.prof.startW=85;S.prof.goalType='lose';calcTargets();genPlan();save();`;
 async function device(){const c=await b.newContext({viewport:{width:390,height:844}});const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));await p.goto(A+'/');await p.waitForFunction(()=>typeof S!=='undefined'&&typeof rsSync==='function');p.errs=errs;p.ctx=c;return p}
 const email=n=>`u${Date.now()}${n}@test.invalid`;
@@ -107,6 +107,21 @@ try{
  {const e6=email('q'),e7=email('r');const x=await device();await x.evaluate(SEED);await up(x,e6);await edit(x,"S.bw['2026-11-13']=77");await sync(x);
   await x.evaluate(async e=>{await SB.out();await SB.up(e,'password123','t')},e7);const r=await sync(x);const acct=await get(x,"RS.acct"),u2=await uidOf(x),rows=dbq(`select count(*) from public.sync_records where user_id='${u2}'`);
   rec('ACC-01','تسجيل دخول حساب آخر على جهاز فيه بيانات حساب سابق: لا رفع تلقائي ولا خلط، ويُطلب قرار المستخدم',r==='acct'&&acct===1&&rows==='0',JSON.stringify({r,acct,rows}));await x.ctx.close()}
+ /* ---- واجهة الحذف والمسح: التأكيد المزدوج، والمسح المحلي مستقل عن السحابة ---- */
+ {const e8=email('u');const w=await device();await w.evaluate(SEED);await up(w,e8);await edit(w,"S.bw['2026-11-15']=58");await sync(w);const uid=await uidOf(w);
+  await w.evaluate(()=>{S.tab='me';S.sub='set';render()});const html=await w.evaluate(()=>document.body.innerText);
+  const has=html.includes('حذف نسخة المزامنة السحابية')&&html.includes('مسح بيانات هذا الجهاز')&&html.includes(e8);
+  await w.click('[data-a=rsdelq]');const conf=await w.evaluate(()=>document.body.innerText.includes('تأكيد حذف النسخة السحابية'));const rowsBefore=dbq(`select count(*) from public.sync_records where user_id='${uid}'`);
+  await w.click('[data-a=rsdelc]');const gone=await w.evaluate(()=>!document.body.innerText.includes('تأكيد حذف النسخة السحابية'));const rowsAfterCancel=dbq(`select count(*) from public.sync_records where user_id='${uid}'`);
+  rec('UI-01','بطاقة المزامنة تعرض الحساب وخياري الحذف والمسح المستقلين؛ الحذف يحتاج تأكيدًا والإلغاء لا يحذف شيئًا',has&&conf&&gone&&rowsBefore===rowsAfterCancel&&Number(rowsBefore)>10,JSON.stringify({has,conf,gone,rowsBefore,rowsAfterCancel}));
+  await w.click('[data-a=rswipeq]');const wc=await w.evaluate(()=>document.body.innerText.includes('تأكيد مسح بيانات هذا الجهاز'));await w.click('[data-a=rswipec]');const stillThere=await get(w,"S.bw['2026-11-15']");
+  await Promise.all([w.waitForNavigation(),w.click('[data-a=rswipeq]').then(()=>w.click('[data-a=rswipe]'))]);await w.waitForFunction(()=>typeof S!=='undefined');
+  const after=await get(w,"({bw:Object.keys(S.bw).length,ses:!!SB.ses,fit1:localStorage.getItem('fit1')===null||JSON.parse(localStorage.getItem('fit1')).bw&&Object.keys(JSON.parse(localStorage.getItem('fit1')).bw).length===0})");const cloud=dbq(`select count(*) from public.sync_records where user_id='${uid}'`);
+  rec('UI-02','مسح بيانات الجهاز: يحتاج تأكيدًا، يمسح المحلي ويُخرج الحساب، ولا يمسّ النسخة السحابية',wc&&stillThere===58&&after.bw===0&&after.ses===false&&cloud===rowsBefore,JSON.stringify({wc,stillThere,after,cloud,rowsBefore}));await w.ctx.close()}
+ /* ---- التراجع: إزالة إعداد Supabase من التطبيق تُبقي بيانات الجهاز سليمة ويعمل التطبيق بالنمط القديم ---- */
+ {const keep=await get(d1,"S.bw['2026-11-01']");cfgMode='legacy';await d1.reload();await d1.waitForFunction(()=>typeof S!=='undefined');
+  const rb=await get(d1,"({bw:S.bw['2026-11-01'],rsOn:rsOn(),sb:SB.on()})");cfgMode='full';
+  rec('RB-01','تراجع العميل: بدون إعداد Supabase يعمل التطبيق ببياناته المحلية كاملة (لا حذف ولا إعادة ضبط)',keep===80&&rb.bw===80&&rb.rsOn===false&&rb.sb===false,JSON.stringify({keep,rb}))}
  /* ---- أخطاء JS ---- */
  rec('RS-09','لا أخطاء JavaScript أثناء كل السيناريوهات',d1.errs.length===0&&d2.errs.length===0,JSON.stringify([...d1.errs,...d2.errs].slice(0,3)));
 }catch(e){rec('RS-FATAL','استثناء غير متوقع في الاختبار',false,String(e&&e.stack||e).slice(0,600))}

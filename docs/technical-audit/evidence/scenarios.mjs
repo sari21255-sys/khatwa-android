@@ -59,7 +59,7 @@ try{
  await ev(pB,()=>{S.ts=Date.now()+5;(S.bw[TD()+'x']=1);S.cd['2026-01-01']={steps:999};save();return syncPush()});await pB.waitForTimeout(200);
  const srv=JSON.parse(KV.m.get('s:'+tokA)||KV.m.get([...KV.m.keys()].find(k=>k.startsWith('s:'))||'')||'{}');
  const lostA=!(srv.nt&&srv.nt.note==='edit-A');
- rec('T09b','تعديلان متزامنان من جهازين: هل يُدمجان؟',!lostA,'الخادم يحتفظ بآخر كتابة كاملة؛ تعديل الجهاز الأول '+(lostA?'فُقد (last-write-wins بلا دمج)':'محفوظ'),'P1');
+ rec('T09b-legacy','نمط المزامنة القديم (لقطة كاملة برمز الوسيط، بلا Supabase): تعديلان متزامنان من جهازين. الاختبار المعتمد لمسار P1 هو T09b في tests/sync.e2e.mjs',!lostA,'الخادم يحتفظ بآخر كتابة كاملة؛ تعديل الجهاز الأول '+(lostA?'فُقد (last-write-wins بلا دمج)':'محفوظ'),'P1');
  /* T10 دون اتصال */
  await cA.close();
  const {c:cO,p:pO}=await newDev();

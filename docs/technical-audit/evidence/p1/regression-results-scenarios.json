@@ -1,0 +1,135 @@
+[
+ {
+  "id": "T01",
+  "name": "مستخدم جديد يكمل التسجيل الأولي عبر الواجهة (7 خطوات)",
+  "result": "PASS",
+  "evidence": "{\"ob\":1,\"name\":\"سالم\",\"kcal\":2270,\"p\":179,\"days\":3,\"ex\":15,\"mp\":7,\"prg\":\"fb3\"}",
+  "severity": ""
+ },
+ {
+  "id": "T02",
+  "name": "إغلاق وفتح التطبيق يحفظ الملف والخطة",
+  "result": "PASS",
+  "evidence": "{\"name\":\"سالم\",\"ob\":1,\"ex\":15}",
+  "severity": ""
+ },
+ {
+  "id": "T03",
+  "name": "تسجيل تمرين (وزن×تكرار) يُحفظ ويدخل سجل الأداء",
+  "result": "PASS",
+  "evidence": "{\"n\":\"سكوات\",\"w\":25,\"done\":true,\"base\":25,\"inLifts\":true}",
+  "severity": ""
+ },
+ {
+  "id": "T04a",
+  "name": "منتقي الأطعمة: بحث بالعربية وإضافة وجبة بالجرامات",
+  "result": "PASS",
+  "evidence": "{\"foods\":742,\"found\":3,\"added\":1,\"kcal\":500,\"name\":\"ستيك لحم بقري مشوي (200 غ)\"}",
+  "severity": ""
+ },
+ {
+  "id": "T04b",
+  "name": "حساب السعرات حسب الجرامات (القيم لكل 100 غ: 250 × 2 = 500)",
+  "result": "PASS",
+  "evidence": "الفعلي 500",
+  "severity": ""
+ },
+ {
+  "id": "T05",
+  "name": "تسجيل الوزن ونسبة الدهون",
+  "result": "PASS",
+  "evidence": "{\"bw\":84.2,\"bf\":22}",
+  "severity": ""
+ },
+ {
+  "id": "T06",
+  "name": "شاشة التقدّم ترسم رسومًا وأرقامًا",
+  "result": "PASS",
+  "evidence": "{\"svg\":44,\"len\":654622}",
+  "severity": ""
+ },
+ {
+  "id": "T07",
+  "name": "بناء خطة بالذكاء الاصطناعي (وسيط حقيقي + Anthropic وهمي)",
+  "result": "PASS",
+  "evidence": "{\"res\":{\"name\":\"خطة اختبار\",\"days\":2,\"ex\":8,\"skipped\":0},\"msg\":\"\",\"busy\":0,\"SM\":true}",
+  "severity": ""
+ },
+ {
+  "id": "T08a",
+  "name": "رد غير JSON من الذكاء: رسالة خطأ بلا انهيار",
+  "result": "PASS",
+  "evidence": "{\"res\":null,\"msg\":\"تعذّر الحصول على النتيجة، حاول مرة أخرى.\",\"busy\":0,\"SM\":true}",
+  "severity": ""
+ },
+ {
+  "id": "T08b",
+  "name": "فشل المزوّد 500: رسالة خطأ بلا انهيار",
+  "result": "PASS",
+  "evidence": "{\"res\":null,\"msg\":\"تعذّر الحصول على النتيجة، حاول مرة أخرى.\",\"busy\":0,\"SM\":true}",
+  "severity": ""
+ },
+ {
+  "id": "T08c",
+  "name": "تمارين غير موجودة في المكتبة تُستبعد",
+  "result": "PASS",
+  "evidence": "{\"res\":null,\"msg\":\"تعذّر الحصول على النتيجة، حاول مرة أخرى.\",\"busy\":0,\"SM\":true}",
+  "severity": ""
+ },
+ {
+  "id": "T09a",
+  "name": "الجهاز الثاني يسحب حالة الأول عبر الرمز",
+  "result": "PASS",
+  "evidence": "{\"r\":\"pulled\",\"name\":\"سالم\",\"ex\":15}",
+  "severity": ""
+ },
+ {
+  "id": "T09b-legacy",
+  "name": "نمط المزامنة القديم (لقطة كاملة برمز الوسيط، بلا Supabase): تعديلان متزامنان من جهازين. الاختبار المعتمد لمسار P1 هو T09b في tests/sync.e2e.mjs",
+  "result": "FAIL",
+  "evidence": "الخادم يحتفظ بآخر كتابة كاملة؛ تعديل الجهاز الأول فُقد (last-write-wins بلا دمج)",
+  "severity": "P1"
+ },
+ {
+  "id": "T10a",
+  "name": "تسجيل Service Worker وملء الكاش",
+  "result": "PASS",
+  "evidence": "{\"reg\":true,\"active\":true,\"caches\":[\"khatwa-v65\"]}",
+  "severity": ""
+ },
+ {
+  "id": "T10b",
+  "name": "فتح التطبيق دون إنترنت وإضافة وجبة",
+  "result": "PASS",
+  "evidence": "{\"name\":\"أوفلاين\",\"saved\":1}",
+  "severity": ""
+ },
+ {
+  "id": "T10c",
+  "name": "قاعدة الأجهزة (eq-db.js) متاحة دون اتصال قبل أول فتح",
+  "result": "PASS",
+  "evidence": "{\"status\":200} — محاولة جلب eq-db.js دون اتصال بعد تثبيت الـService Worker",
+  "severity": ""
+ },
+ {
+  "id": "T11",
+  "name": "تصدير ثم استيراد في جهاز نظيف يعيد البيانات",
+  "result": "PASS",
+  "evidence": "{\"ok\":true,\"name\":\"أوفلاين\",\"meals\":1}",
+  "severity": ""
+ },
+ {
+  "id": "T12",
+  "name": "رمز غريب لا يرى حالة مستخدم آخر",
+  "result": "PASS",
+  "evidence": "status 404",
+  "severity": ""
+ },
+ {
+  "id": "T13",
+  "name": "أخطاء JS خلال كل السيناريوهات",
+  "result": "PASS",
+  "evidence": "[[],[],[],[]]",
+  "severity": ""
+ }
+]

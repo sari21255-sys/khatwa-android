@@ -35,6 +35,7 @@ jobs:
           psql -h localhost -U postgres -v ON_ERROR_STOP=1 -q -f supabase/tests/00_mock_supabase.sql
           psql -h localhost -U postgres -q -f supabase/tests/01_rls_and_limits.sql
           psql -h localhost -U postgres -v ON_ERROR_STOP=1 -q -f supabase/tests/02_p1_sync.sql
+          psql -h localhost -U postgres -v ON_ERROR_STOP=1 -q -f supabase/tests/04_rollback.sql
       - name: P1 concurrency (parallel psql sessions) and sync end-to-end (two browsers, real Postgres functions)
         env: { PGPASSWORD: pg }
         run: |
