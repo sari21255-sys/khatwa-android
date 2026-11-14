@@ -13,7 +13,7 @@ debuggable='application-debuggable' in bad
 m=re.search(r'android:allowBackup\([^)]*\)=(\S+)',xml);backup=m.group(1) if m else 'غير مذكور (الافتراضي true)'
 ALLOWED={'android.permission.INTERNET','android.permission.POST_NOTIFICATIONS','android.permission.RECEIVE_BOOT_COMPLETED','android.permission.WAKE_LOCK',
  'android.permission.health.READ_STEPS','android.permission.health.READ_HEART_RATE','android.permission.health.READ_DISTANCE',
- 'android.permission.health.READ_TOTAL_CALORIES_BURNED','android.permission.health.READ_ACTIVE_CALORIES_BURNED','android.permission.health.READ_SLEEP'}
+ 'android.permission.health.READ_ACTIVE_CALORIES_BURNED','android.permission.health.READ_SLEEP'}
 print('ملف:',apk);print('minSdk',msdk,'targetSdk',tsdk,'debuggable',debuggable,'allowBackup',backup)
 print('الأذونات:');[print('  ',p) for p in perms]
 errs=[]

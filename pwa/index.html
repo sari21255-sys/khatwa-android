@@ -1972,6 +1972,7 @@ function vSet(){
  h+=pinCard()+profCard();
  if(!IN_CLAUDE&&(CFG.syncUrl||CFG.aiUrl)){h+='<div class="card"><h2>'+ic('watch')+'المزامنة والأجهزة</h2><div class="mu" style="margin-bottom:8px">رمزك الخاص يربط بياناتك بين أجهزتك ويفعّل المساعد الذكي. لا تشاركه مع أحد.</div><label class="f">رمز المزامنة<input id="tok" type="text" dir="ltr" value="'+esc(SYNC.token)+'"></label><div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="copytok">نسخ الرمز</button><button class="btn sm" data-a="synctok">استعمال هذا الرمز</button></div><div class="tag'+(SYNC.st==='err'?' bad':'')+'" style="margin-top:8px">'+(SYNC.st==='err'?'تعذّرت المزامنة، البيانات محفوظة على الجهاز':'المزامنة تعمل')+'</div></div>'}
  if(INST)h+='<div class="card hl"><button class="btn" data-a="install">تثبيت التطبيق على الشاشة الرئيسية</button></div>';
+ h+='<div class="card"><h2>'+ic('info')+'الخصوصية والبيانات</h2><a class="lnk" href="privacy.html">'+ic('info')+'<span class="t">سياسة الخصوصية</span>'+ic('next')+'</a><a class="lnk" href="delete-account.html">'+ic('trash')+'<span class="t">حذف الحساب والبيانات</span>'+ic('next')+'</a></div>';
  return h}
 
 /* ---------- sub views ---------- */
@@ -3380,7 +3381,9 @@ const soc={ig:h=>'https://instagram.com/'+h,x:h=>'https://x.com/'+h,tt:h=>'https
 const SOCN={ig:'Instagram',x:'X',tt:'TikTok',fb:'Facebook',sn:'Snapchat'};
 const lnkA=(u,t)=>'<a class="chip" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+t+'</a>';
 const mono=c=>'<div class="gl">'+esc((c.en||c.n).replace(/[^A-Za-z\u0600-\u06FF ]/g,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join(''))+'</div>';
-const logoH=c=>c.logo?'<img class="gl" src="'+esc(c.logo)+'" alt="" referrerpolicy="no-referrer" onerror="this.outerHTML=\'<div class=&quot;gl&quot;>'+esc((c.en||c.n)[0])+'</div>\'">':mono(c);
+const logoH=c=>c.logo?'<img class="gl" src="'+esc(c.logo)+'" alt="" referrerpolicy="no-referrer" data-ml="'+esc((c.en||c.n)[0])+'">':mono(c);
+/* شعار النادي يفشل تحميله: يُستبدل بحرف أول. معالج عام بدل onerror مضمّن كي تعمل سياسة CSP بلا unsafe-inline */
+document.addEventListener('error',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.classList&&t.classList.contains('gl')&&t.dataset.ml!==undefined){const d=document.createElement('div');d.className='gl';d.textContent=t.dataset.ml;t.replaceWith(d)}},true);
 const gDist=c=>{const l=UI.lc;if(l&&c.lat)return hav(l.lat,l.lon,c.lat,c.lon);return null};
 function gyFiltered(){
  const city=curCity(),q=(UI.gq||'').trim().toLowerCase(),h=gy().home;
@@ -4618,7 +4621,7 @@ document.addEventListener('change',ev=>{const t=ev.target,d=t.dataset||{};
 document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id==='wz-v'){ev.preventDefault();const b=document.querySelector('[data-a="wznext"]');if(b)b.click()}if(ev.key==='Enter'&&ev.target.id==='co-q'){ev.preventDefault();const b=document.querySelector('[data-a="csend"]');if(b)b.click()}});
 
 Object.assign(ACT,{
- gloc:()=>{if(!navigator.geolocation){UI.locMsg='المتصفح لا يدعم تحديد الموقع.';return}UI.locBusy=1;UI.locMsg='جارٍ تحديد الموقع…';render();
+ gloc:()=>{if(NAT){UI.locMsg='تحديد الموقع غير متاح في نسخة أندرويد حاليًا. اختر مدينتك من القائمة.';return}if(!navigator.geolocation){UI.locMsg='المتصفح لا يدعم تحديد الموقع.';return}UI.locBusy=1;UI.locMsg='جارٍ تحديد الموقع…';render();
   navigator.geolocation.getCurrentPosition(p=>{UI.lc={lat:p.coords.latitude,lon:p.coords.longitude,ts:Date.now()};try{localStorage.setItem('fit_loc',JSON.stringify(UI.lc))}catch(e){lg(e)}UI.gc='';UI.locBusy=0;UI.locMsg='';render()},e=>{UI.locMsg=e&&e.code===1?'لم تسمح بالوصول إلى الموقع. اختر مدينتك يدويًا.':'تعذّر تحديد الموقع الآن. اختر مدينتك يدويًا.';UI.locBusy=0;render()},{timeout:12000,maximumAge:600000});return false},
  gx:b=>{UI.gx=UI.gx===b.dataset.id?'':b.dataset.id},
  gf:b=>{UI[b.dataset.k]=b.dataset.v},
@@ -4630,7 +4633,7 @@ Object.assign(ACT,{
  gnew:()=>{UI.ge={add:1,f:{g:'b',am:[],city:curCity()==='all'?'':curCity()}};S.sub='gye';window.scrollTo(0,0)},
  geg:b=>{geSync();UI.ge.f.g=b.dataset.v},
  gea:b=>{geSync();const a=UI.ge.f.am=UI.ge.f.am||[],i=a.indexOf(b.dataset.v);if(i>=0)a.splice(i,1);else a.push(b.dataset.v)},
- gepos:()=>{geSync();if(!navigator.geolocation){toast('الموقع غير مدعوم');return false}navigator.geolocation.getCurrentPosition(p=>{UI.ge.f.lat=+p.coords.latitude.toFixed(5);UI.ge.f.lon=+p.coords.longitude.toFixed(5);render()},()=>toast('تعذّر تحديد الموقع'),{timeout:12000});return false},
+ gepos:()=>{geSync();if(NAT){toast('تحديد الموقع غير متاح في نسخة أندرويد حاليًا');return false}if(!navigator.geolocation){toast('الموقع غير مدعوم');return false}navigator.geolocation.getCurrentPosition(p=>{UI.ge.f.lat=+p.coords.latitude.toFixed(5);UI.ge.f.lon=+p.coords.longitude.toFixed(5);render()},()=>toast('تعذّر تحديد الموقع'),{timeout:12000});return false},
  gesave:()=>{geSync();const f=UI.ge.f;if(!f.n){toast('اكتب اسم النادي');return false}
   ['lat','lon'].forEach(k=>{if(f[k]===''||f[k]==null||isNaN(+f[k]))delete f[k];else f[k]=+f[k]});
   if(f.tel)f.tel=telDigits(f.tel);

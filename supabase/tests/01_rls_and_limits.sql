@@ -51,4 +51,14 @@ do $$ declare n int:=0; begin for i in 1..60 loop begin insert into public.comme
 select public.delete_my_account();
 reset role;
 select pg_temp.eq((select count(*) from public.profiles where id='00000000-0000-0000-0000-00000000000b')::int,0,'account deleted');
+-- P0-07: الزائر المجهول (anon) ممنوع من كل الجداول والدالة
+set role anon;
+select pg_temp.must_fail('select * from public.profiles','anon select profiles');
+select pg_temp.must_fail('select * from public.posts','anon select posts');
+select pg_temp.must_fail('select * from public.comments','anon select comments');
+select pg_temp.must_fail('select * from public.notifications','anon select notifications');
+select pg_temp.must_fail('select * from public.user_settings','anon select user_settings');
+select pg_temp.must_fail($q$insert into public.posts(body) values('x')$q$,'anon insert post');
+select pg_temp.must_fail('select public.delete_my_account()','anon delete_my_account');
+reset role;
 select 'ALL RLS TESTS PASSED' as result;

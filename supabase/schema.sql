@@ -234,3 +234,10 @@ create policy notif_del on public.notifications for delete to authenticated usin
 
 drop policy if exists settings_all on public.user_settings;
 create policy settings_all on public.user_settings for all to authenticated using (user_id=auth.uid()) with check (user_id=auth.uid());
+
+-- P0-07: لا وصول للزائر غير المسجّل (anon) إلى جداول التطبيق. القراءة والكتابة للمستخدمين المسجّلين فقط وتحكمها سياسات RLS أعلاه.
+-- لا يغيّر هذا السطر أي جدول أو بيانات؛ يسحب صلاحيات كانت ستمنحها Supabase افتراضيًا للدور anon.
+revoke all on all tables in schema public from anon;
+revoke all on all sequences in schema public from anon;
+alter default privileges in schema public revoke all on tables from anon;
+alter default privileges in schema public revoke all on sequences from anon;

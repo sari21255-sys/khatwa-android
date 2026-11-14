@@ -4,16 +4,17 @@ import os,re,sys
 from pathlib import Path
 A=Path('android');M=A/'app/src/main/AndroidManifest.xml'
 m=M.read_text(encoding='utf-8')
-# الأذونات المطلوبة فعليًا: قراءة Health Connect للأنواع التي يطلبها التطبيق (HC_READ في الكود)، والإشعارات المحلية.
+# الأذونات المطلوبة فعليًا: قراءة Health Connect للأنواع التي يطلبها التطبيق (HC_READ في الكود) والإشعارات المحلية.
+# إضافة capgo تربط 'calories' بـActiveCaloriesBurned فقط، لذا لا حاجة لـTOTAL_CALORIES_BURNED.
 # RECEIVE_BOOT_COMPLETED تضيفه إضافة الإشعارات المحلية لإعادة جدولة التذكيرات بعد إعادة التشغيل.
 PERMS=['android.permission.health.READ_STEPS','android.permission.health.READ_HEART_RATE','android.permission.health.READ_DISTANCE',
- 'android.permission.health.READ_TOTAL_CALORIES_BURNED','android.permission.health.READ_ACTIVE_CALORIES_BURNED','android.permission.health.READ_SLEEP',
+ 'android.permission.health.READ_ACTIVE_CALORIES_BURNED','android.permission.health.READ_SLEEP',
  'android.permission.POST_NOTIFICATIONS']
 # أذونات تُزال من الملف المدموج (تأتي من الإضافات أو غير مستعملة). لا كتابة إلى Health Connect، ولا كاميرا/ميكروفون/موقع
 # لأن الميزات المقابلة (مسح الباركود، الإملاء الصوتي، تحديد الموقع) غير مختبرة على جهاز فتُعطَّل في نسخة أندرويد.
 REMOVE=['android.permission.health.WRITE_STEPS','android.permission.health.WRITE_DISTANCE','android.permission.health.WRITE_ACTIVE_CALORIES_BURNED',
  'android.permission.health.WRITE_HEART_RATE','android.permission.health.READ_WEIGHT','android.permission.health.WRITE_WEIGHT',
- 'android.permission.SCHEDULE_EXACT_ALARM','android.permission.USE_EXACT_ALARM','android.permission.CAMERA','android.permission.RECORD_AUDIO',
+ 'android.permission.health.READ_TOTAL_CALORIES_BURNED','android.permission.SCHEDULE_EXACT_ALARM','android.permission.USE_EXACT_ALARM','android.permission.CAMERA','android.permission.RECORD_AUDIO',
  'android.permission.ACCESS_FINE_LOCATION','android.permission.ACCESS_COARSE_LOCATION','android.permission.READ_EXTERNAL_STORAGE','android.permission.WRITE_EXTERNAL_STORAGE']
 if 'xmlns:tools' not in m: m=m.replace('<manifest ','<manifest xmlns:tools="http://schemas.android.com/tools" ',1)
 add=''

@@ -2,7 +2,7 @@ name: Tests
 on:
   pull_request:
   push:
-    branches: [main, master]
+    branches: [main, master, 'p0/**']
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -24,6 +24,8 @@ jobs:
           npm i -g playwright
           npx playwright install --with-deps chromium
           NODE_PATH="$(npm root -g)" node tests/app.e2e.js
+      - name: P0 acceptance (security headers + CSP, offline eq-db, 320px, worker failure)
+        run: NODE_PATH="$(npm root -g)" node docs/technical-audit/evidence/p0-acceptance.mjs
       - name: Supabase schema + RLS tests
         env: { PGPASSWORD: pg }
         run: |

@@ -29,6 +29,7 @@ jobs:
         run: |
           { echo "== health manifest"; grep -rniE "uses-permission|queries" node_modules/@capgo/capacitor-health/android/src/main/AndroidManifest.xml || true
             echo "== health calories mapping"; grep -rniE "calories" node_modules/@capgo/capacitor-health/android/src/main/java | head -12 || true
+            echo "== health plugin version/types"; grep -m1 '"version"' node_modules/@capgo/capacitor-health/package.json; grep -nE "^\s+[A-Z_]+\(" node_modules/@capgo/capacitor-health/android/src/main/java/app/capgo/plugin/health/HealthDataType.kt | head -14
             echo "== local-notifications manifest"; grep -rn "uses-permission" node_modules/@capacitor/local-notifications/android/src/main/AndroidManifest.xml || true; } > diag.txt
           echo "::notice title=plugin-diag::$(tr '\n' '|' < diag.txt | cut -c1-3500)"
       - name: Build debug APK (installable directly)
