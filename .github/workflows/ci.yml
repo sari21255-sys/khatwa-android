@@ -2,7 +2,7 @@ name: Tests
 on:
   pull_request:
   push:
-    branches: [main, master, 'p0/**']
+    branches: [main, master, 'p0/**', 'p1/**']
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,6 +17,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
+      - name: Generated files match the committed ones (index, _headers, CSP hashes)
+        run: python3 tools/build.py --check
+      - run: npm ci
       - name: Worker tests
         run: node tests/worker.test.mjs
       - name: App tests (Playwright)

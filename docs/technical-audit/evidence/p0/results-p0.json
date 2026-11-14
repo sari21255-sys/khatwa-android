@@ -17,14 +17,14 @@
   "id": "T22b-fresh",
   "name": "ملف pwa/_headers المُلتزَم به محدّث (تجزئات السكربتات تطابق الصفحات الحالية)",
   "result": "PASS",
-  "evidence": "إن فشل: python3 scripts/gen-headers.py pwa",
+  "evidence": "إن فشل: python3 tools/gen-headers.py pwa",
   "severity": ""
  },
  {
   "id": "T22c",
   "name": "التطبيق يعمل تحت CSP: 29 شاشة + خطة ذكاء + مزامنة + تقرير مطبوع، صفر مخالفات CSP وصفر أخطاء JS",
   "result": "PASS",
-  "evidence": "{\"err\":[],\"con\":[],\"plan_days\":2,\"sync\":\"ok\",\"report_print_called\":1}",
+  "evidence": "{\"err\":[],\"csp_violations\":[],\"con\":[],\"plan_days\":2,\"sync\":\"ok\",\"report_print_called\":1}",
   "severity": ""
  },
  {

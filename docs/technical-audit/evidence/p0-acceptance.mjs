@@ -10,7 +10,8 @@ const {chromium,staticServer,workerServer,MODE,KV,rec,results,siteHeaders}=await
 const A='http://127.0.0.1:8081';const st=await staticServer(8081),wk=await workerServer(8788,A);
 const b=await chromium.launch();const seed=`S.prof.ob=1;S.prof.name='اختبار';S.prof.sex='m';S.prof.age=30;S.prof.ht=178;S.prof.startW=85;S.prof.goalType='lose';S.prof.lvl='b';S.prof.eq='gym';S.prof.dpw=4;S.bw[TD()]=85;calcTargets();genPlan();render()`;
 const watch=p=>{const o={viol:[],err:[],con:[]};p.on('pageerror',e=>o.err.push(e.message));p.on('console',m=>{if(m.type()==='error')o.con.push(m.text().slice(0,160))});
-  p.addInitScript(()=>{window.__v=[];document.addEventListener('securitypolicyviolation',e=>window.__v.push(e.violatedDirective+' '+(e.blockedURI||'').slice(0,80)))});return o};
+  p.exposeFunction('__vr',s=>{o.viol.push(s)}).catch(()=>{});
+  p.addInitScript(()=>{window.__v=[];document.addEventListener('securitypolicyviolation',e=>{const s=e.violatedDirective+' '+(e.blockedURI||'').slice(0,80)+' @'+location.pathname;window.__v.push(s);if(window.__vr)window.__vr(s)})});return o};
 const viol=p=>p.evaluate(()=>window.__v||[]);
 try{
  /* T22b: الترويسات تصل فعليًا على الصفحات والملفات */
@@ -38,7 +39,7 @@ try{
  await p.waitForFunction(()=>window.__printed>0,null,{timeout:8000}).catch(()=>{});const printed=await p.evaluate(()=>window.__printed);
  await p.goto(A+'/privacy.html');await p.goto(A+'/delete-account.html');
  const v=await viol(p);const v1=w.viol;
- rec('T22c','التطبيق يعمل تحت CSP: 29 شاشة + خطة ذكاء + مزامنة + تقرير مطبوع، صفر مخالفات CSP وصفر أخطاء JS',w.err.length===0&&(await Promise.all([viol(p)])).flat().length===0&&(ai.days||[]).length>=1&&printed>=1,JSON.stringify({err:w.err,con:w.con.filter(x=>!/Failed to load resource|fonts\.(googleapis|gstatic)/.test(x)).slice(0,3),plan_days:(ai.days||[]).length,sync:syncOk,report_print_called:printed}),'P1');
+ rec('T22c','التطبيق يعمل تحت CSP: 29 شاشة + خطة ذكاء + مزامنة + تقرير مطبوع، صفر مخالفات CSP وصفر أخطاء JS',w.err.length===0&&w.viol.length===0&&syncOk==='ok'&&(ai.days||[]).length>=1&&printed>=1,JSON.stringify({err:w.err,csp_violations:w.viol.slice(0,5),con:w.con.filter(x=>!/Failed to load resource|fonts\.(googleapis|gstatic)/.test(x)).slice(0,3),plan_days:(ai.days||[]).length,sync:syncOk,report_print_called:printed}),'P1');
  const pv=await ctx.newPage();await pv.addInitScript(()=>{window.__v=[];document.addEventListener('securitypolicyviolation',e=>window.__v.push(e.violatedDirective))});await pv.goto(A+'/index.html');await pv.waitForFunction(()=>typeof S!=='undefined');await pv.waitForTimeout(800);
  rec('T22c-load','فتح الصفحة الرئيسية بلا أي مخالفة CSP (تشمل تسجيل الـService Worker)',(await viol(pv)).length===0,JSON.stringify(await viol(pv)),'P1');
  await ctx.close();
@@ -79,7 +80,7 @@ try{
  MODE.ai='500';let r6=await aiTry();rec('P0-06a','وسيط يرد 500: رسالة خطأ واضحة بلا انهيار',!r6.res&&!!r6.msg&&!r6.busy,JSON.stringify(r6),'P1');MODE.ai='ok';
  wk.close();await new Promise(r=>setTimeout(r,200));
  r6=await aiTry();const syncOff=await f.evaluate(async()=>{await syncPush();return SYNC.st});
- rec('P0-06b','الوسيط غير متاح (انقطاع الشبكة): رسالة واضحة، التطبيق لا ينهار، والمزامنة تُبلغ بالفشل',!r6.res&&!!r6.msg&&!r6.busy&&w4.err.length===0,JSON.stringify({ai:r6,sync:syncOff,js_errors:w4.err}),'P1');
+ rec('P0-06b','الوسيط غير متاح (انقطاع الشبكة): رسالة واضحة، التطبيق لا ينهار، والمزامنة تُبلغ بالفشل',!r6.res&&!!r6.msg&&!r6.busy&&w4.err.length===0&&syncOff==='err',JSON.stringify({ai:r6,sync:syncOff,js_errors:w4.err}),'P1');
  await c3.close();
  // أصل غير مسموح و"*" مرفوضان (اختبارات الوحدة للوسيط؛ هنا فحص المصدر)
  const wsrc=fs.readFileSync(ROOT+'worker/ai-proxy.js','utf8');rec('P0-06c','الوسيط لا يقبل ALLOW_ORIGIN=* ولا يعيد ACAO:* (مصدر + اختبار الوحدة)',!/indexOf\('\*'\)/.test(wsrc)&&/ok=!!og&&al\.indexOf\(og\)>=0/.test(wsrc),'tests/worker.test.mjs يغطي السلوك','P2');
