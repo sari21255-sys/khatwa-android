@@ -1021,13 +1021,94 @@ try{SYNC.token=localStorage.getItem('fit_sync')||''}catch(e){lg(e)}
 const genToken=()=>Array.from(crypto.getRandomValues(new Uint8Array(18))).map(b=>b.toString(36).padStart(2,'0')).join('');
 function b64Image(f){return new Promise((res,rej)=>{const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const k=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL('image/jpeg',.82).split(',')[1])};im.onerror=()=>{URL.revokeObjectURL(u);rej({code:'image_rejected'})};im.src=u})}
 function parseJson(t){t=String(t||'').trim();try{return JSON.parse(t)}catch(e){lg(e)}const f=t.match(/```(?:json)?\s*([\s\S]*?)```/);if(f){try{return JSON.parse(f[1])}catch(e){lg(e)}}const a=t.search(/[\[{]/),z=Math.max(t.lastIndexOf('}'),t.lastIndexOf(']'));if(a>=0&&z>a){try{return JSON.parse(t.slice(a,z+1))}catch(e){lg(e)}}throw{code:'invalid_json'}}
-function proxySample(){return{json:async(prompt,o)=>{o=o||{};const body={prompt:prompt,tier:o.modelTier||'default'};if(o.images)body.image=await b64Image(o.images);let r;try{r=await fetch(CFG.aiUrl,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+SYNC.token},body:JSON.stringify(body)})}catch(e){throw{code:'upstream_error'}}if(r.status===429)throw{code:'rate_limited'};if(r.status===401||r.status===403)throw{code:'not_granted'};if(!r.ok)throw{code:'upstream_error'};const j=await r.json();return parseJson(j.text)}}}
-async function syncPull(force){if(!CFG.syncUrl||!SYNC.token)return 'off';try{const r=await fetch(CFG.syncUrl,{headers:{Authorization:'Bearer '+SYNC.token}});if(r.status===404)return 'none';if(!r.ok)return 'err';const x=await r.json();if(x&&x.plan&&(force||(+x.ts||0)>(+S.ts||0))){if(!load(x))return 'err';try{localStorage.setItem('fit1',JSON.stringify(S))}catch(e){lg(e)}return 'pulled'}return 'same'}catch(e){return 'err'}}
-async function syncPush(){if(!CFG.syncUrl||!SYNC.token)return;try{const r=await fetch(CFG.syncUrl,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+SYNC.token},body:JSON.stringify(S)});SYNC.st=r.ok?'ok':'err'}catch(e){SYNC.st='err'}}
+function proxySample(){return{json:async(prompt,o)=>{o=o||{};const body={prompt:prompt,tier:o.modelTier||'default'};if(o.images)body.image=await b64Image(o.images);let tk=SYNC.token;try{if(CFG.sbUrl&&SB.ses&&await SB.fresh())tk=SB.ses.access_token}catch(e){lg(e)}let r;try{r=await fetch(CFG.aiUrl,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tk},body:JSON.stringify(body)})}catch(e){throw{code:'upstream_error'}}if(r.status===429)throw{code:'rate_limited'};if(r.status===401||r.status===403)throw{code:'not_granted'};if(!r.ok)throw{code:'upstream_error'};const j=await r.json();return parseJson(j.text)}}}
+async function syncPull(force){if(!CFG.syncUrl||!SYNC.token||SYNC.dead||rsOn())return 'off';try{const r=await fetch(CFG.syncUrl,{headers:{Authorization:'Bearer '+SYNC.token}});if(r.status===410){SYNC.dead=1;return 'off'}if(r.status===404)return 'none';if(!r.ok)return 'err';const x=await r.json();if(x&&x.plan&&(force||(+x.ts||0)>(+S.ts||0))){if(!load(x))return 'err';try{localStorage.setItem('fit1',JSON.stringify(S))}catch(e){lg(e)}return 'pulled'}return 'same'}catch(e){return 'err'}}
+async function syncPush(){if(!CFG.syncUrl||!SYNC.token||SYNC.dead||rsOn())return;try{const r=await fetch(CFG.syncUrl,{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+SYNC.token},body:JSON.stringify(S)});if(r.status===410||r.status===403)SYNC.dead=1;SYNC.st=r.ok?'ok':'err'}catch(e){SYNC.st='err'}}
+/* ---------- مزامنة على مستوى السجل (Supabase) ----------
+   كل مدخل في الحالة سجلٌّ بمعرّف ثابت: خرائط S[kind][مفتاح]، وعناصر المصفوفات ذات id، وباقي الحقول سجل cfg.
+   كل سجل يحمل ts (وقت التعديل على جهازه) ومعرّف الجهاز. الخادم يقبل الأحدث لكل سجل على حدة، فلا تُستبدل لقطة كاملة.
+   التعديلات غير المرسلة تبقى محفوظة (علم p) وتُعاد حتى يؤكدها الخادم. الحذف سجل tombstone. */
+const RSX={tab:1,sub:1,ts:1,v:1},RSK=/^[a-z0-9_]{1,40}$/,RSB=['__proto__','constructor','prototype'];
+const RS={busy:0,again:0,err:'',last:0,reset:0,acct:0,pause:0,msg:'',skipped:0};
+let RSM={dev:'',epoch:null,cursor:0,uid:'',rec:{}},RST=null,RSLT=0;
+try{RSM=Object.assign(RSM,JSON.parse(localStorage.getItem('fit_rs')||'{}'));if(!RSM.rec||typeof RSM.rec!=='object')RSM.rec={}}catch(e){lg(e)}
+if(!RSM.dev)RSM.dev='d'+genToken().slice(0,14);
+try{RS.pause=+localStorage.getItem('fit_rs_off')||0}catch(e){lg(e)}
+const rsSave=()=>{try{localStorage.setItem('fit_rs',JSON.stringify(RSM))}catch(e){lg(e)}};
+const rsH=s=>{let a=0xdeadbeef,b=0x41c6ce57;for(let i=0,c;i<s.length;i++){c=s.charCodeAt(i);a=Math.imul(a^c,2654435761);b=Math.imul(b^c,1597334677)}a=Math.imul(a^(a>>>16),2246822507)^Math.imul(b^(b>>>13),3266489909);b=Math.imul(b^(b>>>16),2246822507)^Math.imul(a^(a>>>13),3266489909);return(4294967296*(2097151&b)+(a>>>0)).toString(36)};
+const rsTs=at=>(RSLT=Math.max(at||Date.now(),RSLT+1));
+const rsOn=()=>{try{return !IN_CLAUDE&&!RS.pause&&!RS.acct&&SB.on()&&!!SB.ses}catch(e){return false}};
+const rsRid=e=>e.length<=120?e:'~'+rsH(e);
+/* يفكّك الحالة إلى سجلات: المفتاح kind\u0001rid. m: o=خريطة، a=مصفوفة id، c=حقل منفرد */
+function rsDecomp(s){const o={};RS.skipped=0;
+ const add=(k,r,e,v,m)=>{if(RSB.indexOf(e)>=0)return;if(JSON.stringify(v).length>190000){RS.skipped++;return}o[k+'\u0001'+r]={k,r,e,v,m}};
+ for(const k of Object.keys(s)){if(RSX[k])continue;const v=s[k];
+  if(RSK.test(k)&&Array.isArray(v)&&v.length&&v.every(x=>x&&typeof x==='object'&&!Array.isArray(x)&&(typeof x.id==='string'||typeof x.id==='number')))v.forEach(x=>add(k,rsRid(String(x.id)),String(x.id),x,'a'));
+  else if(RSK.test(k)&&v&&typeof v==='object'&&!Array.isArray(v))Object.keys(v).forEach(e=>add(k,rsRid(e),e,v[e],'o'));
+  else add('cfg',rsRid(k),k,v,'c')}
+ return o}
+/* يوسم التعديلات المحلية بوقت التعديل. أول مرة (بلا سجل مزامنة) تُوسم السجلات الحالية بوقت آخر حفظ للحالة لتخسر أمام تعديلات أحدث من أجهزة أخرى. */
+function rsMark(first,at){const cur=rsDecomp(S),R=RSM.rec,base=first?(+S.ts||0):0;
+ for(const key in cur){const h=rsH(JSON.stringify(cur[key].v)),e=R[key];if(!e||e.x||e.h!==h)R[key]={h,t:(first&&!e)?base:rsTs(at),x:0,p:1}}
+ for(const key in R){if(!cur[key]&&!R[key].x)R[key]={h:0,t:rsTs(at),x:1,p:1}}
+ return cur}
+function rsChanges(cur){const ch=[];for(const key in RSM.rec){const e=RSM.rec[key];if(!e.p)continue;const i=key.indexOf('\u0001'),k=key.slice(0,i),r=key.slice(i+1);
+ if(e.x)ch.push({k,r,x:true,ts:e.t,d:RSM.dev});else{const c=cur[key];if(c)ch.push({k,r,v:{m:c.m,e:c.e,v:c.v},ts:e.t,d:RSM.dev})}}
+ return ch.sort((a,b)=>a.ts-b.ts)}
+/* قاعدة الفوز مطابقة لـSQL: (ts الأعلى) ثم التعديل يغلب الحذف ثم dev الأكبر */
+const rsWins=(ts,x,d,ts2,x2,d2)=>ts!==ts2?ts>ts2:x!==x2?!x:d>d2;
+function rsPut(r){const k=r.k,v=r.v;
+ if(k==='cfg'){const n=(v&&v.e!=null)?String(v.e):r.r;if(RSB.indexOf(n)>=0)return null;if(r.x){delete S[n];return 0}S[n]=cleanData(v&&v.v);return S[n]===undefined?0:S[n]}
+ if(!RSK.test(k)||RSX[k])return null;
+ if(r.x){const c=S[k],id=r.r;if(Array.isArray(c)){const i=c.findIndex(x=>x&&rsRid(String(x.id))===id);if(i>=0)c.splice(i,1)}else if(c&&typeof c==='object'){const e=Object.keys(c).find(n=>rsRid(n)===id);if(e!==undefined)delete c[e]}return 0}
+ if(!v||typeof v!=='object')return null;const e=String(v.e),val=cleanData(v.v);if(RSB.indexOf(e)>=0)return null;
+ if(v.m==='a'){if(!Array.isArray(S[k]))S[k]=[];const i=S[k].findIndex(x=>x&&String(x.id)===e);if(i>=0)S[k][i]=val;else S[k].push(val)}
+ else{if(!S[k]||typeof S[k]!=='object'||Array.isArray(S[k]))S[k]={};S[k][e]=val}
+ return val}
+function rsApply(recs){let n=0;
+ for(const r of recs){if(!r||typeof r.k!=='string'||typeof r.r!=='string')continue;const key=r.k+'\u0001'+r.r,e=RSM.rec[key],x=!!r.x;
+  if(e){if(e.t===+r.ts&&!!e.x===x){delete e.p;continue}                                       /* السجل نفسه (صدى تعديلنا) */
+   if(!rsWins(+r.ts,x,String(r.d),e.t,!!e.x,RSM.dev))continue}                                  /* المحلي أحدث: يبقى وسيُرسل */
+  const val=rsPut(r);if(val===null)continue;
+  RSM.rec[key]={h:x?0:rsH(JSON.stringify(val)),t:+r.ts,x:x?1:0};n++}
+ if(n){try{norm();localStorage.setItem('fit1',JSON.stringify(S))}catch(e){lg(e)}}
+ return n}
+async function rsCall(body){if(!(await SB.fresh()))throw{code:'auth'};
+ const r=await fetch(CFG.sbUrl+'/rest/v1/rpc/sync_exchange',{method:'POST',headers:SB.hd(1),body:JSON.stringify(body)});
+ if(r.status===401||r.status===403)throw{code:'auth'};
+ if(!r.ok){let m='';try{m=(await r.json()).message||''}catch(e){lg(e)}if(/session revoked|not signed in/.test(m))throw{code:'auth'};throw{code:'http',s:r.status}}
+ return r.json()}
+async function rsSync(){
+ if(!rsOn())return 'off';if(RS.busy){RS.again=1;return 'busy'}RS.busy=1;RS.err='';let out='ok';
+ try{
+  const uid=SB.uid();
+  if(RSM.uid&&RSM.uid!==uid){RS.acct=1;out='acct';return out}   /* بيانات هذا الجهاز لحساب آخر: لا نخلطها دون موافقة */
+  RSM.uid=uid;const first=!Object.keys(RSM.rec).length&&!RSM.cursor;let pulled=0;
+  for(let g=0;g<60;g++){
+   const cur=rsMark(first&&g===0),ch=rsChanges(cur).slice(0,500);
+   const j=await rsCall({p_epoch:RSM.epoch,p_cursor:RSM.cursor,p_changes:ch});
+   if(j.reset){RS.reset=1;RSM.resetEpoch=j.epoch;rsSave();out='reset';return out}
+   RSM.epoch=j.epoch;ch.forEach(c=>{const e=RSM.rec[c.k+'\u0001'+c.r];if(e&&e.t===c.ts)delete e.p});
+   pulled+=rsApply(j.records||[]);RSM.cursor=j.cursor;rsSave();
+   if(!j.more&&ch.length<500)break}
+  RS.last=Date.now();SYNC.st='ok';if(pulled){S.ts=Date.now();render()}
+ }catch(e){out='err';SYNC.st='err';RS.err=e&&e.code==='auth'?'auth':'net'}
+ finally{RS.busy=0;if(RS.again){RS.again=0;setTimeout(rsSync,300)}}
+ return out}
+const rsSoon=ms=>{if(!rsOn())return;clearTimeout(RST);RST=setTimeout(rsSync,ms||1500)};
+function rsStamp(){if(!rsOn()||RS.dt)return;RS.dt=Date.now();setTimeout(()=>{const at=RS.dt;RS.dt=0;try{if(rsOn()){rsMark(false,at);rsSave()}}catch(e){lg(e)}},250)}
+/* ترحيل لقطة الوسيط القديمة: تُحوَّل إلى سجلات بوقت اللقطة وتُدمج بقاعدة الفوز نفسها فلا تطغى على تعديلات أحدث */
+async function rsLegacyImport(){
+ const r=await fetch(CFG.syncUrl,{headers:{Authorization:'Bearer '+SYNC.token}});if(r.status===404)return{n:0,none:1};if(r.status===410)return{n:0,gone:1};if(!r.ok)throw new Error('legacy_'+r.status);
+ const x=await r.json();if(!x||!x.plan)return{n:0,none:1};
+ const first=!Object.keys(RSM.rec).length&&!RSM.cursor;rsMark(first);
+ const snap=rsDecomp(cleanData(x)),ts=+x.ts||1,recs=Object.values(snap).map(c=>({k:c.k,r:c.r,v:{m:c.m,e:c.e,v:c.v},ts,d:'legacy',x:false}));
+ const n=rsApply(recs);rsSave();return{n,total:recs.length}}
 async function bootPwa(){
- if(CFG.aiUrl||CFG.syncUrl){if(!SYNC.token){SYNC.token=genToken();try{localStorage.setItem('fit_sync',SYNC.token)}catch(e){lg(e)}}}
+ if((CFG.aiUrl||CFG.syncUrl)&&!CFG.sbUrl){if(!SYNC.token){SYNC.token=genToken();try{localStorage.setItem('fit_sync',SYNC.token)}catch(e){lg(e)}}}
  if(CFG.aiUrl){SM=proxySample();SMI=true}
- if(CFG.syncUrl){const r=await syncPull();SYNC.st=r==='err'?'err':'ok';if(r==='pulled'){render()}else if(r!=='err'){await syncPush()}}
+ if(rsOn()){await rsSync()}
+ else if(CFG.syncUrl&&SYNC.token){const r=await syncPull();SYNC.st=r==='err'?'err':'ok';if(r==='pulled'){render()}else if(r!=='err'&&r!=='off'){await syncPush()}}
  try{const g=new URLSearchParams(location.search).get('go');if(['dash','train','food','pg','me'].indexOf(g)>=0){S.tab=g;S.sub=null}}catch(e){lg(e)}
  render()}
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();INST=e;if(S.prof.ob&&S.tab==='me'&&!S.sub)render()});
@@ -1037,7 +1118,7 @@ function save(){
  S.ts=Date.now();
  try{S.tot[W()]=tasks().length;localStorage.setItem('fit1',JSON.stringify(S));SAVEFAIL=0}catch(e){lg(e);if(!SAVEFAIL){SAVEFAIL=1;try{toast('تعذّر الحفظ على الجهاز. صدّر نسخة احتياطية من الإعدادات الآن')}catch(_){}}}
  clearTimeout(saveT);saveT=setTimeout(()=>{if(ref)ref.set(JSON.parse(JSON.stringify(S))).catch(()=>{})},600);
- if(!IN_CLAUDE&&CFG.syncUrl&&SYNC.token){clearTimeout(syncT);syncT=setTimeout(syncPush,1500)}}
+ if(rsOn()){rsStamp();rsSoon(1500)}else if(!IN_CLAUDE&&CFG.syncUrl&&SYNC.token){clearTimeout(syncT);syncT=setTimeout(syncPush,1500)}}
 
 /* ---------- derived data ---------- */
 function tasks(){const w=W(),o=[];S.plan.forEach((p,d)=>p.ex.forEach(e=>{const k=w+'|'+d+'|'+e.id;o.push({k,d,e,r:S.done[k]})}));return o}
@@ -1966,11 +2047,12 @@ function vSet(){
  h+='<div class="card"><h2>'+ic('flame')+'أهدافي</h2><div class="g2">'+inp('خطوات يوميًا','pf:steps',P.steps)+inp('سعرات محروقة يوميًا','pf:kcal',P.kcal)+inp('كارديو أسبوعي (دقيقة)','pf:cardio',P.cardio)+inp('مسافة أسبوعية (كم)','pf:km',P.km)+inp('النوم (ساعات)','pf:sleep',P.sleep,'step="0.25"')+inp('نقاط النشاط الأسبوعية','pf:pts',P.pts)+'</div><div class="mu" style="margin:14px 0 8px">أهداف التغذية اليومية</div><div class="g2">'+inp('السعرات','nt:kcal',S.nt.kcal)+inp('البروتين (غ)','nt:p',S.nt.p)+inp('الكربوهيدرات (غ)','nt:c',S.nt.c)+inp('الدهون (غ)','nt:f',S.nt.f)+'</div><div class="row" style="margin-top:12px"><button class="btn sm ghost" data-a="recalc">احسب أهدافي تلقائيًا</button></div></div>';
  h+='<div class="card" style="padding-block:4px"><button class="lnk" data-a="sub" data-v="wgt">'+ic('scale')+'<span class="t">مراقبة الوزن</span>'+ic('next')+'</button><button class="lnk" data-a="sub" data-v="plan">'+ic('dumbbell')+'<span class="t">خطة التمارين والأوزان</span>'+ic('next')+'</button><button class="lnk" data-a="sub" data-v="prog">'+ic('chart')+'<span class="t">التقدّم</span>'+ic('next')+'</button><button class="lnk" data-a="sub" data-v="arch">'+ic('box')+'<span class="t">الأرشيف</span>'+ic('next')+'</button><button class="lnk" data-a="sub" data-v="tools">'+ic('calc')+'<span class="t">الأدوات والحاسبات</span>'+ic('next')+'</button><button class="lnk" data-a="sub" data-v="prg">'+ic('book')+'<span class="t">البرامج الجاهزة</span>'+ic('next')+'</button><button class="lnk" data-a="sub" data-v="mpg">'+ic('fork')+'<span class="t">مولّد خطة الوجبات</span>'+ic('next')+'</button><button class="lnk" data-a="sub" data-v="ach">'+ic('trophy')+'<span class="t">الإنجازات والسلاسل</span>'+ic('next')+'</button><button class="lnk" data-a="sub" data-v="cul">'+ic('book')+'<span class="t">الثقافة الرياضية (مدربون ومقالات)</span>'+ic('next')+'</button><button class="lnk" data-a="report">'+ic('chart')+'<span class="t">تقرير التقدّم (طباعة أو PDF)</span>'+ic('next')+'</button><button class="lnk" data-a="sub" data-v="watch">'+ic('watch')+'<span class="t">ساعة شاومي وMi Fitness</span>'+ic('next')+'</button></div>';
  h+='<div class="card"><h2>'+ic('download')+'استيراد سجلّك من Hevy أو Strong</h2><div class="mu" style="margin-bottom:8px">صدّر ملف CSV من التطبيق القديم واختره هنا، فتنتقل أوزانك السابقة وتظهر في اقتراحات الزيادة والسلسلة.</div><label class="f">ملف CSV<input id="hv-in" type="file" accept=".csv,text/csv"></label></div>';
- h+=accCard();if(NAT)h+=hcCard();
+ if(!CFG.sbUrl)h+=accCard();if(NAT)h+=hcCard();
  h+='<div class="card"><h2>'+ic('bell')+'إشعار التمرين اليومي</h2><div class="seg">'+[['1','مفعّل'],['0','متوقف']].map(x=>'<button class="'+((P.dnon?'1':'0')===x[0]?'on':'')+'" data-a="dnon" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div><label class="f" style="margin-top:10px">وقت التذكير<input type="time" data-c="pt:dnt" value="'+(P.dnt||'17:00')+'"></label><div class="mu" style="margin-top:6px">'+(NAT?'يصل التذكير في وقته حتى والتطبيق مغلق.':'إشعار واحد في اليوم بتمرينك. يعمل والتطبيق مفتوح أو مثبّتًا على الشاشة.')+'</div>'+(NAT?'<div class="seg" style="margin-top:12px">'+[['1','تذكير تسجيل المساء: مفعّل'],['0','متوقف']].map(x=>'<button class="'+((P.wnon?'1':'0')===x[0]?'on':'')+'" data-a="wnon" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div><label class="f" style="margin-top:10px">وقت تذكير المساء<input type="time" data-c="pt:wnt" value="'+(P.wnt||'20:30')+'"></label>':'')+'</div><div class="card"><h2>'+ic('user')+'الاستخدام باليد الواحدة</h2><div class="seg">'+[['','إيقاف'],['r','يد يمنى'],['l','يد يسرى']].map(x=>'<button class="'+((P.oh||'')===x[0]?'on':'')+'" data-a="ohset" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div><div class="mu" style="margin-top:6px">أزرار أكبر ويُنقل زر الإضافة إلى جهة إبهامك.</div></div>';
  h+=prefCard();h+='<div class="card"><h2>'+ic('gear')+'الإعدادات والنسخ</h2><div class="mu" style="margin-bottom:6px">المظهر</div><div class="seg">'+[['dark','داكن'],['light','فاتح'],['auto','تلقائي']].map(x=>'<button class="'+(TH===x[0]?'on':'')+'" data-a="themeset" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div><div class="mu" style="margin:12px 0 6px">اللغة</div><div class="seg nobi-x">'+[['1','عربي + English'],['0','عربي فقط'],['en','English only']].map(x=>'<button class="'+((document.body.classList.contains('nobi')?'0':document.body.classList.contains('en1')?'en':'1')===x[0]?'on':'')+'" data-a="biset" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div><label class="f">خط قمرة Bold<input id="font-in" type="file" accept=".ttf,.otf,.woff,.woff2"></label><label class="f" style="margin-top:8px">خط قمرة Light<input id="font-in-l" type="file" accept=".ttf,.otf,.woff,.woff2"></label><div class="mu" style="margin:6px 0 10px">ارفع ملفي الخط مرة واحدة ليُحفظا على هذا الجهاز. بدونهما يُستعمل خط Cairo بوزني Bold وLight.</div><div class="row"><button class="btn sm ghost" data-a="fontreset">إزالة الخط المرفوع</button><button class="btn sm ghost" data-a="exp">'+ic('download')+'تصدير بياناتي</button></div><div class="mu" style="margin:14px 0 6px">استرجاع نسخة محفوظة (الصق محتوى ملف JSON أو ارفعه)</div><textarea id="impall" placeholder="{...}"></textarea><div class="row" style="margin-top:8px"><input type="file" id="impall-f" accept=".json" style="flex:1;width:auto"><button class="btn sm" data-a="impall">استرجاع</button></div>'+(UI.msg?'<div class="tag" style="margin-top:8px">'+esc(UI.msg)+'</div>':'')+'</div>';
  h+=pinCard()+profCard();
- if(!IN_CLAUDE&&(CFG.syncUrl||CFG.aiUrl)){h+='<div class="card"><h2>'+ic('watch')+'المزامنة والأجهزة</h2><div class="mu" style="margin-bottom:8px">رمزك الخاص يربط بياناتك بين أجهزتك ويفعّل المساعد الذكي. لا تشاركه مع أحد.</div><label class="f">رمز المزامنة<input id="tok" type="text" dir="ltr" value="'+esc(SYNC.token)+'"></label><div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="copytok">نسخ الرمز</button><button class="btn sm" data-a="synctok">استعمال هذا الرمز</button></div><div class="tag'+(SYNC.st==='err'?' bad':'')+'" style="margin-top:8px">'+(SYNC.st==='err'?'تعذّرت المزامنة، البيانات محفوظة على الجهاز':'المزامنة تعمل')+'</div></div>'}
+ h+=rsCard();
+ if(!IN_CLAUDE&&!CFG.sbUrl&&(CFG.syncUrl||CFG.aiUrl)){h+='<div class="card"><h2>'+ic('watch')+'المزامنة والأجهزة</h2><div class="mu" style="margin-bottom:8px">رمزك الخاص يربط بياناتك بين أجهزتك ويفعّل المساعد الذكي. لا تشاركه مع أحد.</div><label class="f">رمز المزامنة<input id="tok" type="text" dir="ltr" value="'+esc(SYNC.token)+'"></label><div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="copytok">نسخ الرمز</button><button class="btn sm" data-a="synctok">استعمال هذا الرمز</button></div><div class="tag'+(SYNC.st==='err'?' bad':'')+'" style="margin-top:8px">'+(SYNC.st==='err'?'تعذّرت المزامنة، البيانات محفوظة على الجهاز':'المزامنة تعمل')+'</div></div>'}
  if(INST)h+='<div class="card hl"><button class="btn" data-a="install">تثبيت التطبيق على الشاشة الرئيسية</button></div>';
  h+='<div class="card"><h2>'+ic('info')+'الخصوصية والبيانات</h2><a class="lnk" href="privacy.html">'+ic('info')+'<span class="t">سياسة الخصوصية</span>'+ic('next')+'</a><a class="lnk" href="delete-account.html">'+ic('trash')+'<span class="t">حذف الحساب والبيانات</span>'+ic('next')+'</a></div>';
  return h}
@@ -2047,7 +2129,7 @@ function localParse(t){t=n2(t);const o={},m=t.match.bind(t);let x;
  o.cardio=[];[['مشي','مشي (جهاز)'],['جري','جري (جهاز)'],['دراج','دراجة'],['إهليلجي','إهليلجي'],['تجديف','تجديف'],['سلم','سلّم'],['قفز','قفز الحبل']].forEach(a=>{const y=t.match(new RegExp(a[0]+'[^0-9]{0,15}(\\d+)\\s*دقيق'));if(y)o.cardio.push({machine:a[1],min:+y[1]})});
  o.meals=[];const re=/أكلت\s*([^\d،,.]+?)\s*(\d+)\s*سعر/g;let z;while((z=re.exec(t)))o.meals.push({name:z[1].trim(),kcal:+z[2]});
  return o}
-function aiErr(e){const c=e&&e.code;return c==='not_granted'?(IN_CLAUDE?'لم تسمح للصفحة بالاستعانة بـ Claude.':'تعذّر التحقق من رمز الاستخدام. افتح صفحة «أنا» وتأكد من رمز المزامنة.'):c==='rate_limited'?'وصلت إلى حد الاستخدام الآن، حاول بعد قليل.':c==='image_rejected'?'تعذّرت قراءة الصورة، جرّب صورة أخرى.':c==='cancelled'?'':c==='session_expired'?'انتهت الجلسة، سجّل الدخول من جديد.':'تعذّر الحصول على النتيجة، حاول مرة أخرى.'}
+function aiErr(e){const c=e&&e.code;return c==='not_granted'?(IN_CLAUDE?'لم تسمح للصفحة بالاستعانة بـ Claude.':'تعذّر التحقق من حسابك. سجّل الدخول من صفحة «المجتمع» ثم أعد المحاولة.'):c==='rate_limited'?'وصلت إلى حد الاستخدام الآن، حاول بعد قليل.':c==='image_rejected'?'تعذّرت قراءة الصورة، جرّب صورة أخرى.':c==='cancelled'?'':c==='session_expired'?'انتهت الجلسة، سجّل الدخول من جديد.':'تعذّر الحصول على النتيجة، حاول مرة أخرى.'}
 async function runText(){
  const t=(UI.txt||'').trim();if(!t){UI.msg='اكتب أو املِ ما تريد تسجيله أولًا.';render();return}
  UI.busy=1;UI.res=null;UI.msg='';render();
@@ -3448,7 +3530,7 @@ function remTick(){
   const a=r.away;if(a&&a.on){const ad=awayDays();if(ad!=null&&ad>=a.days&&hm>=a.t&&r.fired.away!==td){r.fired.away=td;ch=1;gyNotify('اشتقنا لك',a.msg||('مرّت '+ad+' أيام بلا تمرين. جلسة قصيرة اليوم تكفي لتعود.'))}}
   if(ch)save()}catch(e){lg(e)}}
 function addMin(t,m){const p=t.split(':'),x=(((+p[0])*60+(+p[1])+m)%1440+1440)%1440;return ('0'+Math.floor(x/60)).slice(-2)+':'+('0'+x%60).slice(-2)}
-setInterval(remTick,20000);setTimeout(remTick,2500);document.addEventListener('visibilitychange',()=>{if(!document.hidden)remTick()});
+window.addEventListener('online',()=>rsSoon(500));document.addEventListener('visibilitychange',()=>{if(!document.hidden)rsSoon(800)});setInterval(remTick,20000);setTimeout(remTick,2500);document.addEventListener('visibilitychange',()=>{if(!document.hidden)remTick()});
 function icsText(){
  const r=gy().rem,esc2=s=>String(s).replace(/[,;\\]/g,m=>'\\'+m),now=new Date(),stamp=now.toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
  let o='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Khatwa//AR\r\nCALSCALE:GREGORIAN\r\n';
@@ -4022,6 +4104,26 @@ async function accCall(kind,email,pw){
  const r=await fetch(accBase()+'/api/'+kind,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,password:pw})});
  let j={};try{j=await r.json()}catch(e){lg(e)}if(!r.ok)throw new Error(j.error||('http'+r.status));return j}
 const ACCERR={exists:'هذا البريد مسجّل مسبقًا',bad_creds:'البريد أو كلمة المرور غير صحيحة',bad_email:'بريد غير صالح',weak_pw:'كلمة المرور يجب ألا تقل عن 8 أحرف',rate:'محاولات كثيرة، حاول لاحقًا'};
+/* ---- بطاقة المزامنة السحابية والحذف ---- */
+const rsPend=()=>Object.keys(RSM.rec).filter(k=>RSM.rec[k].p).length;
+function rsCard(){
+ if(IN_CLAUDE||!(CFG.sbUrl&&CFG.sbKey))return '';
+ let h='<div class="card"><h2>'+ic('watch')+'المزامنة السحابية والبيانات</h2>';
+ if(!SB.ses){h+='<div class="mu" style="margin-bottom:8px">سجّل الدخول بحسابك لتتزامن بياناتك بين أجهزتك، والمساعد الذكي يعمل بالحساب نفسه. بدون حساب تبقى بياناتك على هذا الجهاز فقط.</div><button class="btn sm" data-a="sub" data-v="comm">تسجيل الدخول</button>'}
+ else{
+  const pend=rsPend(),st=RS.pause?'متوقفة على هذا الجهاز':RS.err==='auth'?'انتهت الجلسة، سجّل الدخول من جديد':RS.err==='net'?'تعذّر الاتصال، التعديلات محفوظة وستُرسل لاحقًا':RS.last?'آخر مزامنة '+ago(RS.last):'لم تتم مزامنة بعد';
+  h+='<div class="mu">الحساب: <b dir="ltr">'+esc(SB.email())+'</b></div><div class="tag'+(RS.err||RS.pause?' bad':'')+'" style="margin:8px 0">'+esc(st)+(pend?' · '+pend+' تعديل بانتظار الإرسال':'')+'</div>';
+  if(RS.acct)h+='<div class="mu" style="margin-bottom:8px">هذا الجهاز يحوي بيانات حساب آخر. لن تُرفع إلى هذا الحساب دون موافقتك.</div><div class="row"><button class="btn sm" data-a="rsacctup">ارفع بيانات هذا الجهاز إلى هذا الحساب</button><button class="btn sm ghost" data-a="rsacctwipe">امسح هذا الجهاز وحمّل بيانات الحساب</button></div>';
+  else if(RS.reset)h+='<div class="mu" style="margin-bottom:8px">حُذفت النسخة السحابية من جهاز آخر. بيانات هذا الجهاز لم تُمس ولم تُرفع.</div><div class="row"><button class="btn sm" data-a="rsadopt">ارفع بيانات هذا الجهاز كنسخة جديدة</button><button class="btn sm ghost" data-a="rskeep">أبقِها على هذا الجهاز فقط</button></div>';
+  else if(RS.pause)h+='<button class="btn sm" data-a="rsresume">إعادة تفعيل المزامنة</button>';
+  else h+='<button class="btn sm ghost" data-a="rsnow">مزامنة الآن</button>';
+  if(CFG.syncUrl&&SYNC.token&&!SYNC.dead&&!RSM.migrated)h+='<div class="mu" style="margin:14px 0 6px">لديك مزامنة قديمة برمز الوسيط. انقل بياناتها إلى حسابك (تُدمج سجلًا بسجل ولا تُحذف بياناتك الحالية).</div><button class="btn sm" data-a="rsmig">نقل بيانات المزامنة القديمة</button>'+(UI.msg?'<div class="mu" style="margin-top:6px">'+esc(UI.msg)+'</div>':'');
+  h+='<div class="mu" style="margin:16px 0 6px"><b>حذف البيانات</b> (كل خيار مستقل عن الآخر)</div>';
+  h+=UI.rsdel?'<div class="mu" style="margin:6px 0">سيُحذف كل ما رفعته إلى السحابة. حسابك وبياناتك على هذا الجهاز تبقى. ولن تُرفع بيانات هذا الجهاز مجددًا إلا إذا أعدت تفعيل المزامنة. الأجهزة الأخرى لن تستطيع إعادة رفع النسخة المحذوفة.</div><div class="row"><button class="btn sm" style="background:#b91c1c" data-a="rsdel">تأكيد حذف النسخة السحابية</button><button class="btn sm ghost" data-a="rsdelc">إلغاء</button></div>':'<button class="btn sm ghost" data-a="rsdelq">'+ic('trash')+'حذف نسخة المزامنة السحابية</button>';
+  h+=UI.rswipe?'<div class="mu" style="margin:10px 0 6px">سيُمسح كل ما على هذا الجهاز (التمارين والوجبات والوزن والإعدادات) ويُسجَّل خروجك. النسخة السحابية لا تتأثر ويمكنك استعادتها بتسجيل الدخول.</div><div class="row"><button class="btn sm" style="background:#b91c1c" data-a="rswipe">تأكيد مسح بيانات هذا الجهاز</button><button class="btn sm ghost" data-a="rswipec">إلغاء</button></div>':'<div style="margin-top:8px"><button class="btn sm ghost" data-a="rswipeq">'+ic('trash')+'مسح بيانات هذا الجهاز</button></div>';
+  h+='<div class="mu" style="margin-top:8px">حذف الحساب كاملًا (المجتمع والمزامنة والحصص) من صفحة «المجتمع».</div>'}
+ if(CFG.syncUrl&&SYNC.token&&!SYNC.dead)h+=(UI.lgdel?'<div class="mu" style="margin:14px 0 6px">سيُحذف نسخة المزامنة القديمة من الوسيط نهائيًا. لا تتأثر بيانات الجهاز ولا حسابك الجديد.</div><div class="row"><button class="btn sm" style="background:#b91c1c" data-a="lgdel">تأكيد حذف المزامنة القديمة</button><button class="btn sm ghost" data-a="lgdelc">إلغاء</button></div>':'<div style="margin-top:14px"><button class="btn sm ghost" data-a="lgdelq">'+ic('trash')+'حذف المزامنة القديمة (رمز الوسيط)</button></div>');
+ return h+'</div>'}
 function accCard(){
  if(!CFG.syncUrl)return'';const P=S.prof;
  if(P.accEmail)return '<div class="card acc"><h2>'+ic('user')+'حسابي</h2><div class="mu" style="margin-bottom:8px">'+esc(P.accEmail)+' · بياناتك تُزامَن مع حسابك على كل أجهزتك.</div><div class="row"><button class="btn sm ghost" data-a="accout">تسجيل الخروج</button></div>'+(ACC.msg?'<div class="note" style="margin-top:8px">'+esc(ACC.msg)+'</div>':'')+'</div>';
@@ -4308,6 +4410,23 @@ function importWatch(t){const q=x=>x===undefined||x===''||isNaN(+x)?-1:+x;let n=
  try{const j=JSON.parse(t);(Array.isArray(j)?j:[]).forEach(x=>put(x.date,q(x.steps),q(x.kcal),q(x.km),q(x.hr),q(x.sleep)))}catch(e){n2(t).split(/\n/).forEach(l=>{const p=l.split(/[,;\t]/).map(x=>x.trim());put(p[0],q(p[1]),q(p[2]),q(p[3]),q(p[4]),q(p[5]))})}
  return n}
 const ACT={
+ rsnow:async()=>{const r=await rsSync();toast(r==='ok'?'تمت المزامنة':r==='err'?'تعذّرت المزامنة، تعديلاتك محفوظة':'');return false},
+ rsmig:async()=>{UI.msg='';try{const r=await rsLegacyImport();if(r.none||r.gone){UI.msg=r.gone?'المزامنة القديمة محذوفة مسبقًا':'لا توجد لقطة قديمة على الوسيط';RSM.migrated=1;rsSave();render();return false}
+  const o=await rsSync();if(o!=='ok'){UI.msg='تم الدمج محليًا، تعذّر الرفع الآن وسيُعاد تلقائيًا';render();return false}
+  try{await fetch(CFG.syncUrl.replace(/\/api\/state$/,'/api/migrated'),{method:'POST',headers:{Authorization:'Bearer '+SYNC.token}})}catch(e){lg(e)}
+  RSM.migrated=1;rsSave();UI.msg='نُقلت بياناتك ('+r.n+' سجلًا دُمج). النسخة القديمة جُمّدت ولم تُحذف، يمكنك حذفها من الأسفل.'}catch(e){UI.msg='تعذّر النقل، لم يتغير شيء'}render();return false},
+ rsdelq:()=>{UI.rsdel=1},rsdelc:()=>{UI.rsdel=0},
+ rsdel:async()=>{try{if(!(await SB.fresh()))throw new Error('auth');const r=await fetch(CFG.sbUrl+'/rest/v1/rpc/delete_sync_data',{method:'POST',headers:SB.hd(1),body:'{}'});if(!r.ok)throw new Error('http'+r.status);const j=await r.json();
+  RSM.epoch=j.epoch;RSM.cursor=0;RSM.rec={};RS.pause=1;try{localStorage.setItem('fit_rs_off','1')}catch(e){lg(e)}rsSave();UI.rsdel=0;toast('حُذفت النسخة السحابية')}catch(e){UI.rsdel=0;toast('تعذّر الحذف، لم يتغير شيء')}render();return false},
+ rsresume:async()=>{RS.pause=0;try{localStorage.removeItem('fit_rs_off')}catch(e){lg(e)}RSM.rec={};RSM.cursor=0;rsSave();const r=await rsSync();toast(r==='ok'?'عادت المزامنة':'');render();return false},
+ rsadopt:async()=>{RSM.epoch=RSM.resetEpoch;RSM.cursor=0;RSM.rec={};RS.reset=0;rsSave();await rsSync();render();return false},
+ rskeep:()=>{RS.reset=0;RS.pause=1;try{localStorage.setItem('fit_rs_off','1')}catch(e){lg(e)}return false},
+ rsacctup:async()=>{RSM={dev:RSM.dev,epoch:null,cursor:0,uid:'',rec:{}};RS.acct=0;rsSave();await rsSync();render();return false},
+ rsacctwipe:async()=>{S=def();norm();RSM={dev:RSM.dev,epoch:null,cursor:0,uid:'',rec:{}};RS.acct=0;try{localStorage.setItem('fit1',JSON.stringify(S))}catch(e){lg(e)}rsSave();await rsSync();render();return false},
+ rswipeq:()=>{UI.rswipe=1},rswipec:()=>{UI.rswipe=0},
+ rswipe:async()=>{try{await SB.out()}catch(e){lg(e)}['fit1','fit_rs','fit_rs_off','fit_sync','fit_sb'].forEach(k=>{try{localStorage.removeItem(k)}catch(e){lg(e)}});location.reload();return false},
+ lgdelq:()=>{UI.lgdel=1},lgdelc:()=>{UI.lgdel=0},
+ lgdel:async()=>{try{const r=await fetch(CFG.syncUrl,{method:'DELETE',headers:{Authorization:'Bearer '+SYNC.token}});if(!r.ok&&r.status!==410)throw new Error('h');SYNC.dead=1;toast('حُذفت المزامنة القديمة')}catch(e){toast('تعذّر الحذف، لم يتغير شيء')}UI.lgdel=0;render();return false},
  install:()=>{if(INST){INST.prompt();INST=null}},
  copytok:()=>{try{navigator.clipboard.writeText(SYNC.token);UI.msg='تم نسخ الرمز'}catch(e){UI.msg='انسخ الرمز يدويًا من الخانة'}},
  synctok:async()=>{const t=($('#tok').value||'').trim();if(t.length<20){UI.msg='الرمز قصير جدًا';return}SYNC.token=t;try{localStorage.setItem('fit_sync',t)}catch(e){lg(e)}const r=await syncPull(true);SYNC.st=r==='err'?'err':'ok';if(r==='none')await syncPush();UI.msg=r==='pulled'?'تم جلب بياناتك من الرمز':'تم تفعيل الرمز';render()},
@@ -4566,7 +4685,7 @@ Object.assign(ACT,{
   UI.abusy=0;render();return false},
  aout:async()=>{await SB.out();CM.posts=[];CM.notes=[];CM.my={};render();return false},
  adelq:()=>{UI.deln=1},
- adel:async()=>{try{await SB.q('rpc/delete_my_account','POST',{});}catch(e){toast(sbErr(e));UI.deln=0;render();return false}SB.set(null);UI.deln=0;CM.posts=[];CM.notes=[];toast('حُذف حسابك');render();return false},
+ adel:async()=>{try{await SB.q('rpc/delete_my_account','POST',{});}catch(e){toast(sbErr(e));UI.deln=0;render();return false}SB.set(null);RSM={dev:RSM.dev,epoch:null,cursor:0,uid:'',rec:{}};RS.pause=0;RS.acct=0;rsSave();UI.deln=0;CM.posts=[];CM.notes=[];toast('حُذف حسابك وحُذفت نسخة المزامنة معه');render();return false},
  ppost:async()=>{const t=(($('#cm-new')||{}).value||'').trim();if(!t){toast('اكتب شيئًا أولًا');return false}
   try{await SB.q('posts','POST',{body:t},'return=minimal');await cmLoad();toast('تم النشر')}catch(e){toast(sbErr(e))}return false},
  plike:async b=>{const id=+b.dataset.id,p=CM.posts.find(x=>x.id===id);if(!p)return false;const had=CM.my[id];
