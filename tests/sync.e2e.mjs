@@ -82,6 +82,15 @@ try{
   await fetch('http://127.0.0.1:8792/api/migrated',{method:'POST',headers:{Authorization:'Bearer '+lt,Origin:'http://127.0.0.1:8790'}});
   const w=await fetch('http://127.0.0.1:8792/api/state',{method:'PUT',headers:{Authorization:'Bearer '+lt,Origin:'http://127.0.0.1:8790'},body:JSON.stringify(old)});
   rec('MIG-03','جهاز قديم لا يستطيع الكتابة فوق النسخة بعد الترحيل (410)',w.status===410,'status '+w.status);await m.ctx.close()}
+ /* ---- جهاز جديد بلا رمز قديم: دخول الحساب القديم بالبريد وكلمة المرور ثم النقل ---- */
+ {const o=await fetch('http://127.0.0.1:8792/api/register',{method:'POST',headers:{'content-type':'application/json',Origin:'http://127.0.0.1:8790','CF-Connecting-IP':'9.9.9.'+(Date.now()%200)},body:JSON.stringify({email:email('lg'),password:'legacypass123'})});const reg=await o.json();
+  const lem=email('lg2');const o2=await fetch('http://127.0.0.1:8792/api/register',{method:'POST',headers:{'content-type':'application/json',Origin:'http://127.0.0.1:8790','CF-Connecting-IP':'8.8.8.'+(Date.now()%200)},body:JSON.stringify({email:lem,password:'legacypass123'})});const tk=(await o2.json()).token;
+  const st=await d1.evaluate(()=>JSON.parse(JSON.stringify(S)));st.ts=Date.now()-5000;st.bw={'2026-09-09':91};st.meals={};
+  await fetch('http://127.0.0.1:8792/api/state',{method:'PUT',headers:{Authorization:'Bearer '+tk,Origin:'http://127.0.0.1:8790'},body:JSON.stringify(st)});
+  const n=await device();await n.evaluate(SEED);await up(n,email('nl'));await n.evaluate(()=>{S.tab='me';S.sub='set';render()});
+  await n.fill('#olem',lem);await n.fill('#olpw','legacypass123');await n.click('[data-a=lglogin]');await n.waitForFunction(()=>!!SYNC.token);
+  await n.click('[data-a=rsmig]');await n.waitForFunction(()=>RSM.migrated===1,null,{timeout:8000});const v=await get(n,"S.bw['2026-09-09']");const frozen=await fetch('http://127.0.0.1:8792/api/state',{method:'PUT',headers:{Authorization:'Bearer '+tk,Origin:'http://127.0.0.1:8790'},body:JSON.stringify(st)});
+  rec('MIG-04','حساب مزامنة قديم (بريد وكلمة مرور) على جهاز جديد: الدخول من الإعدادات ثم النقل يجلب بياناته ويجمّد النسخة القديمة',v===91&&frozen.status===410&&!!reg.token,JSON.stringify({v,frozen:frozen.status}));await n.ctx.close()}
  /* ---- حذف نسخة المزامنة: جهاز قديم لا يعيد رفعها ---- */
  {const uid=await uidOf(d1);const before=dbq(`select count(*) from public.sync_records where user_id='${uid}'`);
   await d1.evaluate(()=>ACT.rsdel());const after=dbq(`select count(*) from public.sync_records where user_id='${uid}'`),pausedD1=await get(d1,"RS.pause");

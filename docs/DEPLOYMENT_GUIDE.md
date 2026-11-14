@@ -43,3 +43,15 @@
 - **ALLOW_ORIGIN في الوسيط:** لم يعد `*` مقبولًا. ضع نطاق موقعك بالضبط (مثل `https://اسم-موقعك.netlify.app`) مع `https://localhost,capacitor://localhost` لتطبيق أندرويد.
 - **أندرويد:** `targetSdk=36` و`compileSdk=36` (متطلب Google Play منذ 2026-08-31)، `allowBackup=false`، أذونات القراءة فقط. بعد كل بناء يشغّل CI `scripts/check_manifest.py` ويفشل إن ظهر إذن غير مسموح أو debuggable في Release.
 - **التوقيع:** أسرار `KEYSTORE_B64` و`KEYSTORE_PASSWORD` و`KEY_ALIAS` و`KEY_PASSWORD` تُضاف من GitHub ← Settings ← Secrets فقط، ولا تُكتب في المستودع أو المحادثة. لتوليد الملف على جهازك: `keytool -genkeypair -v -keystore release.jks -alias khatwa -keyalg RSA -keysize 2048 -validity 10000` ثم `base64 -w0 release.jks` وضع الناتج في `KEYSTORE_B64`. احتفظ بنسخة من `release.jks` في مكان آمن خارج المستودع، وفعّل Play App Signing.
+
+
+## 8. نشر P1 (لا تنفّذه قبل مراجعة الفرع)
+
+الترتيب مهم، وكل خطوة قابلة للتراجع (انظر `docs/technical-audit/P1-DESIGN.md`).
+
+1. **Supabase:** خذ نسخة احتياطية. نفّذ `supabase/schema.sql` إن كان مشروعًا جديدًا، ثم `supabase/migrations/p1_sync.sql`. تحقق بـ`select count(*) from public.sync_records` (صفر) وأن `anon` لا يستطيع استدعاء `sync_exchange`.
+2. **Auth:** فعّل تأكيد البريد إن أردت (مستحسن). لا حاجة لتفعيل مزوّدات أخرى.
+3. **الوسيط:** أضف المتغيرات `SUPABASE_URL` و`SUPABASE_ANON_KEY` (المفتاح العام) و`AUTH_MODE=transition` أولًا. لمشاريع HS256 أضف `SUPABASE_JWT_SECRET` كسرّ (`wrangler secret put`). انشر ثم جرّب `/api/ai` بحساب تجريبي.
+4. **التطبيق:** ضع `sbUrl` و`sbKey` في `config.js`، شغّل `python3 tools/build.py`، وانشر `pwa/`.
+5. **بعد ترحيل المستخدمين القدامى:** غيّر `AUTH_MODE` إلى `supabase` (أو احذفه) فيُرفض رمز الوسيط القديم للذكاء والكتابة.
+6. **التراجع:** أعد `AUTH_MODE=transition`، أزل `sbUrl` من `config.js` وأعد النشر، ثم نفّذ `p1_sync_rollback.sql` إن لزم.
