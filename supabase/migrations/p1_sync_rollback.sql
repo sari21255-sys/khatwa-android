@@ -8,7 +8,7 @@
 -- أرشيف سابق لم يُحذف (تراجع ثانٍ): يُنقل بمخططه كاملًا إلى اسم بلاحقة زمنية ولا يُكتب فوقه
 do $$ begin
   if exists(select 1 from pg_namespace where nspname='p1_archive') then
-    execute format('alter schema p1_archive rename to %I','p1_archive_'||to_char(clock_timestamp(),'YYYYMMDD"T"HH24MISS'));
+    execute format('alter schema p1_archive rename to %I','p1_archive_'||to_char(clock_timestamp(),'YYYYMMDD"T"HH24MISSUS'));
   end if;
 end $$;
 create schema p1_archive;

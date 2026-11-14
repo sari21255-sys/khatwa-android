@@ -24,6 +24,12 @@ run sql-01-rls $P -f supabase/tests/01_rls_and_limits.sql
 run sql-02-p1 $P -v ON_ERROR_STOP=1 -f supabase/tests/02_p1_sync.sql
 run sql-04-rollback-restore $P -v ON_ERROR_STOP=1 -f supabase/tests/04_rollback.sql
 run concurrency env PSQL="$PGCMD -d $DB -q -At" bash supabase/tests/03_concurrency.sh
+# الاختبارات نفسها على قاعدة بترتيب لغوي ICU (en-US) كما في Supabase
+$PGCMD -d postgres -q -c "drop database if exists ${DB}_icu" -c "create database ${DB}_icu template template0 encoding 'UTF8' locale_provider icu icu_locale 'en-US' locale 'C.UTF-8'"
+PI="$PGCMD -d ${DB}_icu -q -v ON_ERROR_STOP=1"
+run icu-00-mock $PI -f supabase/tests/00_mock_supabase.sql
+run icu-02-p1 $PI -f supabase/tests/02_p1_sync.sql
+run icu-04-rollback-restore $PI -f supabase/tests/04_rollback.sql
 # e2e على قاعدة نظيفة بالهجرة الحالية
 $PGCMD -d postgres -q -c "drop database if exists ${DB}_e2e" -c "create database ${DB}_e2e"
 Q="$PGCMD -d ${DB}_e2e -q -v ON_ERROR_STOP=1"

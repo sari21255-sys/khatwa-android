@@ -8,6 +8,7 @@ create table if not exists public.sync_meta(
   seq bigint not null default 0,
   epoch int not null default 1,
   closed boolean not null default false,   -- true بعد حذف نسخة السحابة: لا كتابة من أي جهاز حتى يبدأ المستخدم مزامنة جديدة صراحةً
+  deleted_at timestamptz,                  -- آخر حذف لنسخة السحابة: حدّ دائم يبقى بعد إعادة فتح المزامنة، وتتجاوز الاستعادة كل سجل كُتب قبله
   updated_at timestamptz not null default now());
 create table if not exists public.sync_records(
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -17,9 +18,13 @@ create table if not exists public.sync_records(
   ts bigint not null,
   dev text not null check (dev ~ '^[A-Za-z0-9_.-]{1,40}$'),
   del boolean not null default false,
+  written_at timestamptz not null default now(),   -- وقت الخادم لآخر كتابة (لا ساعة الجهاز)
   seq bigint not null,
   primary key(user_id,kind,rid));
 create index if not exists sync_records_user_seq on public.sync_records(user_id,seq);
+-- قواعد أُنشئت بنسخة سابقة من هذا الملف
+alter table public.sync_meta add column if not exists deleted_at timestamptz;
+alter table public.sync_records add column if not exists written_at timestamptz not null default now();
 create table if not exists public.quota_counters(
   scope text not null, bucket text not null, win text not null, n int not null default 0,
   primary key(scope,bucket,win));
@@ -69,8 +74,8 @@ begin
     -- dev يُقارَن بترتيب البايتات (collate "C") ليطابق مقارنة JavaScript على أي ترتيب لغوي للقاعدة (Supabase افتراضيًا en_US.UTF-8)
     if not found or (v_ts, not v_del, v_dev collate "C") > (ex.ts, not ex.del, ex.dev collate "C") then
       m.seq:=m.seq+1;
-      insert into public.sync_records(user_id,kind,rid,data,ts,dev,del,seq) values(uid,v_kind,v_rid,v_data,v_ts,v_dev,v_del,m.seq)
-        on conflict(user_id,kind,rid) do update set data=excluded.data,ts=excluded.ts,dev=excluded.dev,del=excluded.del,seq=excluded.seq;
+      insert into public.sync_records(user_id,kind,rid,data,ts,dev,del,seq,written_at) values(uid,v_kind,v_rid,v_data,v_ts,v_dev,v_del,m.seq,now())
+        on conflict(user_id,kind,rid) do update set data=excluded.data,ts=excluded.ts,dev=excluded.dev,del=excluded.del,seq=excluded.seq,written_at=excluded.written_at;
       applied:=applied+1;
     else ignored:=ignored+1; end if;
   end loop;
@@ -91,7 +96,7 @@ begin
   insert into public.sync_meta(user_id) values(uid) on conflict do nothing;
   perform 1 from public.sync_meta where user_id=uid for update;
   delete from public.sync_records where user_id=uid;
-  update public.sync_meta set epoch=epoch+1,closed=true,updated_at=now() where user_id=uid returning epoch into e;
+  update public.sync_meta set epoch=epoch+1,closed=true,deleted_at=now(),updated_at=now() where user_id=uid returning epoch into e;
   return jsonb_build_object('epoch',e,'deleted',true,'closed',true);
 end $$;
 
