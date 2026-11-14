@@ -1,0 +1,12 @@
+build-check rc=0
+crlf-sim rc=0
+worker-legacy rc=0
+worker-p1 rc=0
+app-e2e rc=0
+p0-acceptance rc=0
+sql-00-mock rc=0
+sql-01-rls rc=0
+sql-02-p1 rc=0
+sql-04-rollback-restore rc=0
+concurrency rc=0
+sync-e2e rc=0

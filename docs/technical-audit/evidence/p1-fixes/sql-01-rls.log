@@ -1,0 +1,130 @@
+ as_user 
+---------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ delete_my_account 
+-------------------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+        result        
+----------------------
+ ALL RLS TESTS PASSED
+(1 row)
+

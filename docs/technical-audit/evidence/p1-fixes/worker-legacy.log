@@ -1,0 +1,26 @@
+  ok   بلا رمز = 401
+  ok   رمز قصير = 401
+  ok   حالة غير موجودة = 404
+  ok   حالة بلا خطة تُرفض
+  ok   حالة صالحة تُحفظ
+  ok   رمز آخر لا يرى حالتي
+  ok   نطاق غير مسموح = 403
+  ok   ترويسة CORS للنطاق المسموح فقط
+  ok   ALLOW_ORIGIN=* لا يُقبل (الطلبات تحمل رمز اعتماد)
+  ok   ALLOW_ORIGIN فارغ = رفض كل أصول المتصفح (الإغلاق عند الفشل)
+  ok   ترويسة Vary: Origin موجودة
+  ok   كلمة مرور ضعيفة تُرفض
+(node:7650) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/claude/khatwa-android/worker/ai-proxy.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/claude/khatwa-android/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok   تسجيل ناجح
+  ok   بريد مكرر = 409
+  ok   كلمة مرور خاطئة = 401
+  ok   دخول صحيح
+  ok   حد التسجيل لكل IP (حُجب 3 من 8)
+  ok   السقف اليومي الكلي يوقف الاستهلاك بعد 3 رغم تغيّر الرمز وIP (200,200,200,429,429,429)
+  ok   حد لكل IP يعمل (40 نجح)
+  ok   صورة أكبر من الحد = 413
+
+20 ناجح، 0 فاشل
