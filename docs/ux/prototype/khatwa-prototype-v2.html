@@ -1,0 +1,819 @@
+<title>نموذج خُطوة</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Readex+Pro:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* التخطيط: تطبيق جوال بعمود واحد؛ أسود وأبيض، والألوان في الأيقونات فقط وتدل على معنى (برتقالي حرق، أخضر إنجاز، أزرق راحة، بنفسجي تقدّم) */
+:root{
+ --bg:#fafafa; --card:#ffffff; --ink:#0b0b0c; --mu:#6b6b72; --line:#e6e6e9; --soft:#f1f1f3;
+ --btn:#0b0b0c; --btn-ink:#ffffff;
+ --c-burn:#f97316; --c-done:#16a34a; --c-rest:#2563eb; --c-prog:#7c3aed; --c-warn:#d97706;
+ --font-d:"Readex Pro","IBM Plex Sans Arabic",system-ui,sans-serif;
+ --font-b:"IBM Plex Sans Arabic","Readex Pro",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --bg:#0a0a0b; --card:#151517; --ink:#f4f4f5; --mu:#9a9aa3; --line:#26262a; --soft:#1d1d20;
+ --btn:#f4f4f5; --btn-ink:#0a0a0b; --c-burn:#fb923c; --c-done:#4ade80; --c-rest:#60a5fa; --c-prog:#a78bfa; --c-warn:#fbbf24; color-scheme:dark}}
+:root[data-theme="dark"]{
+ --bg:#0a0a0b; --card:#151517; --ink:#f4f4f5; --mu:#9a9aa3; --line:#26262a; --soft:#1d1d20;
+ --btn:#f4f4f5; --btn-ink:#0a0a0b; --c-burn:#fb923c; --c-done:#4ade80; --c-rest:#60a5fa; --c-prog:#a78bfa; --c-warn:#fbbf24; color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:16px;line-height:1.5;padding-inline:0}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+input{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--font-d);margin:0;text-wrap:balance;line-height:1.25}
+.num{font-variant-numeric:tabular-nums;font-family:var(--font-d)}
+#app{max-width:460px;margin-inline:auto;min-height:100vh;position:relative}
+.ann{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--btn);color:var(--btn-ink);font-size:13px;display:flex;align-items:center;gap:10px;padding:8px max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px))}
+.ann b{font-family:var(--font-d);white-space:nowrap}
+.ann span{flex:1;min-width:0}
+.ann button{opacity:.7;font-size:18px;line-height:1;min-width:32px;min-height:32px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:41;background:var(--btn)}
+.scr{padding:18px max(16px,env(safe-area-inset-right,0px)) 120px max(16px,env(safe-area-inset-left,0px))}
+.top{display:flex;align-items:center;gap:8px;margin-bottom:18px;min-height:44px}
+.top .sp{flex:1}
+.ib{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--soft)}
+.ib svg{width:22px;height:22px}
+.mu{color:var(--mu)}
+.sm{font-size:14px}
+.xs{font-size:12.5px}
+h1{font-size:28px;font-weight:700}
+h2{font-size:19px;font-weight:600}
+.sub{color:var(--mu);margin:6px 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}
+.stack{display:grid;gap:12px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;border-radius:16px;background:var(--btn);color:var(--btn-ink);font-weight:600;font-size:17px;padding:0 18px;font-family:var(--font-d)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.sm{min-height:44px;font-size:15px;border-radius:14px}
+.btn[disabled]{opacity:.4}
+.btn svg{width:20px;height:20px}
+.fix{position:fixed;inset-inline:0;bottom:0;z-index:30;padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));background:linear-gradient(transparent,var(--bg) 30%);display:flex;justify-content:center}
+.fix>div{width:100%;max-width:460px}
+.opt{display:flex;align-items:center;gap:14px;text-align:start;width:100%;padding:16px;border-radius:20px;background:var(--card);border:1.5px solid var(--line);min-height:76px}
+.opt.on{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink) inset}
+.opt .ico{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--soft);flex:none}
+.opt .ico svg{width:26px;height:26px}
+.opt .t{flex:1;min-width:0}
+.opt .t b{display:block;font-family:var(--font-d);font-weight:600;font-size:17px}
+.opt .t span{color:var(--mu);font-size:14px}
+.grp{margin-bottom:22px}
+.grp>h2{margin-bottom:10px;font-size:16px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:8px}
+.seg button{min-height:52px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);font-weight:600;padding:6px 8px;line-height:1.3}
+.seg button small{display:block;font-weight:400;color:var(--mu);font-size:12px}
+.seg button.on{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink) inset}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--soft)}
+.badge.ok{color:var(--c-done)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12.5px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);color:var(--mu)}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.wd{display:grid;justify-items:center;gap:4px;padding:8px 0;border-radius:14px;border:1px solid var(--line);background:var(--card);font-size:12px;min-width:0}
+.wd .d{font-size:11.5px;color:var(--mu)}
+.wd .n{font-family:var(--font-d);font-weight:600;font-size:15px}
+.wd.today{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
+.wd.today .d{color:inherit;opacity:.75}
+.wd .mk{width:18px;height:18px;display:grid;place-items:center}
+.wd .mk svg{width:16px;height:16px}
+.wd.off{opacity:.55}
+.exl{display:grid;gap:0}
+.exl>div{display:flex;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line)}
+.exl>div:first-child{border-top:0}
+.exl .i{width:30px;height:30px;border-radius:10px;background:var(--soft);display:grid;place-items:center;font-family:var(--font-d);font-size:13px;font-weight:600;flex:none}
+.exl .n{flex:1;min-width:0}
+.exl .n b{font-weight:600;display:block}
+.exl .n span{color:var(--mu);font-size:13px}
+.exl .r{color:var(--mu);font-size:14px;white-space:nowrap}
+.nav{position:fixed;inset-inline:0;bottom:0;z-index:30;display:flex;justify-content:center;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav>div{width:100%;max-width:460px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding-inline:max(4px,env(safe-area-inset-right,0px)) max(4px,env(safe-area-inset-left,0px))}
+.nav button{display:grid;justify-items:center;gap:2px;padding:9px 0 8px;min-height:60px;color:var(--mu);font-size:12px;font-weight:500}
+.nav button svg{width:24px;height:24px}
+.nav button.on{color:var(--ink);font-weight:700}
+.nav button.on svg{stroke-width:2.3}
+.hero{background:var(--btn);color:var(--btn-ink);border-radius:26px;padding:20px;display:grid;gap:14px}
+.hero .mu{color:inherit;opacity:.7}
+.hero h1{font-size:26px}
+.hero .btn{background:var(--btn-ink);color:var(--btn)}
+.hero .btn.ghost{background:transparent;color:var(--btn-ink);border-color:color-mix(in srgb,var(--btn-ink) 35%,transparent)}
+.stat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat>div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 8px;text-align:center}
+.stat b{display:block;font-family:var(--font-d);font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat span{font-size:12.5px;color:var(--mu)}
+.hero .stat>div{background:color-mix(in srgb,var(--btn-ink) 12%,transparent);border-color:transparent}
+.hero .stat span{color:inherit;opacity:.75}
+.bar{height:6px;border-radius:9px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ink);border-radius:9px;transition:width .3s}
+.ex-h{display:grid;gap:4px;margin-bottom:14px}
+.ex-h .mus{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--mu)}
+.sets{display:grid;gap:8px}
+.sr{border:1.5px solid var(--line);background:var(--card);border-radius:18px;overflow:hidden}
+.sr.act{border-color:var(--ink)}
+.sr .h{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;min-height:54px;text-align:start}
+.sr .h .k{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-d);font-weight:600;font-size:14px;background:var(--soft);flex:none}
+.sr.done .h .k{background:var(--c-done);color:#fff}
+.sr .h .k svg{width:16px;height:16px}
+.sr .h .t{flex:1;min-width:0;font-weight:600}
+.sr .h .t small{display:block;font-weight:400;color:var(--mu);font-size:13px}
+.sr .body{padding:2px 14px 14px;display:grid;gap:12px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fld{display:grid;gap:4px;min-width:0}
+.fld>span{font-size:13px;color:var(--mu)}
+.stp{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;direction:ltr;border:1.5px solid var(--line);border-radius:14px;overflow:hidden;background:var(--bg)}
+.stp button{min-height:52px;font-size:22px;font-weight:600}
+.stp input{width:100%;min-width:0;text-align:center;border:0;background:transparent;font-family:var(--font-d);font-size:22px;font-weight:700;padding:0;font-variant-numeric:tabular-nums}
+.stp input:focus{outline:2px solid var(--ink);outline-offset:-2px}
+.rest{position:fixed;inset-inline:0;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:31;display:flex;justify-content:center;padding-inline:max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-left,0px));pointer-events:none}
+.rest>div{pointer-events:auto;width:100%;max-width:428px;background:var(--card);border:1.5px solid var(--c-rest);border-radius:18px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.rest .tm{font-family:var(--font-d);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--c-rest)}
+.rest .tx{flex:1;font-weight:600;min-width:0}
+.toast{position:fixed;inset-inline:0;bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:50;display:flex;justify-content:center;padding-inline:16px;pointer-events:none}
+.toast>div{pointer-events:auto;background:var(--btn);color:var(--btn-ink);border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:14px;font-size:14.5px;max-width:420px}
+.toast button{font-weight:700;text-decoration:underline;min-height:36px;padding-inline:4px}
+.sheet-bg{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:460px;background:var(--card);border-radius:26px 26px 0 0;padding:20px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:grid;gap:12px;max-height:88vh;overflow:auto}
+.sheet h2{font-size:21px}
+.sheet ul{margin:0;padding-inline-start:20px;color:var(--mu)}
+.row{display:flex;align-items:center;gap:12px}
+.lnk{display:flex;align-items:center;gap:12px;width:100%;text-align:start;padding:13px 0;min-height:56px;border-top:1px solid var(--line)}
+.lnk:first-child{border-top:0}
+.lnk .ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--soft);flex:none}
+.lnk .ico svg{width:22px;height:22px}
+.lnk .t{flex:1;min-width:0}
+.lnk .t b{display:block;font-weight:600}
+.lnk .t span{color:var(--mu);font-size:13.5px}
+.tag{font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;border:1px solid var(--line);color:var(--mu);white-space:nowrap}
+.empty{text-align:center;padding:34px 12px;display:grid;gap:12px;justify-items:center}
+.empty .ico{width:72px;height:72px;border-radius:24px;background:var(--soft);display:grid;place-items:center}
+.empty .ico svg{width:36px;height:36px}
+.sec{margin-top:22px;display:grid;gap:10px}
+.sec>.row{justify-content:space-between}
+.chev{width:18px;height:18px;color:var(--mu);transform:scaleX(-1)}
+.pr{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.pr:first-child{border-top:0}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<style>
+/* إضافات الجولة الثانية */
+.scr svg{width:22px;height:22px;flex:none}
+svg.chart{width:100%;height:auto}
+.partial-tag svg,.pill svg{width:16px;height:16px}
+.hd{display:flex;align-items:center;gap:8px;margin-bottom:16px;min-height:48px}
+.hd .sp{flex:1}
+.hd h1{font-size:24px}
+.hd .sub2{font-size:13.5px;color:var(--mu)}
+.qk{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.qk button{display:grid;justify-items:center;gap:6px;padding:12px 4px 10px;border-radius:16px;background:var(--card);border:1px solid var(--line);font-size:13px;font-weight:600;min-height:78px;min-width:0}
+.qk button span.i{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--soft)}
+.qk button svg{width:22px;height:22px}
+.qk button small{font-weight:400;color:var(--mu);font-size:11.5px;line-height:1.2;text-align:center}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;border:1px solid var(--line);color:var(--mu);white-space:nowrap}
+.pill.live{color:var(--c-done);border-color:var(--c-done)}
+.pill.demo{color:var(--c-warn);border-color:var(--c-warn)}
+.pill.cfg{color:var(--c-rest);border-color:var(--c-rest)}
+.tabs2{display:flex;gap:6px;overflow-x:auto;margin:0 -2px 14px;padding:2px;scrollbar-width:none}
+.tabs2::-webkit-scrollbar{display:none}
+.tabs2 button{flex:none;min-height:40px;padding:0 14px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);font-weight:600;font-size:14px}
+.tabs2 button.on{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
+.mac{display:grid;gap:10px}
+.mac .l{display:grid;grid-template-columns:70px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:14px}
+.mac .l b{font-variant-numeric:tabular-nums}
+.chart{width:100%;height:auto;display:block}
+.chart text{font-family:var(--font-d);font-size:10px;fill:var(--mu)}
+.lst>div,.lst>button{display:flex;align-items:center;gap:12px;width:100%;text-align:start;padding:12px 0;border-top:1px solid var(--line);min-width:0}
+.lst>:first-child{border-top:0}
+.lst .g{flex:1;min-width:0}
+.lst .g b{display:block;font-weight:600}
+.lst .g span{color:var(--mu);font-size:13.5px}
+.lst .r{color:var(--mu);font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.bd{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.bd>div{display:grid;justify-items:center;gap:6px;padding:12px 4px;border-radius:16px;border:1px solid var(--line);background:var(--card);text-align:center;font-size:12.5px;min-width:0;opacity:.5}
+.bd>div.on{opacity:1}
+.bd svg{width:28px;height:28px}
+.fld2{display:grid;gap:6px;margin-bottom:12px}
+.fld2>span{font-size:13.5px;color:var(--mu)}
+.in{width:100%;min-height:50px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);padding:0 14px;font-size:17px;font-family:var(--font-d)}
+.in:focus{outline:2px solid var(--ink);outline-offset:-2px}
+.prog{height:8px;border-radius:9px;background:var(--soft);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--c-warn);border-radius:9px}
+.hero .prog{background:color-mix(in srgb,var(--btn-ink) 18%,transparent)}
+.partial-tag{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:3px 10px;border-radius:99px;background:color-mix(in srgb,var(--c-warn) 18%,transparent);color:var(--c-warn)}
+.hero .partial-tag{background:color-mix(in srgb,var(--btn-ink) 16%,transparent);color:var(--btn-ink)}
+.srch{display:flex;gap:8px;margin-bottom:12px}
+.hint2{font-size:13px;color:var(--mu);margin:2px 0 10px}
+.rowx{display:flex;gap:10px;align-items:center}
+.rowx>*{min-width:0}
+.rowx .sp{flex:1}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sh-title{display:flex;align-items:center;gap:10px}
+.sh-title .ib{width:40px;height:40px;border-radius:12px}
+.opt2{display:flex;flex-wrap:wrap;gap:8px}
+.opt2 button{min-height:44px;padding:0 14px;border-radius:12px;border:1.5px solid var(--line);font-weight:600;background:var(--card)}
+.opt2 button.on{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink) inset}
+.opt2 button[disabled]{opacity:.45}
+.res button{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:start;padding:11px 12px;min-height:50px;border-radius:12px;border:1.5px solid var(--line);margin-bottom:6px;background:var(--bg)}
+.res button.on{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink) inset}
+.res small{color:var(--mu);display:block;font-size:12.5px}
+.note2{border-radius:14px;background:var(--soft);padding:10px 12px;font-size:13.5px;color:var(--mu)}
+.bul{margin:0;padding-inline-start:20px;display:grid;gap:4px}
+.bul li{color:var(--ink)}
+.bul.mu li{color:var(--mu)}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:14.5px}
+.kv:first-child{border-top:0}
+.kv span:first-child{color:var(--mu)}
+.fab2{display:none}
+
+
+.ico{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--soft);flex:none}
+.ico svg{width:22px;height:22px}
+.opt .ico{width:48px;height:48px}.opt .ico svg{width:26px;height:26px}
+.opt .grow b{display:block;font-weight:600;font-size:17px;font-family:var(--font-d)}
+.opt small,.lst small{color:var(--mu);font-size:13.5px;display:block}
+.opt{margin-bottom:10px}
+.grow{flex:1;min-width:0}
+.lnk{display:inline-flex;align-items:center;justify-content:center;width:auto;min-height:44px;padding:0 8px;border:0;text-decoration:underline;font-weight:600;gap:6px}
+.lnk.sm{font-size:14px}
+.ctr .lnk{margin-top:6px}
+button.row{display:flex;align-items:center;gap:12px;width:100%;text-align:start;padding:12px 14px;margin:10px 0;border-radius:16px;border:1px solid var(--line);background:var(--card);min-height:56px}
+button.row small{display:block;color:var(--mu);font-size:13px}
+.lst>button svg:last-child{flex:none}
+.lab{font-size:14px;font-weight:600;color:var(--mu);margin:18px 0 8px}
+.lab:first-child{margin-top:0}
+.ctr{min-height:82vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}
+.ctr>.btn{margin-top:6px}
+.logo{width:84px;height:84px;border-radius:28px;background:var(--btn);display:grid;place-items:center}
+.logo svg{width:42px;height:42px}
+.logo.done{background:var(--c-done)}
+.big{font-size:44px}
+.bigno{font-family:var(--font-d);font-size:38px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.bigno small{font-size:15px;font-weight:500;color:var(--mu)}
+.eyebrow{font-size:13.5px;opacity:.75;margin:0}
+.hero h2{font-size:24px}
+.hero p{margin:0;opacity:.88}
+.hero .prog i{background:var(--btn-ink)}
+button.stat{display:block;grid-template-columns:none;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 8px;text-align:center;min-width:0;min-height:76px}
+div.stat{display:block;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 8px;text-align:center}
+.cols2{margin:12px 0}
+.card{margin-bottom:12px}
+.empty.tight{padding:8px 0}
+.empty p{margin:0}
+.srow{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.lst>.srow:first-child{border-top:0}
+.srow.act{font-weight:700}
+.srow.done{color:var(--mu)}
+.srow .r{margin-inline-start:auto}
+.stp2{display:grid;grid-template-columns:minmax(0,1fr) 48px 64px 48px;align-items:center;gap:6px;border:1.5px solid var(--line);border-radius:16px;padding:6px 12px;margin-bottom:10px;background:var(--card)}
+.stp2 b{text-align:center;font-family:var(--font-d);font-size:24px;font-variant-numeric:tabular-nums}
+.stp2 .ib{font-size:24px;font-weight:600}
+.rbar{margin-top:12px;display:flex;align-items:center;gap:6px;background:var(--card);border:1.5px solid var(--c-rest);border-radius:18px;padding:8px 14px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.rbar>span{flex:1;font-weight:600;display:flex;align-items:center;gap:8px}
+.rbar svg{width:20px;height:20px}
+.rbar b{font-family:var(--font-d);color:var(--c-rest);font-size:22px;font-variant-numeric:tabular-nums}
+.wk{padding-bottom:110px}
+.toast{opacity:0;transition:opacity .2s}
+.toast.on{opacity:1}
+.toast>div:empty{display:none}
+.ib.sm{width:40px;height:40px}
+.mu{margin:6px 0}
+.hint2{margin:6px 0}
+.sheet-bg{z-index:60}
+.sheet .btn[disabled]{opacity:.4}
+.sheet .opt2{margin-bottom:6px}
+.sheet .stp2{margin:6px 0}
+.annot{display:none}
+.row.sm{}
+</style>
+<div id="app" dir="rtl" lang="ar"></div>
+<script>
+/* ===== أيقونات ===== */
+const I=(p,c)=>`<svg viewBox="0 0 24 24" fill="none" stroke="${c||'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
+const P={
+ flame:'<path d="M12 3c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-1.5.5-2.5 1.5-3.5C10 10 11 9 11 7c0-1.5.2-2.8 1-4z"/><path d="M12 21a6 6 0 0 0 6-6c0-3-2-4-3-6"/>',
+ dumb:'<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/>',
+ heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+ check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',back:'<path d="M9 5l7 7-7 7"/>',chev:'<path d="M9 5l7 7-7 7"/>',
+ chart:'<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>',
+ food:'<path d="M7 3v8a2 2 0 0 0 2 2v8M5 3v6M9 3v6M17 21V3c-2 2-3 5-3 8h3"/>',
+ grid:'<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>',
+ today:'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16"/>',
+ play:'<path d="M7 5l12 7-12 7z" fill="currentColor"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ undo:'<path d="M9 7L4 12l5 5"/><path d="M4 12h11a5 5 0 0 1 0 10h-3"/>',plus:'<path d="M12 5v14M5 12h14"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',
+ bell:'<path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+ watch:'<rect x="7" y="7" width="10" height="10" rx="3"/><path d="M9 7l1-4h4l1 4M9 17l1 4h4l1-4"/>',
+ spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+ shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
+ pin:'<path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>',
+ book:'<path d="M5 4h10a4 4 0 0 1 4 4v12H9a4 4 0 0 1-4-4z"/><path d="M5 16a4 4 0 0 1 4-4h10"/>',
+ users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6 6 0 0 1 3.5 5.5"/>',
+ trophy:'<path d="M8 4h8v6a4 4 0 0 1-8 0zM8 6H4v1a3 3 0 0 0 4 3M16 6h4v1a3 3 0 0 1-4 3M12 14v4M8 20h8"/>',
+ reset:'<path d="M4 4v6h6"/><path d="M5.5 15a8 8 0 1 0 1.2-8.3L4 10"/>',
+ scale:'<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8.5 9a5 5 0 0 1 7 0M12 9.2l1.5 2"/>',
+ box:'<rect x="3" y="4" width="18" height="5" rx="1.5"/><path d="M5 9v10h14V9M10 13h4"/>',
+ share:'<path d="M12 4v11M8 8l4-4 4 4M5 14v5h14v-5"/>',
+ calc:'<rect x="5" y="3" width="14" height="18" rx="3"/><path d="M8 7h8M8 12h2M14 12h2M8 16h2M14 16h2"/>',
+ search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/>',
+ timer:'<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 1.5M9.5 3h5"/>',
+ gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>',
+ moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>',
+ drop:'<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+ run:'<circle cx="14" cy="5" r="2"/><path d="M6 21l3-6 3 2 2-5-3-2-2 3-3-1M13 11l3 3 3-1"/>',
+ ruler:'<rect x="3" y="8" width="18" height="8" rx="1.5"/><path d="M7 8v3M11 8v4M15 8v3M19 8v4"/>',
+ target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 12h.01"/>',
+ image:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="M4 18l5-5 4 4 3-3 4 4"/>',
+ list:'<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/>',
+ lock:'<rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+ cal:'<rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M4 10h16M9 14h2M13 14h2"/>',
+ cap:'<path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v5c2 2 8 2 10 0v-5"/>',
+ mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+ info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+ fast:'<circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/>',
+ star:'<path d="M12 4l2.4 5 5.4.7-4 3.8 1 5.4-4.8-2.7-4.8 2.7 1-5.4-4-3.8 5.4-.7z"/>',
+};
+const IC={};Object.keys(P).forEach(k=>IC[k]=c=>I(P[k],c));
+IC.today=c=>I(P.today,c);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=n=>(Math.round(n*10)/10).toString();
+const mmss=s=>{s=Math.max(0,Math.round(s));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+const DAY=864e5;
+const dkey=t=>{const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const dlabel=t=>new Date(t).toLocaleDateString('ar',{weekday:'long',day:'numeric',month:'long'});
+const dshort=t=>new Date(t).toLocaleDateString('ar',{day:'numeric',month:'short'});
+
+/* ===== بيانات تجريبية ===== */
+const DAYN=['سبت','أحد','إثن','ثلا','أرب','خمي','جمع'];
+const SCHED={3:[0,2,4],4:[0,1,3,4],5:[0,1,2,4,5]};
+const T=(n,m,s,r,w,u)=>({n,m,s,r,w:w==null?null:w,u:u||''});
+const LIB={
+ gym:{
+  FBA:{t:'جسم كامل أ',ex:[T('ضغط أرجل','الفخذ',3,12,40),T('بنش برس','الصدر',3,10,20),T('سحب علوي','الظهر',3,10,30),T('ضغط أكتاف دمبل','الأكتاف',3,10,8),T('بلانك','البطن',3,30,null,'ث')]},
+  FBB:{t:'جسم كامل ب',ex:[T('رفعة رومانية بدمبل','الخلفية',3,10,10),T('ضغط صدر مائل دمبل','الصدر',3,10,8),T('تجديف كابل جالس','الظهر',3,12,25),T('رفرفة جانبية','الأكتاف',3,12,4),T('كرنش','البطن',3,15,null)]},
+  UP:{t:'علوي',ex:[T('بنش برس','الصدر',3,8,25),T('سحب علوي','الظهر',3,10,35),T('ضغط أكتاف دمبل','الأكتاف',3,10,10),T('بايسبس دمبل','الذراع',3,12,6),T('ترايسبس كابل','الذراع',3,12,15)]},
+  LOW:{t:'سفلي',ex:[T('سكوات بالبار','الفخذ',3,8,30),T('ضغط أرجل','الفخذ',3,12,60),T('رفعة رومانية','الخلفية',3,10,15),T('سمانة واقفًا','السمانة',3,15,20),T('بلانك','البطن',3,40,null,'ث')]},
+  PUSH:{t:'دفع',ex:[T('بنش برس','الصدر',3,8,25),T('ضغط مائل دمبل','الصدر',3,10,10),T('ضغط أكتاف دمبل','الأكتاف',3,10,10),T('رفرفة جانبية','الأكتاف',3,12,4),T('ترايسبس كابل','الذراع',3,12,15)]},
+  PULL:{t:'سحب',ex:[T('سحب علوي','الظهر',3,10,35),T('تجديف بار','الظهر',3,10,25),T('سحب للوجه','الأكتاف',3,15,12),T('بايسبس دمبل','الذراع',3,12,6),T('بايسبس مطرقة','الذراع',3,12,6)]},
+  LEG:{t:'أرجل',ex:[T('سكوات بالبار','الفخذ',3,8,30),T('ضغط أرجل','الفخذ',3,12,60),T('رفعة رومانية','الخلفية',3,10,15),T('سمانة واقفًا','السمانة',3,15,20),T('كرنش','البطن',3,15,null)]}
+ },
+ home:{
+  FBA:{t:'جسم كامل أ',ex:[T('سكوات بوزن الجسم','الفخذ',3,15,null),T('ضغط (Push-up)','الصدر',3,10,null),T('تجديف دمبل بيد واحدة','الظهر',3,10,8),T('جسر الأرداف','الأرداف',3,15,null),T('بلانك','البطن',3,30,null,'ث')]},
+  FBB:{t:'جسم كامل ب',ex:[T('اندفاع أمامي','الفخذ',3,10,null),T('ضغط أكتاف دمبل','الأكتاف',3,10,6),T('رفعة رومانية دمبل','الخلفية',3,12,8),T('ضغط ضيق','الذراع',3,8,null),T('كرنش','البطن',3,15,null)]},
+  UP:{t:'علوي',ex:[T('ضغط (Push-up)','الصدر',3,12,null),T('تجديف دمبل بيد واحدة','الظهر',3,10,8),T('ضغط أكتاف دمبل','الأكتاف',3,10,6),T('بايسبس دمبل','الذراع',3,12,5),T('ترايسبس خلف الرأس','الذراع',3,12,5)]},
+  LOW:{t:'سفلي',ex:[T('سكوات بوزن الجسم','الفخذ',3,15,null),T('اندفاع أمامي','الفخذ',3,10,null),T('جسر الأرداف','الأرداف',3,15,null),T('سمانة واقفًا','السمانة',3,20,null),T('بلانك','البطن',3,40,null,'ث')]}
+ }
+};
+LIB.home.PUSH=LIB.home.UP;LIB.home.PULL=LIB.home.UP;LIB.home.LEG=LIB.home.LOW;
+const PLANS={
+ fb3:{id:'fb3',n:'جسم كامل',d:3,codes:['FBA','FBB','FBA'],min:45},
+ ul4:{id:'ul4',n:'علوي وسفلي',d:4,codes:['UP','LOW','UP','LOW'],min:50},
+ ppl5:{id:'ppl5',n:'دفع وسحب وأرجل',d:5,codes:['PUSH','PULL','LEG','UP','LOW'],min:55}
+};
+const GOAL={lose:{n:'خسارة وزن',s:'حرق دهون بتمارين وأكل أخف',ic:'flame',c:'--c-burn'},gain:{n:'زيادة عضلات',s:'أوزان تتصاعد وتمارين للجسم كله',ic:'dumb',c:'--c-prog'},keep:{n:'لياقة وثبات',s:'قوة ونشاط مع وزن ثابت',ic:'heart',c:'--c-done'}};
+function planDays(p,place){return p.codes.map((c,i)=>({code:c,day:SCHED[p.d][i],t:LIB[place][c].t,ex:LIB[place][c].ex}))}
+function why(p,S){
+ const g={lose:'يحرق سعرات كثيرة لأنه يشغّل أكبر عدد من العضلات',gain:'يعطي كل عضلة تمرينًا أكثر من مرة في الأسبوع',keep:'يحافظ على قوتك ويترك لك وقتًا للراحة'}[S.goal||'keep'];
+ const d={3:'ثلاثة أيام تمرين مع راحة بينها، وهذا يناسب البداية.',4:'أربعة أيام: يومان للجسم العلوي ويومان للسفلي.',5:'خمسة أيام موزّعة على الدفع والسحب والأرجل.'}[p.d];
+ return d+' '+g+'.'}
+const FOODS=[
+ ['بيضة مسلوقة','بيضة',78,6,1,5],['صدر دجاج مشوي','100 غ',165,31,0,4],['أرز أبيض مطبوخ','كوب',205,4,45,0],
+ ['خبز عربي','رغيف',165,5,33,1],['زبادي يوناني','كوب',130,12,8,5],['تمر','3 حبات',200,2,54,0],
+ ['موز','حبة',105,1,27,0],['شوفان مطبوخ','كوب',160,6,28,3],['حليب','كوب',120,8,12,5],
+ ['فول مدمس مع خبز','صحن',380,18,55,9],['مندي لحم','صحن',690,44,70,25],['سلطة خضراء','صحن',60,2,8,3]
+];
+const MEALN=['فطور','غداء','عشاء','سناك'];
+const TG={kcal:1960,p:164,c:193,f:59,water:2750};
+
+/* ===== الخدمات: كل ميزة موجودة في التطبيق الحالي ===== */
+/* st: live = تعمل في النموذج، demo = تظهر بصورة تجريبية، cfg = تنتظر إعدادًا أو اختبارًا خارجيًا */
+const SV={
+ plan:{t:'خطتي',ic:'list',col:'--c-burn',st:'live',sub:'أيام التمرين وتمارينها وأوزان كل تمرين',has:['أيام الأسبوع وتمارين كل يوم','الوزن الحالي لكل تمرين (قدرتك)','إضافة تمرين وحذفه'],imp:['تمرين اليوم يبدأ من «اليوم» دائمًا','تعديل واحد بدل ثلاثة مواضع']},
+ programs:{t:'برامج جاهزة',ic:'cal',col:'--c-burn',st:'demo',sub:'12 برنامجًا بمستويات وأماكن مختلفة',has:['تصفية بالمستوى (مبتدئ، متوسط، متقدم)','تصفية بالمكان (نادٍ، بيت) وللنساء','معاينة أيام البرنامج ثم تطبيقه بدل الخطة','يبقى وزن كل تمرين كما سجّلته'],imp:['«مقترح لك» يظهر في أعلى القائمة','تأكيد قبل الاستبدال يبقى كما هو']},
+ aiplan:{t:'خطة بالذكاء الاصطناعي',ic:'spark',col:'--c-prog',st:'cfg',sub:'تبني خطة أسبوعية من مكتبة التمارين حسب أيامك ومعداتك',has:['اختيار الأيام والمعدات والهدف','خطة من مكتبة التمارين (144 تمرينًا)'],need:['تفعيل الوسيط (Cloudflare Worker) في الإعداد','موافقتك الصريحة قبل أول إرسال'],imp:['تعمل بعد موافقة واحدة تظهر في «بياناتي والخصوصية»']},
+ sessions:{t:'جلسات جاهزة',ic:'play',col:'--c-burn',st:'demo',sub:'17 جلسة موجهة بشاشة تشغيل لكل تمرين',has:['اختيار بمدة المستوى والمكان','العضلات المستهدفة برسم الجسم','تشغيل التمارين واحدًا واحدًا ثم شاشة «أحسنت»'],imp:['تستعمل مشغّل «ابدأ التمرين» نفسه فيتوحد التسجيل','وتُحفظ في الأرشيف مثل جلسات الخطة']},
+ exlib:{t:'مكتبة التمارين',ic:'book',col:'--c-rest',st:'demo',sub:'144 تمرينًا بشرح وعضلات مستهدفة وبحث',has:['بحث بالعربية والإنجليزية','عضلات التمرين وطريقة الأداء','سجل أوزانك لكل تمرين'],imp:['زر «كيف؟» داخل المشغّل يفتح التمرين نفسه']},
+ devices:{t:'الأجهزة الرياضية',ic:'dumb',col:'--c-warn',st:'demo',sub:'869 جهازًا من 7 ماركات',has:['تصفية بالعضلة والماركة والنوع','تحديد وزن مسجّل لكل جهاز','صوّر جهازًا للتعرف عليه (يحتاج الذكاء الاصطناعي)'],need:['موافقة الذكاء الاصطناعي لميزة التصوير فقط'],imp:['تُفتح من مكتبة التمارين بدل مكان مستقل','عرض 30 نتيجة مع «المزيد» بدل 120']},
+ missed:{t:'أهداف لم تتحقق',ic:'target',col:'--c-warn',st:'demo',sub:'خطة الأسبوع مع ما تأخر من أسابيع سابقة',has:['قائمة المتأخر لكل أسبوع','تعليم التمرين منجزًا مباشرة'],imp:['تظهر كشارة صغيرة على «اليوم» عند وجود متأخر','تقرأ الجلسات المكتملة نفسها فلا تُدخل شيئًا مرتين']},
+ foodplan:{t:'خطة وجبات اليوم',ic:'cal',col:'--c-done',st:'demo',sub:'وجبات مخططة لكل يوم مع السعرات والبروتين',has:['فطور وغداء وعشاء وسناك','تعليم الوجبة كمأكولة بضغطة','عرض شهري بأيام الالتزام'],imp:['«أكلتها» تسجّل الوجبة في شاشة التسجيل نفسها']},
+ foodlib:{t:'قائمة وجباتي',ic:'food',col:'--c-done',st:'demo',sub:'وجباتك المحفوظة وقاعدة 742 طعامًا',has:['وجبة جديدة من قاعدة الأطعمة','تعديل السعرات والماكروز','وصفات'],imp:['تُستعمل نتائجها في بحث «سجّل وجبة»']},
+ foodins:{t:'تحليل التغذية',ic:'chart',col:'--c-prog',st:'demo',sub:'سبعة أيام من أكلك مقابل أهدافك',has:['متوسط السعرات والبروتين','الأيام القريبة من الهدف'],imp:['يظهر ملخصه في «التقدّم» أيضًا']},
+ mealgen:{t:'مولّد خطة الوجبات',ic:'spark',col:'--c-done',st:'demo',sub:'أسبوع كامل من أطباق حلال حسب هدفك ومطبخك',has:['اختيار المطبخ والنظام (نباتي)','استبعاد الحساسيات (ألبان، مكسرات، بيض، سمك، غلوتين)','تأكيد قبل استبدال خطة الوجبات'],imp:['يُفتح من «التغذية» فقط']},
+ fasting:{t:'الصيام المتقطع',ic:'fast',col:'--c-warn',st:'demo',sub:'مؤقت صيام 12 إلى 24 ساعة مع سجل',has:['اختيار مدة الصيام','بدء الصيام وإنهاؤه','آخر 7 صيامات'],imp:['تنبيه صحي ظاهر قبل البدء']},
+ weight:{t:'مراقبة الوزن',ic:'scale',col:'--c-prog',st:'live',sub:'سجل الوزن والمسار نحو هدفك',has:['تسجيل وزن مع نسبة دهون وملاحظة','وحدات كغ وباوند وستون','رسم لـ 30 و90 يومًا وسنة','الهدف وتاريخ تحقيقه والمتبقي','الوزن المثالي بمعادلة ديفاين ونطاق BMI'],imp:['زر التسجيل نفسه في «اليوم» و«التقدّم»','حالة أولى فارغة بجملة تشرح الخطوة']},
+ measures:{t:'قياسات الجسم',ic:'ruler',col:'--c-prog',st:'demo',sub:'محيط الصدر والخصر والذراع وغيرها',has:['قياسات بتاريخ','مقارنة بأول قياس'],imp:['تدخل ضمن «مراقبة الوزن» كتبويب ثانٍ']},
+ photos:{t:'صور التقدم',ic:'image',col:'--c-prog',st:'cfg',sub:'صور قبل وبعد تبقى على جوالك',has:['تُحفظ على الجهاز فقط','مقارنة صورتين'],need:['اختبار صلاحية الكاميرا والتخزين على جهاز حقيقي'],imp:['تظهر ضمن «التقدّم» وتُذكر في «بياناتي والخصوصية»']},
+ archive:{t:'الأرشيف',ic:'box',col:'--c-rest',st:'live',sub:'كل جلساتك السابقة بتفاصيلها',has:['جلسات مكتملة وجزئية','بحث وتصفية','تفاصيل كل مجموعة','تصدير'],imp:['اليوم يعرض عدد التمارين فقط؛ هنا كل مجموعة']},
+ badges:{t:'الأوسمة والإنجازات',ic:'trophy',col:'--c-warn',st:'live',sub:'12 وسامًا للسلسلة والتمارين والوجبات',has:['سلسلة حالية وأفضل سلسلة','أوسمة تُفتح بالإنجاز','رقم قياسي جديد'],imp:['تظهر بالعربية، والمقفل منها يوضح الشرط']},
+ reports:{t:'تقاريري',ic:'share',col:'--c-rest',st:'demo',sub:'تحليل التزامك في 4 أو 8 أو 12 أسبوعًا',has:['درجة كلية من 100','التمارين والتغذية والانتظام والنوم والتقدّم','فجوات ونصائح من أرقامك','مشاركة التقرير'],imp:['حالة فارغة تقول ماذا تسجّل أولًا']},
+ sleep:{t:'النوم',ic:'moon',col:'--c-rest',st:'live',sub:'ساعات النوم وجودته',has:['تسجيل ساعات اليوم','متوسط الأسبوع','هدف النوم'],imp:['زر التسجيل في «اليوم» وفي هذه الصفحة هو نفسه']},
+ cardio:{t:'الكارديو',ic:'run',col:'--c-burn',st:'demo',sub:'دقائق ومسافة وسعرات ونبض',has:['تسجيل جلسة كارديو','هدف 150 دقيقة أسبوعيًا','الخطوات والسعرات'],imp:['يُسجَّل من «التمرين» ويظهر مجموعه في «التقدّم»']},
+ link:{t:'ربط الساعات',ic:'watch',col:'--c-done',st:'cfg',sub:'Health Connect واستيراد ملفات Apple وGPX وCSV',has:['مزامنة تلقائية على أندرويد (جلاكسي، بكسل، غارمن، فيتبت، شاومي)','استيراد export.xml وGPX وTCX وCSV','نبض لحظي بالبلوتوث','لصق بيانات ساعة شاومي'],need:['جهاز أندرويد حقيقي واختبار الأذونات','مراجعة متطلبات Play لأذونات Health Connect'],imp:['شاشة شرح قبل طلب الإذن']},
+ reminders:{t:'المنبهات',ic:'timer',col:'--c-burn',st:'cfg',sub:'وقت الذهاب إلى النادي وتذكير الغياب',has:['مواعيد ذهاب متعددة','تذكير بعد 2 إلى 7 أيام غياب','تصدير المواعيد إلى تقويم الجوال'],need:['اختبار وصول الإشعار والتطبيق مغلق على جهاز حقيقي'],imp:['تذكير تمرين يومي واحد في الإعدادات الأولى']},
+ gyms:{t:'الأندية',ic:'pin',col:'--c-warn',st:'demo',sub:'أندية المدينة المنورة ثم مدن المملكة',has:['تصفية بالمدينة والنوع والمزايا (مسبح، ساونا، 24 ساعة)','تحديد موقعي','إضافة ناديك'],imp:['بيانات منشورة تحتاج مراجعة دورية قبل الاعتماد عليها']},
+ visits:{t:'جدول زياراتي',ic:'cal',col:'--c-rest',st:'live',sub:'سجل زياراتك للنادي ونمطها',has:['زر «وصلت الآن»','إضافة زيارة بتاريخ','نمط آخر 12 أسبوعًا','مواعيد مقترحة بالذكاء الاصطناعي'],imp:['زيارة النادي تحتسب مع الجلسة نفسها لمن يريد']},
+ culture:{t:'الثقافة الرياضية',ic:'cap',col:'--c-prog',st:'demo',sub:'11 قسمًا من المحتوى التعليمي',has:['المدربون','المنهج والاختبارات (9 وحدات)','مقالات علمية','التشريح العضلي','أساسيات','خرافات وحقائق','قاموس','إحماء وإصابات','مقالات الأكاديمية (46 مقالًا)','المكملات (54 مكملًا)','وزارة الصحة'],imp:['قسم المكملات ومقالات الأكاديمية يحتاجان مراجعة صحية قبل الإطلاق (تذكر أدوية ومواد حساسة)']},
+ tools:{t:'الأدوات',ic:'calc',col:'--c-rest',st:'live',sub:'حاسبات الجسم والتغذية والأقراص',has:['كتلة الجسم BMI','البروتين','نسبة الدهون','السعرات','حاسبة الأقراص'],imp:['تقرأ وزنك وطولك من ملفك فلا تُسأل مرة ثانية']},
+ profile:{t:'ملفي وأهدافي',ic:'user',col:'--c-rest',st:'demo',sub:'الاسم والهدف والوزن المستهدف وأهداف اليوم',has:['الاسم والجنس والعمر والطول','الهدف (خسارة، ثبات، زيادة) والمعدل الأسبوعي','أهداف الخطوات والسعرات والنوم والكارديو','أهداف التغذية اليومية وحسابها تلقائيًا'],imp:['القياسات تُسأل هنا وعند أول دخول للتغذية، لا في الترحيب']},
+ settings:{t:'الإعدادات',ic:'gear',col:'--c-mu',st:'demo',sub:'المظهر واللغة والخط والنسخ الاحتياطي والقفل',has:['مظهر فاتح وداكن وتلقائي','عربي فقط، عربي مع إنجليزي، إنجليزي فقط','خط التطبيق ونظام 24 ساعة','نسخة احتياطية واستيراد وتصدير','رمز قفل للتطبيق','استيراد من Hevy'],imp:['تُقسَّم إلى أقسام قصيرة بدل صفحة طولها 4750 بكسل']},
+ notifs:{t:'مركز الإشعارات',ic:'bell',col:'--c-burn',st:'demo',sub:'تنبيهات التمرين والتغذية والسلسلة والوزن',has:['تفعيل كل نوع على حدة','تعليم الكل كمقروء'],imp:['تُفتح من الجرس في «اليوم»']},
+ coach:{t:'المدرب الذكي',ic:'spark',col:'--c-prog',st:'cfg',sub:'أسئلة وتقرير أسبوعي من بياناتك',has:['ملاحظات آلية بلا خادم','أسئلة مقترحة','تقرير أسبوعي ذكي'],need:['وسيط Cloudflare Worker مفعّل','موافقتك الصريحة قبل أي إرسال (غير موجودة اليوم)'],imp:['الملاحظات الآلية تعمل بلا موافقة لأنها محلية']},
+ community:{t:'المجتمع',ic:'users',col:'--c-rest',st:'cfg',sub:'شارك إنجازك واسأل',has:['منشورات عامة','تفاعلات'],need:['Supabase مفعّل وتحقق مرحلي','سياسة إشراف وإبلاغ'],imp:['تُخفى حتى يتحقق ما سبق']},
+ privacy:{t:'بياناتي والخصوصية',ic:'shield',col:'--c-done',st:'demo',sub:'أين تُحفظ بياناتك، وما الذي يخرج من جوالك',has:['ملخص ما يُحفظ على الجهاز','تصدير واستيراد','مسح بيانات الجوال','حذف الحساب','حالة الذكاء الاصطناعي والربط الصحي والمزامنة'],need:['بريد دعم حقيقي من صاحب التطبيق'],imp:['صفحة واحدة بدل رابطين في أسفل الإعدادات']},
+ account:{t:'الحساب والمزامنة',ic:'user',col:'--c-rest',st:'cfg',sub:'احفظ بياناتك وانتقل بين أجهزتك',has:['تسجيل ودخول','مزامنة بين الأجهزة','حذف السحابة وبدء مزامنة جديدة'],need:['التحقق المرحلي على Supabase وCloudflare (انظر تقرير P1)'],imp:['تُخفى في النسخة الأولى وتكفي النسخة الاحتياطية بملف']}
+};
+const GROUPS=[
+ ['الصحة والجسم',['weight','measures','photos','sleep','cardio','fasting','link']],
+ ['النادي',['gyms','visits','reminders']],
+ ['تعلّم',['culture','exlib','devices','tools']],
+ ['التطبيق وحسابي',['profile','settings','notifs','privacy','account','coach','community']]
+];
+const STN={live:'يعمل في النموذج',demo:'عرض تجريبي',cfg:'ينتظر إعدادًا'};
+
+/* ===== الحالة ===== */
+const KEY='khatwa-proto-v2';
+const NEW=()=>({screen:'welcome',tab:'home',stack:[],goal:null,place:'gym',days:3,level:'b',planId:null,sessions:[],cur:null,hint:true,detail:null,svc:null,weights:[],meals:[],water:0,sleep:null,target:72,startKg:78,visits:[],flt:'all',q:''});
+let S=NEW();
+try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r&&r.screen)S=Object.assign(NEW(),r)}catch(e){}
+if(S.screen==='workout'&&!S.cur)S.screen='home';
+let rest=null,restT=null,toastT=null,sheet=null,lastMsg=null;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const plan=()=>PLANS[S.planId]||PLANS.fb3;
+const dayList=()=>planDays(plan(),S.place);
+const wkStart=t=>{const x=new Date(t);x.setHours(0,0,0,0);return x.getTime()-((x.getDay()+1)%7)*DAY};
+const weekDone=()=>S.sessions.filter(s=>s.status==='complete'&&s.ts>=wkStart(Date.now())).length;
+const today=()=>{const s=todaysSession();const l=dayList();if(s){const f=l.find(d=>d.t===s.t);if(f)return f}return l[weekDone()%l.length]};
+const setsOf=s=>s.exs.reduce((a,e)=>a+e.sets.filter(x=>x.done).length,0);
+const totOf=s=>s.exs.reduce((a,e)=>a+e.sets.length,0);
+const volOf=s=>s.exs.reduce((a,e)=>a+e.sets.reduce((b,x)=>b+(x.done&&x.w?x.w*x.r:0),0),0);
+const completeN=()=>S.sessions.filter(s=>s.status==='complete').length;
+const latest=()=>S.sessions.length?S.sessions[S.sessions.length-1]:null;
+const todaysSession=()=>{for(let i=S.sessions.length-1;i>=0;i--){const s=S.sessions[i];if(dkey(s.ts)===dkey(Date.now())&&(setsOf(s)>0||s.status==='new'))return s}return null};
+function lastOf(name){for(let i=S.sessions.length-1;i>=0;i--){const e=S.sessions[i].exs.find(x=>x.n===name);if(e){const s=e.sets.filter(x=>x.done);if(s.length)return s[s.length-1]}}return null}
+const lastKg=()=>S.weights.length?S.weights[S.weights.length-1].kg:null;
+const todayMeals=()=>S.meals.filter(m=>dkey(m.ts)===dkey(Date.now()));
+const mealSum=()=>todayMeals().reduce((a,m)=>({kcal:a.kcal+m.kcal,p:a.p+m.p,c:a.c+m.c,f:a.f+m.f}),{kcal:0,p:0,c:0,f:0});
+function streak(){const ds=new Set();S.sessions.forEach(s=>ds.add(dkey(s.ts)));S.meals.forEach(m=>ds.add(dkey(m.ts)));let n=0,t=Date.now();if(!ds.has(dkey(t)))t-=DAY;while(ds.has(dkey(t))){n++;t-=DAY}return n}
+function bestStreak(){const ds=[...new Set([...S.sessions.map(s=>dkey(s.ts)),...S.meals.map(m=>dkey(m.ts))])].sort();let b=0,c=0,pr=null;ds.forEach(d=>{const t=new Date(d).getTime();c=(pr!==null&&t-pr===DAY)?c+1:1;pr=t;if(c>b)b=c});return b}
+const BADGES=[
+ ['3 أيام متتالية','flame',()=>bestStreak()>=3,'سجّل وجبة أو تمرينًا 3 أيام متتالية'],
+ ['أسبوع متواصل','flame',()=>bestStreak()>=7,'7 أيام متتالية'],
+ ['14 يومًا','flame',()=>bestStreak()>=14,'14 يومًا متتالية'],
+ ['شهر كامل','flame',()=>bestStreak()>=30,'30 يومًا متتالية'],
+ ['60 يومًا','flame',()=>bestStreak()>=60,'60 يومًا متتالية'],
+ ['100 يوم','flame',()=>bestStreak()>=100,'100 يوم متتالية'],
+ ['10 تمارين','dumb',()=>completeN()>=10,'أكمل 10 جلسات'],
+ ['50 تمرينًا','dumb',()=>completeN()>=50,'أكمل 50 جلسة'],
+ ['100 تمرين','dumb',()=>completeN()>=100,'أكمل 100 جلسة'],
+ ['30 وجبة مسجلة','food',()=>S.meals.length>=30,'سجّل 30 وجبة'],
+ ['رقم قياسي جديد','star',()=>{const b={};let rec=false;S.sessions.forEach(s=>s.exs.forEach(e=>e.sets.filter(x=>x.done&&x.w).forEach(x=>{if(b[e.n]!=null&&x.w>b[e.n])rec=true;b[e.n]=Math.max(b[e.n]||0,x.w)})));return rec},'ارفع وزنًا أعلى مما رفعته من قبل'],
+ ['صور التقدم','image',()=>false,'أضف صورة تقدّم (تحتاج جهازًا حقيقيًا)']
+];
+/* ===== مكونات ===== */
+const ico=(k,c,sz)=>`<span class="ico" style="${sz?'width:'+sz+'px;height:'+sz+'px;':''}color:var(${c||'--ink'})">${IC[k]()}</span>`;
+const pill=st=>`<span class="pill ${st}">${STN[st]}</span>`;
+const WHERE={};
+const TABLINKS={
+ train:['plan','programs','sessions','aiplan','exlib','devices','cardio','missed'],
+ food:['foodplan','foodlib','foodins','mealgen','fasting'],
+ prog:['archive','badges','reports','measures','photos','sleep','weight']
+};
+Object.keys(TABLINKS).forEach(t=>TABLINKS[t].forEach(k=>{WHERE[k]=WHERE[k]||({train:'التمرين',food:'التغذية',prog:'التقدّم'})[t]}));
+GROUPS.forEach(g=>g[1].forEach(k=>{WHERE[k]=(WHERE[k]?WHERE[k]+' و':'')+'المزيد › '+g[0]}));
+const svcRow=k=>{const v=SV[k];return `<button class="row" data-a="svc" data-v="${k}">${ico(v.ic,v.col)}<span class="grow"><b>${v.t}</b><small>${v.sub}</small></span>${pill(v.st)}</button>`};
+const NOTE={
+ home:'اليوم: كل ما تحتاجه الآن في شاشة واحدة. زر التمرين في الأعلى، وتحته أربعة اختصاصات للتسجيل السريع.',
+ train:'التمرين: تمرين اليوم أولًا، وتحته كل ما يتعلق بالخطة.',
+ food:'التغذية: «سجّل وجبة» هنا هي نفسها في «اليوم».',
+ prog:'التقدّم: الوزن والأرشيف والأوسمة والتقارير في مكان واحد.',
+ more:'المزيد: كل خدمة لها مكان واحد واضح، وبجانبها حالتها.'
+};
+function toast(m){lastMsg=m;const t=$('#toast');if(!t)return;t.firstChild.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2600)}
+function go(o){S.stack.push(o);save();render()}
+function back(){if(S.stack.length)S.stack.pop();save();render()}
+const ov=()=>S.stack.length?S.stack[S.stack.length-1]:null;
+const hdr=(t,sub)=>`<div class="hd"><button class="ib" data-a="back" aria-label="رجوع">${IC.back()}</button><div class="grow"><h1>${t}</h1>${sub?`<div class="sub2">${sub}</div>`:''}</div></div>`;
+
+/* ===== الجلسة ===== */
+function startSession(){
+ let s=todaysSession();
+ if(s&&s.status==='complete'){toast('أنجزت تمرين اليوم. تجده في الأرشيف');return}
+ if(!s){
+  const d=today();
+  s={id:'s'+Date.now(),t:d.t,ts:Date.now(),status:'new',ei:0,exs:d.ex.map(e=>({n:e.n,m:e.m,u:e.u,sets:Array.from({length:e.s},()=>({r:e.r,w:e.w==null?0:e.w,done:false}))}))};
+  S.sessions.push(s);
+ }
+ S.cur=s.id;S.screen='workout';S.stack=[];save();render();
+}
+const curS=()=>S.sessions.find(s=>s.id===S.cur);
+function nextSet(s){for(let i=0;i<s.exs.length;i++){const j=s.exs[i].sets.findIndex(x=>!x.done);if(j>=0)return [i,j]}return null}
+function tickRest(){
+ const el=$('#restt');if(!rest){clearInterval(restT);restT=null;return}
+ const left=Math.ceil((rest.end-Date.now())/1000);
+ if(left<=0){rest=null;clearInterval(restT);restT=null;render();return}
+ if(el)el.textContent=mmss(left);
+}
+function doneSet(){
+ const s=curS();if(!s)return;const n=nextSet(s);if(!n)return;
+ const e=s.exs[n[0]],x=e.sets[n[1]];x.done=true;
+ s.status=nextSet(s)?'partial':'complete';s.ei=n[0];
+ if(s.status==='complete'){S.cur=s.id;S.screen='summary';rest=null;toast('تم حفظ الجلسة كاملة')}
+ else{const fin=e.sets.every(y=>y.done);rest={end:Date.now()+(fin?60:90)*1000,e:n[0],j:n[1]};clearInterval(restT);restT=setInterval(tickRest,500);toast('حُفظت المجموعة')}
+ save();render();
+}
+function undoSet(){
+ const s=curS();if(!s||!rest)return;const e=s.exs[rest.e],x=e.sets[rest.j];x.done=false;
+ s.status=setsOf(s)?'partial':'new';rest=null;save();render();
+}
+function leaveWorkout(){
+ const s=curS();rest=null;
+ if(s&&s.status==='new'&&!setsOf(s)){S.sessions=S.sessions.filter(x=>x.id!==s.id)}
+ S.screen='home';S.cur=null;save();render();
+ if(s&&setsOf(s)&&s.status==='partial')toast('حُفظ تمرين جزئي. تكمله من اليوم');
+}
+function adj(f,d){
+ const s=curS();if(!s)return;const n=nextSet(s);if(!n)return;const x=s.exs[n[0]].sets[n[1]];
+ if(f==='w')x.w=Math.max(0,Math.round((x.w+d)*10)/10);else x.r=Math.max(1,x.r+d);save();render();
+}
+function finishEarly(){
+ const s=curS();if(!s)return;
+ sheet={k:'finish'};render();
+}
+
+/* ===== شاشات التهيئة ===== */
+function vWelcome(){return `<div class="pad ctr"><div class="logo">${IC.dumb('var(--btn-ink)')}</div><h1 class="big">خُطوة</h1><p class="mu">تمرين اليوم، وزنك، وأكلك، في تطبيق واحد. تبدأ أول تمرين خلال دقيقة.</p><button class="btn" data-a="to" data-v="goal">ابدأ</button><button class="lnk" data-a="skip">عندي حساب، أريد استعراض النموذج بكل بياناته</button></div>`}
+function vGoal(){return `<div class="pad"><h1>ما هدفك؟</h1><p class="mu">نختار لك خطة مناسبة، وتغيّرها لاحقًا.</p>${Object.keys(GOAL).map(k=>{const g=GOAL[k];return `<button class="opt ${S.goal===k?'on':''}" data-a="goal" data-v="${k}">${ico(g.ic,g.c)}<span class="grow"><b>${g.n}</b><small>${g.s}</small></span></button>`}).join('')}</div>`}
+function vSetup(){return `<div class="pad"><h1>أين تتمرن؟ وكم يومًا؟</h1><div class="lab">المكان</div><div class="seg"><button class="${S.place==='gym'?'on':''}" data-a="place" data-v="gym">نادٍ</button><button class="${S.place==='home'?'on':''}" data-a="place" data-v="home">البيت</button></div><div class="lab">أيام التمرين في الأسبوع</div><div class="seg">${[3,4,5].map(n=>`<button class="${S.days===n?'on':''}" data-a="days" data-v="${n}">${n} أيام</button>`).join('')}</div><button class="btn" data-a="to" data-v="plans">التالي</button></div>`}
+function vPlans(){const rec={3:'fb3',4:'ul4',5:'ppl5'}[S.days];const ids=[rec,...Object.keys(PLANS).filter(k=>k!==rec)];
+ return `<div class="pad"><h1>خطتك المقترحة</h1><p class="mu">${why(PLANS[rec],S)}</p>${ids.map((id,i)=>{const p=PLANS[id];return `<button class="opt ${S.planId===id||(!S.planId&&i===0)?'on':''}" data-a="plan" data-v="${id}"><span class="grow"><b>${p.n}</b><small>${p.d} أيام · نحو ${p.min} دقيقة${i===0?' · مقترحة لك':''}</small></span></button>`}).join('')}<button class="btn" data-a="startplan">ابدأ بهذه الخطة</button></div>`}
+
+/* ===== اليوم ===== */
+function hero(){
+ const t=today(),s=todaysSession(),n=t.ex.length;
+ if(s&&s.status==='complete')return `<div class="hero"><div class="rowx"><span class="partial-tag">${IC.check()} مكتمل</span></div><h2>أنجزت تمرين اليوم</h2><p>${t.t}، ${setsOf(s)} مجموعة، حجم ${Math.round(volOf(s))} كغ.</p><button class="btn inv" data-a="svc" data-v="archive">افتح الجلسة في الأرشيف</button></div>`;
+ if(s&&setsOf(s)>0){const a=setsOf(s),b=totOf(s);return `<div class="hero"><div class="rowx"><span class="partial-tag">${IC.clock()} تمرين جزئي محفوظ</span></div><h2>${t.t} · ${a} من ${b} مجموعة</h2><div class="prog" role="progressbar" aria-valuenow="${a}" aria-valuemax="${b}"><i style="width:${Math.round(a/b*100)}%;background:var(--btn-ink)"></i></div><p>ما سجّلته محفوظ. أكمل من آخر مجموعة.</p><button class="btn inv" data-a="start">أكمل التمرين</button></div>`}
+ const first=completeN()===0&&!S.sessions.length;
+ return `<div class="hero"><p class="eyebrow">${first?'أول تمرين لك':'تمرين اليوم'}</p><h2>${t.t}</h2><p>${n} تمارين · نحو ${plan().min} دقيقة${first?'. نبدأ بأوزان خفيفة وتعدّلها كما تريد':''}</p><button class="btn inv" data-a="start">${IC.play()} ابدأ التمرين</button></div>`;
+}
+function vHome(){
+ const wd=weekDone(),goal=plan().d,m=mealSum(),lw=lastKg(),miss=Math.max(0,goal-wd-0);
+ return `<div class="pad t"><div class="hd"><div class="grow"><div class="sub2">${dlabel(Date.now())}</div><h1>أهلًا بك</h1></div><button class="ib" data-a="svc" data-v="notifs" aria-label="الإشعارات">${IC.bell()}</button></div>
+ ${hero()}
+ <div class="lab">سجّل بسرعة</div>
+ <div class="qk">
+  <button data-a="sheet" data-v="weight"><span class="i">${IC.scale('var(--c-prog)')}</span>وزن<small>${lw?fmt(lw)+' كغ':'لم يُسجَّل'}</small></button>
+  <button data-a="sheet" data-v="meal"><span class="i">${IC.food('var(--c-done)')}</span>وجبة<small>${todayMeals().length?m.kcal+' سعرة':'لا وجبات'}</small></button>
+  <button data-a="sheet" data-v="water"><span class="i">${IC.drop('var(--c-rest)')}</span>ماء<small>${S.water} مل</small></button>
+  <button data-a="sheet" data-v="sleep"><span class="i">${IC.moon('var(--c-prog)')}</span>نوم<small>${S.sleep?S.sleep+' ساعات':'لم يُسجَّل'}</small></button>
+ </div>
+ <div class="card"><div class="rowx"><b class="grow">هدف الأسبوع</b><span class="mu">${wd} من ${goal} تمارين</span></div><div class="prog" style="margin-top:10px"><i style="width:${Math.min(100,Math.round(wd/goal*100))}%"></i></div><p class="hint2" style="margin-top:8px">يُحسب التمرين عند اكتماله فقط، ومرة واحدة.</p></div>
+ <div class="card"><div class="rowx"><b class="grow">التغذية اليوم</b><button class="lnk sm" data-a="tab" data-v="food">التفاصيل</button></div>${todayMeals().length?`<div class="kv"><span>السعرات</span><span>${m.kcal} من ${TG.kcal}</span></div><div class="kv"><span>البروتين</span><span>${m.p} من ${TG.p} غ</span></div>`:`<p class="mu">لم تسجّل وجبة اليوم.</p><button class="btn ghost" data-a="sheet" data-v="meal">سجّل وجبة</button>`}</div>
+ <div class="rowx" style="margin:6px 0 2px"><span class="partial-tag">${IC.flame()} سلسلة ${streak()} أيام</span><span class="sp"></span><button class="lnk sm" data-a="svc" data-v="badges">الأوسمة</button></div>
+ ${S.sessions.some(s=>s.status==='partial'&&dkey(s.ts)!==dkey(Date.now()))?`<button class="row" data-a="svc" data-v="missed">${ico('target','--c-warn')}<span class="grow"><b>جلسة جزئية سابقة</b><small>تجدها في الأرشيف وتكملها</small></span>${IC.chev()}</button>`:''}
+ </div>`;
+}
+
+/* ===== التمرين ===== */
+function vTrain(){
+ const t=today(),l=dayList();
+ return `<div class="pad t"><div class="hd"><div class="grow"><h1>التمرين</h1></div></div>${hero()}
+ <div class="lab">${t.t}</div><div class="card lst">${t.ex.map(e=>`<div><span class="g"><b>${e.n}</b><span>${e.m} · ${e.s}×${e.r}${e.u||''}${e.w?' · '+e.w+' كغ':''}</span></span></div>`).join('')}</div>
+ <div class="lab">أيام الأسبوع</div><div class="week">${DAYN.map((d,i)=>{const x=l.find(y=>y.day===i);return `<div class="wd ${x?'':'off'}"><b>${d}</b><small>${x?x.code:'راحة'}</small></div>`}).join('')}</div>
+ <div class="lab">الخطة والمكتبة</div><div class="card lst">${TABLINKS.train.map(k=>`<button data-a="svc" data-v="${k}">${ico(SV[k].ic,SV[k].col)}<span class="g"><b>${SV[k].t}</b><span>${SV[k].sub}</span></span></button>`).join('')}</div></div>`;
+}
+
+/* ===== التغذية ===== */
+function vFood(){
+ const m=mealSum(),tm=todayMeals();
+ const bar=(l,v,g,u)=>`<div class="l"><span>${l}</span><div class="prog"><i style="width:${Math.min(100,v/g*100)}%"></i></div><b>${v}/${g}${u}</b></div>`;
+ return `<div class="pad t"><div class="hd"><div class="grow"><h1>التغذية</h1></div><button class="btn sm" data-a="sheet" data-v="meal">${IC.plus()} سجّل وجبة</button></div>
+ <div class="card mac">${bar('سعرات',m.kcal,TG.kcal,'')}${bar('بروتين',m.p,TG.p,' غ')}${bar('كربوهيدرات',m.c,TG.c,' غ')}${bar('دهون',m.f,TG.f,' غ')}</div>
+ <div class="lab">وجبات اليوم</div>${tm.length?`<div class="card lst">${tm.map(x=>`<div><span class="g"><b>${esc(x.n)}</b><span>${x.type} · ${x.p} غ بروتين</span></span><span class="r">${x.kcal} سعرة</span><button class="ib sm" data-a="delmeal" data-v="${x.id}" aria-label="حذف">${IC.x()}</button></div>`).join('')}</div>`:`<div class="empty"><p>لم تسجّل وجبة اليوم.</p><p class="mu">ابحث عن طعام وأضفه، وتظهر السعرات هنا وفي «اليوم».</p><button class="btn" data-a="sheet" data-v="meal">سجّل أول وجبة</button></div>`}
+ <div class="lab">الخطط والأدوات</div><div class="card lst">${TABLINKS.food.map(k=>`<button data-a="svc" data-v="${k}">${ico(SV[k].ic,SV[k].col)}<span class="g"><b>${SV[k].t}</b><span>${SV[k].sub}</span></span></button>`).join('')}</div></div>`;
+}
+
+/* ===== التقدم ===== */
+function wChart(arr,h){
+ if(arr.length<2)return '';
+ const W=320,H=h||110,p=14,xs=arr.map((_,i)=>p+i*(W-2*p)/(arr.length-1));
+ const v=arr.map(a=>a.kg),lo=Math.min(...v,S.target)-1,hi=Math.max(...v)+1;
+ const y=k=>H-p-(k-lo)/(hi-lo)*(H-2*p);
+ const pts=arr.map((a,i)=>xs[i].toFixed(1)+','+y(a.kg).toFixed(1)).join(' ');
+ return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="رسم الوزن"><line x1="${p}" x2="${W-p}" y1="${y(S.target)}" y2="${y(S.target)}" stroke="var(--c-done)" stroke-dasharray="4 4"/><text x="${W-p}" y="${y(S.target)-4}" text-anchor="end">الهدف ${S.target}</text><polyline points="${pts}" fill="none" stroke="var(--c-prog)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>${arr.map((a,i)=>`<circle cx="${xs[i]}" cy="${y(a.kg)}" r="3" fill="var(--c-prog)"/>`).join('')}</svg>`;
+}
+function vProg(){
+ const lw=lastKg(),cn=completeN(),part=S.sessions.filter(s=>s.status==='partial').length;
+ return `<div class="pad t"><div class="hd"><div class="grow"><h1>التقدّم</h1></div><button class="btn sm" data-a="sheet" data-v="weight">${IC.plus()} وزن</button></div>
+ <div class="card"><div class="rowx"><b class="grow">الوزن</b><button class="lnk sm" data-a="svc" data-v="weight">السجل والمسار</button></div>
+ ${lw?`<div class="bigno">${fmt(lw)} <small>كغ</small></div><p class="mu">الهدف ${S.target} كغ · بقي ${fmt(Math.abs(lw-S.target))} كغ</p>${wChart(S.weights.slice(-14),90)}`:`<div class="empty tight"><p>لم تسجّل وزنك بعد.</p><p class="mu">سجّله مرة، ثم مرة كل أسبوع ليظهر مسارك.</p><button class="btn" data-a="sheet" data-v="weight">سجّل وزنك</button></div>`}</div>
+ <div class="cols2"><button class="stat" data-a="svc" data-v="archive"><b>${cn}</b><span>جلسات مكتملة${part?` · ${part} جزئية`:''}</span></button><button class="stat" data-a="svc" data-v="badges"><b>${BADGES.filter(b=>b[2]()).length}</b><span>أوسمة من ${BADGES.length}</span></button></div>
+ <div class="lab">المزيد من تقدمك</div><div class="card lst">${TABLINKS.prog.filter(k=>k!=='weight').map(k=>`<button data-a="svc" data-v="${k}">${ico(SV[k].ic,SV[k].col)}<span class="g"><b>${SV[k].t}</b><span>${SV[k].sub}</span></span></button>`).join('')}</div></div>`;
+}
+
+/* ===== المزيد ===== */
+function vMore(){
+ return `<div class="pad t"><div class="hd"><div class="grow"><h1>المزيد</h1><div class="sub2">كل خدمة في مكان واحد</div></div></div>
+ <div class="note2" style="margin-bottom:14px">الأربعة الأولى في الشريط السفلي: اليوم، التمرين، التغذية، التقدّم. وما عداها هنا. الوسم يبيّن ما يعمل في هذا النموذج وما هو عرض.</div>
+ ${GROUPS.map(g=>`<div class="lab">${g[0]}</div><div class="card lst">${g[1].map(k=>`<button data-a="svc" data-v="${k}">${ico(SV[k].ic,SV[k].col)}<span class="g"><b>${SV[k].t}</b><span>${SV[k].sub}</span></span>${pill(SV[k].st)}</button>`).join('')}</div>`).join('')}
+ <div class="lab">أدوات النموذج</div><div class="card"><button class="btn ghost" data-a="seed">املأ ببيانات تجريبية</button><button class="btn ghost" data-a="reset" style="margin-top:8px">ابدأ من جديد</button></div></div>`;
+}
+
+/* ===== صفحات الخدمات ===== */
+function svcBody(k){
+ const v=SV[k];let h='';
+ if(k==='weight'){
+  const a=S.weights,lw=lastKg(),fi=a.length?a[0].kg:null;
+  h+=`<div class="card"><button class="btn" data-a="sheet" data-v="weight">${IC.plus()} سجّل وزنًا</button></div>`;
+  if(!a.length)h+=`<div class="empty"><p>لا أوزان بعد.</p><p class="mu">سجّل وزنك الآن، وسيرسم لك التطبيق مسارك نحو ${S.target} كغ.</p></div>`;
+  else{
+   h+=`<div class="card"><div class="bigno">${fmt(lw)} <small>كغ</small></div><p class="mu">من ${fmt(fi)} إلى ${fmt(lw)} (${lw-fi>0?'+':''}${fmt(lw-fi)} كغ) · الهدف ${S.target}</p>${wChart(a.slice(-30))}</div><div class="lab">السجل</div><div class="card lst">${a.slice().reverse().slice(0,20).map(x=>`<div><span class="g"><b>${fmt(x.kg)} كغ</b><span>${dshort(x.ts)}${x.note?' · '+esc(x.note):''}</span></span></div>`).join('')}</div>`;
+  }
+  h+=`<div class="note2">الوزن المثالي بمعادلة ديفاين ونطاق BMI يعرضها التطبيق الحالي هنا، وتبقى كما هي.</div>`;
+ }
+ else if(k==='badges'){
+  h+=`<div class="cols2"><div class="stat"><b>${streak()}</b><span>سلسلتك الحالية</span></div><div class="stat"><b>${bestStreak()}</b><span>أفضل سلسلة</span></div></div><div class="lab">الأوسمة</div><div class="bd">${BADGES.map(b=>`<div class="${b[2]()?'on':''}">${IC[b[1]]('var(--c-warn)')}<b>${b[0]}</b><small class="mu">${b[2]()?'مفتوح':b[3]}</small></div>`).join('')}</div>`;
+ }
+ else if(k==='archive'){
+  const q=S.q.trim(),f=S.flt;
+  let l=S.sessions.filter(s=>setsOf(s)>0).slice().reverse();
+  if(f!=='all')l=l.filter(s=>s.status===f);
+  if(q)l=l.filter(s=>s.t.includes(q)||s.exs.some(e=>e.n.includes(q)));
+  h+=`<div class="srch"><input class="in" id="aq" placeholder="ابحث باسم تمرين أو يوم" value="${esc(S.q)}" aria-label="بحث في الأرشيف"></div><div class="tabs2">${[['all','الكل'],['complete','مكتملة'],['partial','جزئية']].map(x=>`<button class="${f===x[0]?'on':''}" data-a="flt" data-v="${x[0]}">${x[1]}</button>`).join('')}</div>`;
+  if(!S.sessions.some(s=>setsOf(s)>0))h+=`<div class="empty"><p>لا جلسات بعد.</p><p class="mu">أول تمرين تحفظ فيه ولو مجموعة واحدة يظهر هنا.</p><button class="btn" data-a="start">ابدأ أول تمرين</button></div>`;
+  else if(!l.length)h+=`<div class="empty"><p>لا نتائج.</p></div>`;
+  else h+=`<div class="card lst">${l.map(s=>`<button data-a="detail" data-v="${s.id}"><span class="g"><b>${s.t}</b><span>${dshort(s.ts)} · ${setsOf(s)} من ${totOf(s)} مجموعة</span></span>${s.status==='partial'?`<span class="partial-tag">جزئي</span>`:`<span class="pill live">مكتمل</span>`}</button>`).join('')}</div>`;
+ }
+ else if(k==='reports'){
+  const cn=completeN(),mn=S.meals.length,wn=S.weights.length;
+  if(!cn&&!mn&&!wn)h+=`<div class="empty"><p>لا بيانات كافية للتقرير.</p><p class="mu">أكمل تمرينًا واحدًا وسجّل وجبة ووزنًا، ثم عد.</p><button class="btn" data-a="start">ابدأ أول تمرين</button></div>`;
+  else{
+   const tr=Math.min(100,Math.round(cn/Math.max(1,plan().d*2)*100)),nu=Math.min(100,Math.round(mn/12*100)),co=Math.min(100,Math.round(streak()/7*100)),pg=wn>=2?70:wn?40:0;
+   const sc=Math.round((tr+nu+co+pg)/4);
+   h+=`<div class="card"><div class="bigno">${sc} <small>من 100</small></div><p class="mu">درجة التزامك في آخر 4 أسابيع</p></div><div class="card mac">${[['التمارين',tr],['التغذية',nu],['الانتظام',co],['التقدّم',pg]].map(x=>`<div class="l"><span>${x[0]}</span><div class="prog"><i style="width:${x[1]}%"></i></div><b>${x[1]}</b></div>`).join('')}</div><div class="note2">النوم يدخل في الدرجة عند تسجيله. هذه أرقام تجريبية من بيانات النموذج.</div>`;
+  }
+ }
+ else if(k==='tools'){
+  const w=lastKg()||'',hh=S.height||'';
+  h+=`<div class="card"><b>كتلة الجسم (BMI)</b><div class="fld2" style="margin-top:10px"><span>الوزن (كغ)</span><input class="in" id="tw" inputmode="decimal" value="${w}"></div><div class="fld2"><span>الطول (سم)</span><input class="in" id="th" inputmode="numeric" value="${hh||175}"></div><div id="tres" class="bigno"></div></div><div class="note2">باقي الحاسبات (البروتين، نسبة الدهون، السعرات، الأقراص) في التطبيق الحالي وتنتقل كما هي.</div>`;
+ }
+ else if(k==='culture'){
+  const secs=['المدربون','المنهج والاختبارات','مقالات علمية','التشريح العضلي','أساسيات','خرافات وحقائق','قاموس','إحماء وإصابات','أكاديمية خُطوة','المكملات','وزارة الصحة'];
+  h+=`<div class="card lst">${secs.map(x=>`<div>${ico('book','--c-prog')}<span class="g"><b>${x}</b></span></div>`).join('')}</div>`;
+ }
+ else if(k==='visits'){
+  h+=`<button class="btn" data-a="visit">وصلت الآن</button><div class="lab">آخر الزيارات</div>${S.visits.length?`<div class="card lst">${S.visits.slice().reverse().slice(0,10).map(t=>`<div><span class="g"><b>${dlabel(t)}</b></span></div>`).join('')}</div>`:`<div class="empty"><p>لا زيارات مسجّلة.</p></div>`}`;
+ }
+ else if(k==='sleep'){
+  h+=`<button class="btn" data-a="sheet" data-v="sleep">سجّل نوم الليلة</button>${S.sleep?`<div class="card"><div class="bigno">${S.sleep} <small>ساعات</small></div><p class="mu">الهدف 8 ساعات</p></div>`:`<div class="empty"><p>لم تسجّل نومك.</p></div>`}`;
+ }
+ else if(k==='plan'){
+  h+=dayList().map(d=>`<div class="lab">${DAYN[d.day]} · ${d.t}</div><div class="card lst">${d.ex.map(e=>`<div><span class="g"><b>${e.n}</b><span>${e.s}×${e.r}${e.u||''}${e.w?' · '+e.w+' كغ':''}</span></span></div>`).join('')}</div>`).join('');
+ }
+ else if(k==='missed'){
+  const p=S.sessions.filter(s=>s.status==='partial').slice().reverse();
+  h+=p.length?`<div class="lab">جلسات جزئية</div><div class="card lst">${p.map(s=>`<button data-a="detail" data-v="${s.id}"><span class="g"><b>${s.t}</b><span>${dshort(s.ts)} · ${setsOf(s)} من ${totOf(s)}</span></span>${IC.chev()}</button>`).join('')}</div>`:`<div class="empty"><p>لا شيء متأخر.</p></div>`;
+ }
+ if(k==='privacy'){
+  h+=`<div class="card"><b>ما يُحفظ على جوالك</b><ul class="bul mu" style="margin-top:8px"><li>الجلسات والأوزان والوجبات والأهداف</li><li>لا يُرسل شيء خارج جوالك في هذه النسخة</li></ul></div>`;
+ }
+ /* المعلومات العامة */
+ h+=`<div class="lab">من أين تصل إليها</div><div class="card"><p>${WHERE[k]||'المزيد'}</p></div>`;
+ h+=`<div class="lab">ما تحتويه</div><div class="card"><ul class="bul">${v.has.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+ h+=`<div class="lab">التحسين المقترح</div><div class="card"><ul class="bul">${v.imp.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+ if(v.need)h+=`<div class="lab">ما يلزم لتفعيلها</div><div class="card"><ul class="bul">${v.need.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+ return h;
+}
+function vSvc(k){const v=SV[k];return `<div class="pad t">${hdr(v.t,v.sub)}<div style="margin-bottom:12px">${pill(v.st)}</div>${svcBody(k)}</div>`}
+function vDetail(id){
+ const s=S.sessions.find(x=>x.id===id);if(!s)return `<div class="pad">${hdr('الجلسة')}</div>`;
+ return `<div class="pad t">${hdr(s.t,dlabel(s.ts))}<div class="rowx" style="margin-bottom:12px">${s.status==='partial'?`<span class="partial-tag">${IC.clock()} جزئي · ${setsOf(s)} من ${totOf(s)} مجموعة</span>`:`<span class="pill live">مكتمل</span>`}</div>
+ ${s.status==='partial'?`<button class="btn" data-a="resume" data-v="${s.id}" style="margin-bottom:14px">أكمل التمرين</button>`:''}
+ ${s.exs.map(e=>`<div class="lab">${e.n}</div><div class="card lst">${e.sets.map((x,i)=>`<div><span class="g"><b>المجموعة ${i+1}</b><span>${x.done?x.r+(e.u||' تكرار')+(x.w?' × '+x.w+' كغ':''):'لم تُسجَّل'}</span></span>${x.done?IC.check('var(--c-done)'):''}</div>`).join('')}</div>`).join('')}</div>`;
+}
+
+/* ===== المشغّل والملخص ===== */
+function vWorkout(){
+ const s=curS();if(!s)return '';
+ const n=nextSet(s);if(!n)return '';
+ const e=s.exs[n[0]],x=e.sets[n[1]],a=setsOf(s),b=totOf(s),lo=lastOf(e.n);
+ return `<div class="pad wk"><div class="hd"><button class="ib" data-a="leave" aria-label="حفظ والخروج">${IC.x()}</button><div class="grow"><div class="sub2">${s.t} · ${a} من ${b}</div></div><button class="lnk sm" data-a="fin">إنهاء</button></div>
+ <div class="prog" style="margin-bottom:14px"><i style="width:${Math.round(a/b*100)}%"></i></div>
+ <h1>${e.n}</h1><p class="mu">${e.m} · المجموعة ${n[1]+1} من ${e.sets.length}</p>
+ ${lo?`<p class="hint2">آخر مرة: ${lo.r}${lo.w?' × '+lo.w+' كغ':''}</p>`:''}
+ <div class="stp2"><span>${e.u==='ث'?'الثواني':'التكرار'}</span><button class="ib" data-a="adj" data-v="r:-1" aria-label="أنقص">−</button><b>${x.r}</b><button class="ib" data-a="adj" data-v="r:1" aria-label="زِد">+</button></div>
+ ${e.sets[0].w||x.w||e.m!=='البطن'?`<div class="stp2"><span>الوزن (كغ)</span><button class="ib" data-a="adj" data-v="w:-2.5" aria-label="أنقص">−</button><b>${fmt(x.w)}</b><button class="ib" data-a="adj" data-v="w:2.5" aria-label="زِد">+</button></div>`:''}
+ <div class="card lst" style="margin-top:12px">${e.sets.map((y,i)=>`<div class="srow ${y.done?'done':i===n[1]?'act':''}"><span class="g"><b>${i+1}</b></span><span class="r">${y.done?y.r+(y.w?' × '+y.w:''):'—'}</span>${y.done?IC.check('var(--c-done)'):''}</div>`).join('')}</div>
+ <button class="btn" data-a="done" style="margin-top:14px">تمّت المجموعة</button>
+ ${rest?`<div class="rbar"><span>${IC.timer()} راحة <b id="restt">${mmss((rest.end-Date.now())/1000)}</b></span><button class="lnk sm" data-a="undo">تراجع</button><button class="lnk sm" data-a="skiprest">تخطَّ</button></div>`:''}
+ </div>`;
+}
+function vSummary(){
+ const s=curS()||latest();if(!s)return '';
+ return `<div class="pad ctr"><div class="logo done">${IC.check('var(--btn-ink)')}</div><h1>أحسنت</h1><p class="mu">${s.t}: ${setsOf(s)} مجموعة، حجم ${Math.round(volOf(s))} كغ.</p><div class="card" style="width:100%"><b>هدف الأسبوع</b><p class="mu">${weekDone()} من ${plan().d} تمارين</p></div><button class="btn" data-a="home">العودة إلى اليوم</button><button class="lnk" data-a="svc" data-v="archive">افتح الجلسة في الأرشيف</button></div>`;
+}
+
+/* ===== النوافذ السفلية ===== */
+function vSheet(){
+ if(!sheet)return '';
+ let t='',b='',ic='';
+ if(sheet.k==='weight'){
+  t='سجّل وزنك';ic=IC.scale('var(--c-prog)');
+  b=`<div class="fld2"><span>الوزن (كغ)</span><input class="in" id="sw" inputmode="decimal" value="${lastKg()||''}" placeholder="مثال 77.5"></div><div class="fld2"><span>ملاحظة (اختياري)</span><input class="in" id="sn"></div><button class="btn" data-a="savew">احفظ</button>`;
+ }else if(sheet.k==='meal'){
+  t='سجّل وجبة';ic=IC.food('var(--c-done)');
+  const q=(sheet.q||'').trim(),r=FOODS.filter(f=>!q||f[0].includes(q));
+  b=`<div class="opt2" style="margin-bottom:10px">${MEALN.map(m=>`<button class="${(sheet.type||'فطور')===m?'on':''}" data-a="mtype" data-v="${m}">${m}</button>`).join('')}</div><input class="in" id="fq" placeholder="ابحث عن طعام" value="${esc(sheet.q||'')}" style="margin-bottom:10px" aria-label="ابحث عن طعام"><div class="res" style="max-height:34vh;overflow:auto">${r.map(f=>{const i=FOODS.indexOf(f);return `<button class="${sheet.sel===i?'on':''}" data-a="fsel" data-v="${i}"><span><b>${f[0]}</b><small>${f[1]} · ${f[3]} غ بروتين</small></span><span>${f[2]}</span></button>`}).join('')||'<p class="mu">لا نتائج</p>'}</div><button class="btn" data-a="savem" ${sheet.sel==null?'disabled':''}>أضف الوجبة</button>`;
+ }else if(sheet.k==='water'){
+  t='ماء اليوم';ic=IC.drop('var(--c-rest)');
+  b=`<div class="bigno">${S.water} <small>مل من ${TG.water}</small></div><div class="opt2"><button data-a="water" data-v="250">+250</button><button data-a="water" data-v="500">+500</button><button data-a="water" data-v="-250">−250</button></div>`;
+ }else if(sheet.k==='sleep'){
+  t='نوم الليلة';ic=IC.moon('var(--c-prog)');
+  b=`<div class="stp2"><span>الساعات</span><button class="ib" data-a="sl" data-v="-0.5" aria-label="أنقص">−</button><b>${S.sleep||7}</b><button class="ib" data-a="sl" data-v="0.5" aria-label="زِد">+</button></div><button class="btn" data-a="savesl">احفظ</button>`;
+ }else if(sheet.k==='finish'){
+  const s=curS();t='إنهاء التمرين';ic=IC.check();
+  b=`<p class="mu">سجّلت ${setsOf(s)} من ${totOf(s)} مجموعة.</p><button class="btn" data-a="keep">${setsOf(s)?'احفظ جزئيًا وأكمل لاحقًا':'اخرج دون حفظ'}</button><button class="btn ghost" data-a="closesh" style="margin-top:8px">أكمل الآن</button>`;
+ }
+ return `<div class="sheet-bg" data-a="closesh"><div class="sheet" data-a="noop" role="dialog" aria-label="${t}" data-sheet="${sheet.k}"><div class="rowx sh-title"><span class="ib">${ic}</span><h2 class="grow">${t}</h2><button class="ib" data-a="closesh" aria-label="إغلاق">${IC.x()}</button></div>${b}</div></div>`;
+}
+
+/* ===== التبويبات والعرض ===== */
+const TABS=[['home','اليوم','today'],['train','التمرين','dumb'],['food','التغذية','food'],['prog','التقدّم','chart'],['more','المزيد','grid']];
+function render(){
+ const app=$('#app');let h='';
+ const o=ov();
+ if(['welcome','goal','setup','plans'].includes(S.screen))h=({welcome:vWelcome,goal:vGoal,setup:vSetup,plans:vPlans})[S.screen]();
+ else if(S.screen==='workout')h=vWorkout();
+ else if(S.screen==='summary')h=vSummary();
+ else if(o){h=o.k==='svc'?vSvc(o.id):vDetail(o.id)}
+ else{
+  const v=({home:vHome,train:vTrain,food:vFood,prog:vProg,more:vMore})[S.tab]();
+  h=(S.hint?`<div class="ann"><span>${NOTE[S.tab]}</span><button data-a="hint">إخفاء</button></div>`:'')+v;
+ }
+ const nav=(['home'].includes(S.screen)&&!o)?`<nav class="nav" aria-label="التنقل"><div>${TABS.map(t=>`<button class="${S.tab===t[0]?'on':''}" data-a="tab" data-v="${t[0]}" ${S.tab===t[0]?'aria-current="page"':''}>${IC[t[2]]()}<span>${t[1]}</span></button>`).join('')}</div></nav>`:'';
+ app.innerHTML=`<div class="scr">${h}</div>${nav}${vSheet()}<div id="toast" class="toast" role="status"><div></div></div>`;
+ if(lastMsg&&!sheet){}
+ if(S.screen==='workout'&&rest&&!restT)restT=setInterval(tickRest,500);
+ wire();
+}
+function calcBmi(){const w=parseFloat($('#tw').value),h=parseFloat($('#th').value)/100;const r=$('#tres');if(!w||!h){r.textContent='';return}const b=w/(h*h);r.innerHTML=fmt(b)+' <small>'+(b<18.5?'نحافة':b<25?'ضمن الطبيعي':b<30?'زيادة وزن':'سمنة')+'</small>'}
+function wire(){
+ const aq=$('#aq');if(aq)aq.oninput=e=>{S.q=e.target.value;const p=e.target.selectionStart;save();render();const n=$('#aq');n.focus();n.setSelectionRange(p,p)};
+ const fq=$('#fq');if(fq)fq.oninput=e=>{sheet.q=e.target.value;sheet.sel=null;const p=e.target.selectionStart;render();const n=$('#fq');n.focus();n.setSelectionRange(p,p)};
+ if($('#tw')){$('#tw').oninput=calcBmi;$('#th').oninput=calcBmi;calcBmi()}
+}
+/* ===== الأوامر ===== */
+function act(a,v){
+ switch(a){
+  case 'to':S.screen=v;break;
+  case 'skip':seed();S.screen='home';S.tab='home';break;
+  case 'goal':S.goal=v;S.screen='setup';break;
+  case 'place':S.place=v;break;
+  case 'days':S.days=+v;S.planId=null;break;
+  case 'plan':S.planId=v;break;
+  case 'startplan':S.planId=S.planId||{3:'fb3',4:'ul4',5:'ppl5'}[S.days];S.screen='home';S.tab='home';break;
+  case 'tab':S.tab=v;S.stack=[];break;
+  case 'svc':sheet=null;S.stack.push({k:'svc',id:v});break;
+  case 'detail':S.stack.push({k:'detail',id:v});break;
+  case 'back':S.stack.pop();break;
+  case 'hint':S.hint=false;break;
+  case 'start':S.stack=[];sheet=null;startSession();return;
+  case 'resume':{const s=S.sessions.find(x=>x.id===v);if(s){S.cur=s.id;S.screen='workout';S.stack=[]}break}
+  case 'done':doneSet();return;
+  case 'undo':undoSet();return;
+  case 'skiprest':rest=null;break;
+  case 'adj':{const p=v.split(':');adj(p[0],+p[1]);return}
+  case 'leave':leaveWorkout();return;
+  case 'fin':finishEarly();return;
+  case 'keep':sheet=null;leaveWorkout();return;
+  case 'closesh':sheet=null;break;
+  case 'home':S.screen='home';S.tab='home';S.cur=null;break;
+  case 'sheet':sheet={k:v};break;
+  case 'savew':{const x=parseFloat(($('#sw').value||'').replace(',','.'));if(!x||x<20||x>400){toast('أدخل وزنًا صحيحًا');return}S.weights.push({ts:Date.now(),kg:x,note:$('#sn').value});sheet=null;save();render();toast('حُفظ الوزن: '+fmt(x)+' كغ');return}
+  case 'mtype':sheet.type=v;break;
+  case 'fsel':sheet.sel=+v;break;
+  case 'savem':{const f=FOODS[sheet.sel];S.meals.push({id:'m'+Date.now(),ts:Date.now(),n:f[0],type:sheet.type||'فطور',kcal:f[2],p:f[3],c:f[4],f:f[5]});sheet=null;save();render();toast('أُضيفت الوجبة');return}
+  case 'delmeal':S.meals=S.meals.filter(m=>m.id!==v);break;
+  case 'water':S.water=Math.max(0,S.water+(+v));break;
+  case 'sl':S.sleep=Math.max(0,Math.min(14,(S.sleep||7)+(+v)));break;
+  case 'savesl':sheet=null;save();render();toast('حُفظ النوم');return;
+  case 'flt':S.flt=v;break;
+  case 'visit':S.visits.push(Date.now());break;
+  case 'seed':seed();toast('أُضيفت بيانات تجريبية');break;
+  case 'reset':S=NEW();rest=null;sheet=null;break;
+ }
+ save();render();
+}
+function seed(){
+ const now=Date.now();
+ S.goal=S.goal||'lose';S.planId=S.planId||'fb3';
+ if(!S.weights.length)for(let i=13;i>=0;i--)S.weights.push({ts:now-i*DAY,kg:Math.round((78-(13-i)*0.18)*10)/10});
+ if(!S.sessions.some(s=>s.status==='complete')){
+  const l=dayList();
+  [6,4,2].forEach((d,i)=>{const t=l[i%l.length];S.sessions.push({id:'seed'+i,t:t.t,ts:now-d*DAY,status:'complete',ei:0,exs:t.ex.map(e=>({n:e.n,m:e.m,u:e.u,sets:Array.from({length:e.s},()=>({r:e.r,w:e.w||0,done:true}))}))})});
+ }
+ if(!todayMeals().length){const f=FOODS;[[0,'فطور'],[8,'فطور'],[1,'غداء'],[2,'غداء']].forEach((x,i)=>{const q=f[x[0]];S.meals.push({id:'seedm'+i,ts:now-i*1000,n:q[0],type:x[1],kcal:q[2],p:q[3],c:q[4],f:q[5]})})}
+ S.water=S.water||1250;S.sleep=S.sleep||7;
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled||b.dataset.a==='noop')return;act(b.dataset.a,b.dataset.v)});
+render();
+
+</script>
