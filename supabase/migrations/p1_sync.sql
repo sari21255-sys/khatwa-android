@@ -90,23 +90,38 @@ begin
   return jsonb_build_object('epoch',e,'deleted',true);
 end $$;
 
--- حصة ذرية: يزيد العدّاد فقط إن بقي رصيد. النافذة تُحسب في الخادم (لا يمكن للعميل اختيار نافذة جديدة).
-create or replace function public.consume_quota(p_bucket text, p_period text, p_max int, p_global_max int default null)
+-- حدود الحصص يملكها الخادم: لا يمررها العميل ولا الـWorker. تُعدَّل من لوحة SQL بحساب المالك فقط.
+create table if not exists public.quota_settings(
+  bucket text primary key check (bucket in ('ai')),
+  period text not null check (period in ('hour','day')),
+  user_max int not null check (user_max>=1),
+  global_max int check (global_max is null or global_max>=1),
+  updated_at timestamptz not null default now());
+insert into public.quota_settings(bucket,period,user_max,global_max) values('ai','day',100,500) on conflict do nothing;
+alter table public.quota_settings enable row level security;
+revoke all on public.quota_settings from public, anon, authenticated;
+
+-- المسار الموثوق الوحيد لتعديل العدّادات: يستدعيه الـWorker بمفتاح الخدمة (service_role) بعد أن تحقق من توقيع JWT.
+-- التحقق من الجلسة هنا مستقل: الجلسة موجودة في auth.sessions وتخص p_uid نفسه، فتُرفض الجلسة الملغاة فورًا.
+-- ذرّي: insert … on conflict do update … where n<max؛ وإن امتلأ الحد الكلي يُتراجع عن زيادة المستخدم (subtransaction).
+create or replace function public.consume_quota_trusted(p_uid uuid, p_sid uuid, p_bucket text default 'ai')
 returns boolean language plpgsql security definer set search_path=public,auth as $$
-declare uid uuid := auth.uid(); w text; v int;
+declare cfg public.quota_settings%rowtype; w text; v int;
 begin
-  perform public.assert_session();
-  if p_bucket not in ('ai') or p_period not in ('hour','day') or p_max<1 or (p_global_max is not null and p_global_max<1) then
-    raise exception 'bad_quota' using errcode='22023'; end if;
-  w:=case p_period when 'hour' then to_char(now() at time zone 'utc','YYYY-MM-DD"T"HH24') else to_char(now() at time zone 'utc','YYYY-MM-DD') end;
+  if p_uid is null or p_sid is null then raise exception 'not signed in' using errcode='28000'; end if;
+  if not exists(select 1 from auth.sessions where id=p_sid and user_id=p_uid) then
+    raise exception 'session revoked' using errcode='28000'; end if;
+  select * into cfg from public.quota_settings where bucket=p_bucket;
+  if not found then raise exception 'bad_quota' using errcode='22023'; end if;
+  w:=case cfg.period when 'hour' then to_char(now() at time zone 'utc','YYYY-MM-DD"T"HH24') else to_char(now() at time zone 'utc','YYYY-MM-DD') end;
   begin
-    insert into public.quota_counters(scope,bucket,win,n) values('u:'||uid,p_bucket,w,1)
-      on conflict(scope,bucket,win) do update set n=public.quota_counters.n+1 where public.quota_counters.n<p_max returning n into v;
+    insert into public.quota_counters(scope,bucket,win,n) values('u:'||p_uid,p_bucket,w,1)
+      on conflict(scope,bucket,win) do update set n=public.quota_counters.n+1 where public.quota_counters.n<cfg.user_max returning n into v;
     if v is null then raise exception 'q_user'; end if;
-    if p_global_max is not null then
+    if cfg.global_max is not null then
       v:=null;
       insert into public.quota_counters(scope,bucket,win,n) values('g',p_bucket,w,1)
-        on conflict(scope,bucket,win) do update set n=public.quota_counters.n+1 where public.quota_counters.n<p_global_max returning n into v;
+        on conflict(scope,bucket,win) do update set n=public.quota_counters.n+1 where public.quota_counters.n<cfg.global_max returning n into v;
       if v is null then raise exception 'q_global'; end if;
     end if;
     return true;
@@ -114,6 +129,8 @@ begin
     if sqlerrm in ('q_user','q_global') then return false; end if; raise;
   end;
 end $$;
+-- الدالة القديمة التي كان يستدعيها أي مستخدم موثّق بحدود يختارها هو: تُحذف
+drop function if exists public.consume_quota(text,text,int,int);
 
 -- حذف الحساب: يضيف تنظيف عدّادات الحصص (جداول المزامنة تُحذف تلقائيًا بالـcascade)
 create or replace function public.delete_my_account() returns void
@@ -124,7 +141,8 @@ begin
   delete from auth.users where id=auth.uid();
 end $$;
 
-revoke all on function public.assert_session(), public.sync_exchange(int,bigint,jsonb), public.delete_sync_data(), public.consume_quota(text,text,int,int) from public, anon;
-grant execute on function public.sync_exchange(int,bigint,jsonb), public.delete_sync_data(), public.consume_quota(text,text,int,int) to authenticated;
+revoke all on function public.assert_session(), public.sync_exchange(int,bigint,jsonb), public.delete_sync_data(), public.consume_quota_trusted(uuid,uuid,text) from public, anon, authenticated;
+grant execute on function public.sync_exchange(int,bigint,jsonb), public.delete_sync_data() to authenticated;
+grant execute on function public.consume_quota_trusted(uuid,uuid,text) to service_role;
 revoke all on function public.delete_my_account() from public, anon;
 grant execute on function public.delete_my_account() to authenticated;

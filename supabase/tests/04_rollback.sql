@@ -10,7 +10,7 @@ select count(*) as posts_before from public.posts \gset
 \i supabase/migrations/p1_sync_rollback.sql
 do $$ begin
   if to_regclass('public.sync_records') is not null or to_regclass('public.sync_meta') is not null or to_regclass('public.quota_counters') is not null then raise exception 'rollback left tables'; end if;
-  if to_regprocedure('public.sync_exchange(int,bigint,jsonb)') is not null or to_regprocedure('public.consume_quota(text,text,int,int)') is not null then raise exception 'rollback left functions'; end if;
+  if to_regprocedure('public.sync_exchange(int,bigint,jsonb)') is not null or to_regprocedure('public.consume_quota_trusted(uuid,uuid,text)') is not null or to_regclass('public.quota_settings') is not null then raise exception 'rollback left functions'; end if;
 end $$;
 select pg_temp.eq((select count(*) from public.posts),:posts_before::bigint,'community data untouched by rollback') ;
 set role authenticated; select set_config('request.uid','00000000-0000-0000-0000-0000000000f1',false);

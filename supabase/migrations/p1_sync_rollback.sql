@@ -2,11 +2,13 @@
 -- تحذير: يحذف سجلات المزامنة السحابية. بيانات الأجهزة المحلية تبقى. خذ نسخة من الجدول قبل التنفيذ إن لزم.
 drop function if exists public.sync_exchange(int,bigint,jsonb);
 drop function if exists public.delete_sync_data();
+drop function if exists public.consume_quota_trusted(uuid,uuid,text);
 drop function if exists public.consume_quota(text,text,int,int);
 drop function if exists public.assert_session();
 drop table if exists public.sync_records;
 drop table if exists public.sync_meta;
 drop table if exists public.quota_counters;
+drop table if exists public.quota_settings;
 -- استرجاع التعريف السابق لحذف الحساب
 create or replace function public.delete_my_account() returns void
 language plpgsql security definer set search_path=public,auth as $$
