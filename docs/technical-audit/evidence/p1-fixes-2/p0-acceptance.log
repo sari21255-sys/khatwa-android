@@ -1,0 +1,25 @@
+(node:28873) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/claude/khatwa-android/worker/ai-proxy.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/claude/khatwa-android/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS T22b ترويسات الأمان تصل فعليًا على 7 مسارات (CSP، nosniff، Referrer-Policy، X-Frame-Options، Permissions-Policy) — 7 مسارات × 5 ترويسات
+PASS T22b-csp CSP: لا unsafe-eval ولا unsafe-inline في script-src، frame-ancestors/object-src none، سكربتات مضمّنة بالتجزئة — script-src: 'self' 'sha256-YVF7uylCSUUAzpA2m9BpZq5JxfKoQA+xOync7lF5DOs=' 'sha256-7K5ZAeaKu9qOSZ1TDIeUj… | style-src: 'self' 'unsafe-inline' https://fonts.googleapis.com
+PASS T22b-fresh ملف pwa/_headers المُلتزَم به محدّث (تجزئات السكربتات تطابق الصفحات الحالية) — إن فشل: python3 tools/gen-headers.py pwa
+PASS T22c التطبيق يعمل تحت CSP: 29 شاشة + خطة ذكاء + مزامنة + تقرير مطبوع، صفر مخالفات CSP وصفر أخطاء JS — {"err":[],"csp_violations":[],"con":[],"plan_days":2,"sync":"ok","report_print_called":1}
+PASS T22c-load فتح الصفحة الرئيسية بلا أي مخالفة CSP (تشمل تسجيل الـService Worker) — []
+PASS T10c-1 بعد التثبيت: eq-db.js وindex.html في الكاش، والكاش القديم حُذف (المفتاح الوحيد هو إصدار sw.js الحالي) — {"keys":["khatwa-v65"],"eq":true,"idx":true}
+PASS T10c قاعدة الأجهزة دون اتصال بعد التثبيت: تحميل + بحث + تصفية بالعضلة + فتح تفاصيل جهاز — {"status":2,"machines":869,"searchHits":120,"chestHits":106,"detailOpens":true,"ng":"chest"} | js_errors=[]
+PASS T10c-2 عودة الاتصال: لا تعارض كاش (مفتاح واحد هو إصدار sw.js الحالي) والتطبيق يعمل — {"keys":["khatwa-v65"],"status":200,"ok":true} | js_errors=[]
+PASS T10c-3 فشل تحميل القاعدة: رسالة واضحة وزر إعادة محاولة يستعيدها — {"msg":"تعذّر تحميل قاعدة الأجهزة. إن كنت دون اتصال فافتح التطبيق مر","hasRetry":true,"after":2,"machines":869}
+PASS T20-320 لا فيض أفقي على 320px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T20-360 لا فيض أفقي على 360px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T20-390 لا فيض أفقي على 390px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T20-412 لا فيض أفقي على 412px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T20-768 لا فيض أفقي على 768px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T20-1024 لا فيض أفقي على 1024px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T20-nohide الإصلاح بمعالجة السبب: لا overflow-x:hidden عام على html/body — html=visible body=visible
+PASS P0-06a وسيط يرد 500: رسالة خطأ واضحة بلا انهيار — {"res":false,"msg":"تعذّر الحصول على النتيجة، حاول مرة أخرى.","busy":0}
+PASS P0-06b الوسيط غير متاح (انقطاع الشبكة): رسالة واضحة، التطبيق لا ينهار، والمزامنة تُبلغ بالفشل — {"ai":{"res":false,"msg":"تعذّر الحصول على النتيجة، حاول مرة أخرى.","busy":0},"sync":"err","js_errors":[]}
+PASS P0-06c الوسيط لا يقبل ALLOW_ORIGIN=* ولا يعيد ACAO:* (مصدر + اختبار الوحدة) — tests/worker.test.mjs يغطي السلوك
+
+19 PASS / 0 FAIL

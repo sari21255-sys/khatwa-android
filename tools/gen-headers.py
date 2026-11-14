@@ -4,15 +4,17 @@
 - يقرأ pwa/config.js ويضيف أصول (origins) aiUrl وsyncUrl وsbUrl إلى connect-src.
 يُشغَّل بعد كل تعديل على index.html/install.html/privacy.html/config.js:  python3 tools/gen-headers.py pwa"""
 import base64,hashlib,re,sys,glob,os
+try: sys.stdout.reconfigure(encoding='utf-8',errors='replace'); sys.stderr.reconfigure(encoding='utf-8',errors='replace')
+except Exception: pass
 from urllib.parse import urlparse
 d=sys.argv[1] if len(sys.argv)>1 else 'pwa'
 hashes=[]
 for f in sorted(glob.glob(d+'/*.html')):
-    t=open(f,encoding='utf-8').read()
+    t=open(f,'rb').read().decode('utf-8')   # بايتات كما تُقدَّم تمامًا: لا ترجمة لنهايات الأسطر على أي نظام
     for m in re.finditer(r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>',t,re.S):
         h="'sha256-"+base64.b64encode(hashlib.sha256(m.group(1).encode('utf-8')).digest()).decode()+"'"
         if h not in hashes: hashes.append(h)
-cfg=open(d+'/config.js',encoding='utf-8').read() if os.path.exists(d+'/config.js') else ''
+cfg=open(d+'/config.js','rb').read().decode('utf-8') if os.path.exists(d+'/config.js') else ''
 configured=False
 conn=["'self'","https://world.openfoodfacts.org","https://*.openfoodfacts.org"]
 for k in ('aiUrl','syncUrl','sbUrl'):
@@ -58,5 +60,5 @@ sec=f"""/*
   Content-Type: application/json
   Access-Control-Allow-Origin: *
 """
-open(d+'/_headers','w',encoding='utf-8').write(sec)
+open(d+'/_headers','w',encoding='utf-8',newline='\n').write(sec)
 print('written',d+'/_headers','inline-script hashes:',len(hashes))

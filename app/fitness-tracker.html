@@ -1048,8 +1048,8 @@ function rsDecomp(s){const o={};RS.skipped=0;
  return o}
 /* يوسم التعديلات المحلية بوقت التعديل. أول مرة (بلا سجل مزامنة) تُوسم السجلات الحالية بوقت آخر حفظ للحالة لتخسر أمام تعديلات أحدث من أجهزة أخرى. */
 function rsMark(first,at){const cur=rsDecomp(S),R=RSM.rec,base=first?(+S.ts||0):0;
- for(const key in cur){const h=rsH(JSON.stringify(cur[key].v)),e=R[key];if(!e||e.x||e.h!==h)R[key]={h,t:(first&&!e)?base:rsTs(at),x:0,p:1}}
- for(const key in R){if(!cur[key]&&!R[key].x)R[key]={h:0,t:rsTs(at),x:1,p:1}}
+ for(const key in cur){const h=rsH(JSON.stringify(cur[key].v)),e=R[key];if(!e||e.x||e.h!==h)R[key]={h,t:(first&&!e)?base:rsTs(at),x:0,p:1,d:RSM.dev}}
+ for(const key in R){if(!cur[key]&&!R[key].x)R[key]={h:0,t:rsTs(at),x:1,p:1,d:RSM.dev}}
  return cur}
 function rsChanges(cur){const ch=[];for(const key in RSM.rec){const e=RSM.rec[key];if(!e.p)continue;const i=key.indexOf('\u0001'),k=key.slice(0,i),r=key.slice(i+1);
  if(e.x)ch.push({k,r,x:true,ts:e.t,d:RSM.dev});else{const c=cur[key];if(c)ch.push({k,r,v:{m:c.m,e:c.e,v:c.v},ts:e.t,d:RSM.dev})}}
@@ -1066,10 +1066,12 @@ function rsPut(r){const k=r.k,v=r.v;
  return val}
 function rsApply(recs){let n=0;
  for(const r of recs){if(!r||typeof r.k!=='string'||typeof r.r!=='string')continue;const key=r.k+'\u0001'+r.r,e=RSM.rec[key],x=!!r.x;
-  if(e){if(e.t===+r.ts&&!!e.x===x){delete e.p;continue}                                       /* السجل نفسه (صدى تعديلنا) */
-   if(!rsWins(+r.ts,x,String(r.d),e.t,!!e.x,RSM.dev))continue}                                  /* المحلي أحدث: يبقى وسيُرسل */
+  const rd=String(r.d);
+  if(e){const ed=e.d||(e.p?RSM.dev:null);                                                      /* الجهاز الكاتب لما عندنا: معروف دائمًا لما كتبناه أو استلمناه بعد هذا التعديل */
+   if(e.t===+r.ts&&!!e.x===x&&(ed===null||ed===rd)){delete e.p;if(!e.d)e.d=rd;continue}       /* السجل نفسه (صدى كتابتنا أو تكرار): نفس التوقيت والحذف ونفس الجهاز */
+   if(!rsWins(+r.ts,x,rd,e.t,!!e.x,ed||RSM.dev))continue}                                       /* المحلي يفوز (يشمل تعادل التوقيت بفارق الجهاز): يبقى وسيُرسل */
   const val=rsPut(r);if(val===null)continue;
-  RSM.rec[key]={h:x?0:rsH(JSON.stringify(val)),t:+r.ts,x:x?1:0};n++}
+  RSM.rec[key]={h:x?0:rsH(JSON.stringify(val)),t:+r.ts,x:x?1:0,d:rd};n++}                       /* قرار الخادم: القيمة والتوقيت والجهاز الفائز وزوال الانتظار */
  if(n){try{norm();localStorage.setItem('fit1',JSON.stringify(S))}catch(e){lg(e)}}
  return n}
 async function rsCall(body){if(!(await SB.fresh()))throw{code:SB.ses?'net':'auth'};
@@ -1077,6 +1079,8 @@ async function rsCall(body){if(!(await SB.fresh()))throw{code:SB.ses?'net':'auth
  if(r.status===401||r.status===403)throw{code:'auth'};
  if(!r.ok){let m='';try{m=(await r.json()).message||''}catch(e){lg(e)}if(/session revoked|not signed in/.test(m))throw{code:'auth'};throw{code:'http',s:r.status,m}}
  return r.json()}
+async function rsStartNew(){if(!(await SB.fresh()))throw{code:SB.ses?'net':'auth'};
+ const r=await fetch(CFG.sbUrl+'/rest/v1/rpc/start_new_sync',{method:'POST',headers:SB.hd(1),body:'{}'});if(!r.ok)throw{code:'http',s:r.status};return r.json()}
 async function rsSync(){
  if(!rsOn())return 'off';if(RS.busy){RS.again=1;return 'busy'}RS.busy=1;RS.err='';let out='ok';
  try{
@@ -1084,12 +1088,14 @@ async function rsSync(){
   if(RSM.uid&&RSM.uid!==uid){RS.acct=1;out='acct';return out}   /* بيانات هذا الجهاز لحساب آخر: لا نخلطها دون موافقة */
   RSM.uid=uid;const first=!Object.keys(RSM.rec).length&&!RSM.cursor;let pulled=0;
   for(let g=0;g<60;g++){
-   const cur=rsMark(first&&g===0),ch=rsChanges(cur).slice(0,500);
+   /* جهاز بلا معلومات مزامنة (epoch فارغ) يقرأ أولًا ولا يرسل شيئًا؛ الخادم نفسه يتجاهل أي كتابة منه */
+   const cur=rsMark(first&&g===0),can=RSM.epoch!=null,ch=can?rsChanges(cur).slice(0,500):[];
    const j=await rsCall({p_epoch:RSM.epoch,p_cursor:RSM.cursor,p_changes:ch});
    if(j.reset){RS.reset=1;RSM.resetEpoch=j.epoch;rsSave();out='reset';return out}
-   RSM.epoch=j.epoch;ch.forEach(c=>{const e=RSM.rec[c.k+'\u0001'+c.r];if(e&&e.t===c.ts)delete e.p});
+   if(j.closed){RS.closed=1;rsSave();out='closed';return out}   /* النسخة السحابية حُذفت: لا رفع حتى يقرر المستخدم */
+   RS.closed=0;RSM.epoch=j.epoch;ch.forEach(c=>{const e=RSM.rec[c.k+'\u0001'+c.r];if(e&&e.t===c.ts)delete e.p});
    pulled+=rsApply(j.records||[]);RSM.cursor=j.cursor;rsSave();
-   if(!j.more&&ch.length<500)break}
+   if(!j.more&&can&&ch.length<500)break}
   RS.last=Date.now();SYNC.st='ok';if(pulled){S.ts=Date.now();render()}
  }catch(e){out='err';SYNC.st='err';RS.err=e&&e.code==='auth'?'auth':(e&&/bad_ts/.test(e.m||''))?'clock':'net'}
  finally{RS.busy=0;if(RS.again){RS.again=0;setTimeout(rsSync,300)}}
@@ -1102,7 +1108,10 @@ async function rsLegacyImport(){
  const x=await r.json();if(!x||!x.plan)return{n:0,none:1};
  const first=!Object.keys(RSM.rec).length&&!RSM.cursor;rsMark(first);
  const snap=rsDecomp(cleanData(x)),ts=+x.ts||1,recs=Object.values(snap).map(c=>({k:c.k,r:c.r,v:{m:c.m,e:c.e,v:c.v},ts,d:'legacy',x:false}));
- const n=rsApply(recs);rsSave();return{n,total:recs.length}}
+ const n=rsApply(recs);
+ /* السجلات المستوردة تبقى معلّقة (p) حتى يردّ الخادم على رفعها؛ فلا يكفي أنها صارت في الجهاز */
+ let pend=0;for(const c of recs){const e=RSM.rec[c.k+'\u0001'+c.r];if(e&&e.t===ts&&!e.x){e.p=1;e.d=RSM.dev;pend++}}
+ RSM.mig={stage:'imported',n,total:recs.length,at:Date.now()};rsSave();return{n,total:recs.length,pend}}
 async function bootPwa(){
  if((CFG.aiUrl||CFG.syncUrl)&&!CFG.sbUrl){if(!SYNC.token){SYNC.token=genToken();try{localStorage.setItem('fit_sync',SYNC.token)}catch(e){lg(e)}}}
  if(CFG.aiUrl){SM=proxySample();SMI=true}
@@ -4110,14 +4119,15 @@ function rsCard(){
  let h='<div class="card"><h2>'+ic('watch')+'المزامنة السحابية والبيانات</h2>';
  if(!SB.ses){h+='<div class="mu" style="margin-bottom:8px">سجّل الدخول بحسابك لتتزامن بياناتك بين أجهزتك، والمساعد الذكي يعمل بالحساب نفسه. بدون حساب تبقى بياناتك على هذا الجهاز فقط.</div><button class="btn sm" data-a="sub" data-v="comm">تسجيل الدخول</button>'}
  else{
-  const pend=rsPend(),st=RS.pause?'متوقفة على هذا الجهاز':RS.err==='auth'?'انتهت الجلسة، سجّل الدخول من جديد':RS.err==='clock'?'ساعة جهازك غير مضبوطة (متقدمة كثيرًا). صحّح التاريخ والوقت ثم أعد المحاولة':RS.err==='net'?'تعذّر الاتصال، التعديلات محفوظة وستُرسل لاحقًا':RS.last?'آخر مزامنة '+ago(RS.last):'لم تتم مزامنة بعد';
+  const pend=rsPend(),st=RS.pause?'متوقفة على هذا الجهاز':RS.closed?'النسخة السحابية محذوفة، لا رفع حتى تقرر':RS.err==='auth'?'انتهت الجلسة، سجّل الدخول من جديد':RS.err==='clock'?'ساعة جهازك غير مضبوطة (متقدمة كثيرًا). صحّح التاريخ والوقت ثم أعد المحاولة':RS.err==='net'?'تعذّر الاتصال، التعديلات محفوظة وستُرسل لاحقًا':RS.last?'آخر مزامنة '+ago(RS.last):'لم تتم مزامنة بعد';
   h+='<div class="mu">الحساب: <b dir="ltr">'+esc(SB.email())+'</b></div><div class="tag'+(RS.err||RS.pause?' bad':'')+'" style="margin:8px 0">'+esc(st)+(pend?' · '+pend+' تعديل بانتظار الإرسال':'')+'</div>';
   if(RS.acct)h+='<div class="mu" style="margin-bottom:8px">هذا الجهاز يحوي بيانات حساب آخر. لن تُرفع إلى هذا الحساب دون موافقتك.</div><div class="row"><button class="btn sm" data-a="rsacctup">ارفع بيانات هذا الجهاز إلى هذا الحساب</button><button class="btn sm ghost" data-a="rsacctwipe">امسح هذا الجهاز وحمّل بيانات الحساب</button></div>';
+  else if(RS.closed)h+='<div class="mu" style="margin-bottom:8px">حُذفت النسخة السحابية لهذا الحساب. بيانات هذا الجهاز باقية ولم تُرفع. لن يُرفع شيء منها إلا إذا اخترت بدء مزامنة جديدة.</div><div class="row"><button class="btn sm" data-a="rsstart">ابدأ مزامنة جديدة ببيانات هذا الجهاز</button><button class="btn sm ghost" data-a="rskeep">أبقِها على هذا الجهاز فقط</button></div>';
   else if(RS.reset)h+='<div class="mu" style="margin-bottom:8px">حُذفت النسخة السحابية من جهاز آخر. بيانات هذا الجهاز لم تُمس ولم تُرفع.</div><div class="row"><button class="btn sm" data-a="rsadopt">ارفع بيانات هذا الجهاز كنسخة جديدة</button><button class="btn sm ghost" data-a="rskeep">أبقِها على هذا الجهاز فقط</button></div>';
   else if(RS.pause)h+='<button class="btn sm" data-a="rsresume">إعادة تفعيل المزامنة</button>';
   else h+='<button class="btn sm ghost" data-a="rsnow">مزامنة الآن</button>';
   if(CFG.syncUrl&&!SYNC.token&&!RSM.migrated)h+='<div class="mu" style="margin:14px 0 6px">كان لديك حساب مزامنة قديم (بريد وكلمة مرور)؟ سجّل دخوله هنا لتنقل بياناته إلى حسابك الحالي.</div><label class="f">بريد الحساب القديم<input id="olem" type="email" dir="ltr" autocomplete="off"></label><label class="f" style="margin-top:6px">كلمة المرور<input id="olpw" type="password" dir="ltr" autocomplete="off"></label><div class="row" style="margin-top:8px"><button class="btn sm" data-a="lglogin">دخول الحساب القديم</button></div>'+(UI.msg?'<div class="mu" style="margin-top:6px">'+esc(UI.msg)+'</div>':'');
-  if(CFG.syncUrl&&SYNC.token&&!SYNC.dead&&!RSM.migrated)h+='<div class="mu" style="margin:14px 0 6px">لديك مزامنة قديمة برمز الوسيط. انقل بياناتها إلى حسابك (تُدمج سجلًا بسجل ولا تُحذف بياناتك الحالية).</div><button class="btn sm" data-a="rsmig">نقل بيانات المزامنة القديمة</button>'+(UI.msg?'<div class="mu" style="margin-top:6px">'+esc(UI.msg)+'</div>':'');
+  if(CFG.syncUrl&&SYNC.token&&!SYNC.dead&&!RSM.migrated)h+='<div class="mu" style="margin:14px 0 6px">لديك مزامنة قديمة برمز الوسيط. انقل بياناتها إلى حسابك (تُدمج سجلًا بسجل ولا تُحذف بياناتك الحالية).</div><button class="btn sm" data-a="rsmig">'+(RSM.mig&&RSM.mig.stage&&RSM.mig.stage!=='start'?'إعادة محاولة النقل':'نقل بيانات المزامنة القديمة')+'</button>'+(UI.msg?'<div class="mu" style="margin-top:6px">'+esc(UI.msg)+'</div>':'');
   h+='<div class="mu" style="margin:16px 0 6px"><b>حذف البيانات</b> (كل خيار مستقل عن الآخر)</div>';
   h+=UI.rsdel?'<div class="mu" style="margin:6px 0">سيُحذف كل ما رفعته إلى السحابة. حسابك وبياناتك على هذا الجهاز تبقى. ولن تُرفع بيانات هذا الجهاز مجددًا إلا إذا أعدت تفعيل المزامنة. الأجهزة الأخرى لن تستطيع إعادة رفع النسخة المحذوفة.</div><div class="row"><button class="btn sm" style="background:#b91c1c" data-a="rsdel">تأكيد حذف النسخة السحابية</button><button class="btn sm ghost" data-a="rsdelc">إلغاء</button></div>':'<button class="btn sm ghost" data-a="rsdelq">'+ic('trash')+'حذف نسخة المزامنة السحابية</button>';
   h+=UI.rswipe?'<div class="mu" style="margin:10px 0 6px">سيُمسح كل ما على هذا الجهاز (التمارين والوجبات والوزن والإعدادات) ويُسجَّل خروجك. النسخة السحابية لا تتأثر ويمكنك استعادتها بتسجيل الدخول.</div><div class="row"><button class="btn sm" style="background:#b91c1c" data-a="rswipe">تأكيد مسح بيانات هذا الجهاز</button><button class="btn sm ghost" data-a="rswipec">إلغاء</button></div>':'<div style="margin-top:8px"><button class="btn sm ghost" data-a="rswipeq">'+ic('trash')+'مسح بيانات هذا الجهاز</button></div>';
@@ -4411,16 +4421,29 @@ function importWatch(t){const q=x=>x===undefined||x===''||isNaN(+x)?-1:+x;let n=
  return n}
 const ACT={
  rsnow:async()=>{const r=await rsSync();toast(r==='ok'?'تمت المزامنة':r==='err'?'تعذّرت المزامنة، تعديلاتك محفوظة':'');return false},
- rsmig:async()=>{UI.msg='';try{const r=await rsLegacyImport();if(r.none||r.gone){UI.msg=r.gone?'المزامنة القديمة محذوفة مسبقًا':'لا توجد لقطة قديمة على الوسيط';RSM.migrated=1;rsSave();render();return false}
-  const o=await rsSync();if(o!=='ok'){UI.msg='تم الدمج محليًا، تعذّر الرفع الآن وسيُعاد تلقائيًا';render();return false}
-  try{await fetch(CFG.syncUrl.replace(/\/api\/state$/,'/api/migrated'),{method:'POST',headers:{Authorization:'Bearer '+SYNC.token}})}catch(e){lg(e)}
-  RSM.migrated=1;rsSave();UI.msg='نُقلت بياناتك ('+r.n+' سجلًا دُمج). النسخة القديمة جُمّدت ولم تُحذف، يمكنك حذفها من الأسفل.'}catch(e){UI.msg='تعذّر النقل، لم يتغير شيء'}render();return false},
+ rsmig:async()=>{UI.msg='';const M=()=>RSM.mig||(RSM.mig={stage:'start'});
+  try{
+   const m=M();
+   if(m.stage==='frozen'){RSM.migrated=1;rsSave();UI.msg='اكتمل النقل سابقًا';render();return false}
+   if(m.stage==='start'){const r=await rsLegacyImport();
+    if(r.none||r.gone){UI.msg=r.gone?'المزامنة القديمة محذوفة مسبقًا':'لا توجد لقطة قديمة على الوسيط';RSM.mig=null;RSM.migrated=1;rsSave();render();return false}}
+   if(RSM.mig.stage==='imported'){
+    const o=await rsSync();
+    if(o!=='ok'){UI.msg='توقف النقل عند مرحلة رفع البيانات إلى السحابة. بياناتك محفوظة على الجهاز وستُرفع عند إعادة المحاولة';render();return false}
+    if(Object.values(RSM.rec).some(e=>e.p)){UI.msg='توقف النقل عند مرحلة رفع البيانات: بقيت سجلات لم يؤكد الخادم حفظها';render();return false}
+    RSM.mig.stage='uploaded';rsSave()}
+   if(RSM.mig.stage==='uploaded'){
+    let ok=false;try{const f=await fetch(CFG.syncUrl.replace(/\/api\/state$/,'/api/migrated'),{method:'POST',headers:{Authorization:'Bearer '+SYNC.token}});ok=f.ok}catch(e){lg(e)}
+    if(!ok){UI.msg='رُفعت بياناتك إلى السحابة، لكن تعذّر تجميد النسخة القديمة. أعد المحاولة لإكمال الخطوة الأخيرة';render();return false}
+    RSM.mig.stage='frozen';RSM.migrated=1;rsSave();UI.msg='اكتمل النقل: حفظ الخادم بياناتك وجُمّدت النسخة القديمة (لم تُحذف، يمكنك حذفها من الأسفل).'}
+  }catch(e){UI.msg='تعذّر النقل'+(RSM.mig&&RSM.mig.stage&&RSM.mig.stage!=='start'?' عند مرحلة «'+RSM.mig.stage+'». لم يضع شيء وتكفي إعادة المحاولة':'، لم يتغير شيء')}render();return false},
  rsdelq:()=>{UI.rsdel=1},rsdelc:()=>{UI.rsdel=0},
  rsdel:async()=>{try{if(!(await SB.fresh()))throw new Error('auth');const r=await fetch(CFG.sbUrl+'/rest/v1/rpc/delete_sync_data',{method:'POST',headers:SB.hd(1),body:'{}'});if(!r.ok)throw new Error('http'+r.status);const j=await r.json();
   RSM.epoch=j.epoch;RSM.cursor=0;RSM.rec={};RS.pause=1;try{localStorage.setItem('fit_rs_off','1')}catch(e){lg(e)}rsSave();UI.rsdel=0;toast('حُذفت النسخة السحابية')}catch(e){UI.rsdel=0;toast('تعذّر الحذف، لم يتغير شيء')}render();return false},
  rsresume:async()=>{RS.pause=0;try{localStorage.removeItem('fit_rs_off')}catch(e){lg(e)}RSM.rec={};RSM.cursor=0;rsSave();const r=await rsSync();toast(r==='ok'?'عادت المزامنة':'');render();return false},
- rsadopt:async()=>{RSM.epoch=RSM.resetEpoch;RSM.cursor=0;RSM.rec={};RS.reset=0;rsSave();await rsSync();render();return false},
- rskeep:()=>{RS.reset=0;RS.pause=1;try{localStorage.setItem('fit_rs_off','1')}catch(e){lg(e)}return false},
+ rsstart:async()=>{try{const j=await rsStartNew();RSM.epoch=j.epoch;RSM.cursor=0;RSM.rec={};RS.reset=0;RS.closed=0;RS.pause=0;try{localStorage.removeItem('fit_rs_off')}catch(e){lg(e)}rsSave();await rsSync();toast('بدأت مزامنة جديدة')}catch(e){toast('تعذّر البدء، لم يُرفع شيء')}render();return false},
+ rsadopt:async()=>ACT.rsstart(),
+ rskeep:()=>{RS.reset=0;RS.closed=0;RS.pause=1;try{localStorage.setItem('fit_rs_off','1')}catch(e){lg(e)}return false},
  rsacctup:async()=>{RSM={dev:RSM.dev,epoch:null,cursor:0,uid:'',rec:{}};RS.acct=0;rsSave();await rsSync();render();return false},
  rsacctwipe:async()=>{S=def();norm();RSM={dev:RSM.dev,epoch:null,cursor:0,uid:'',rec:{}};RS.acct=0;try{localStorage.setItem('fit1',JSON.stringify(S))}catch(e){lg(e)}rsSave();await rsSync();render();return false},
  rswipeq:()=>{UI.rswipe=1},rswipec:()=>{UI.rswipe=0},

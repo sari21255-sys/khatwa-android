@@ -12,16 +12,20 @@ for u in $U1 $U2 $U3 $U4; do $PSQL -c "insert into auth.sessions(id,user_id) val
 as(){ echo "set role authenticated; select set_config('request.uid','$1',false), set_config('request.jwt.claims','{\"sub\":\"$1\",\"session_id\":\"$(sess $1)\"}',false) \\g /dev/null"; }
 OUT=$(mktemp -d)
 # 1) 40 طلبًا متزامنًا لمستخدم واحد، الحد 5 → بالضبط 5 مسموحة
-for i in $(seq 1 40); do ( { as $U1; echo "select public.consume_quota('ai','hour',5);"; } | $PSQL > $OUT/q1.$i ) & done; wait
+$PSQL -c "update public.quota_settings set period='hour',user_max=5,global_max=null where bucket='ai'"
+q(){ echo "set role service_role; select public.consume_quota_trusted('$1','$(sess $1)');"; }
+for i in $(seq 1 40); do ( q $U1 | $PSQL > $OUT/q1.$i ) & done; wait
 chk "quota user cap under 40 parallel requests" "$(cat $OUT/q1.* | grep -c '^t$')" 5
 # 2) أربعة مستخدمين × 15 طلبًا، حد المستخدم 100 والحد الكلي 7 → بالضبط 7
-for u in $U1 $U2 $U3 $U4; do for i in $(seq 1 15); do ( { as $u; echo "select public.consume_quota('ai','day',100,7);"; } | $PSQL > $OUT/q2.$u.$i ) & done; done; wait
+$PSQL -c "update public.quota_settings set period='day',user_max=100,global_max=7 where bucket='ai'"
+for u in $U1 $U2 $U3 $U4; do for i in $(seq 1 15); do ( q $u | $PSQL > $OUT/q2.$u.$i ) & done; done; wait
 chk "global cap under 60 parallel requests" "$(cat $OUT/q2.* | grep -c '^t$')" 7
 # 3) 24 جهازًا يرفعون بالتوازي سجلات مختلفة + سجل واحد مشترك بأوقات مختلفة
-for i in $(seq 1 24); do ( { as $U2; echo "select (public.sync_exchange(null,0,'[{\"k\":\"bw\",\"r\":\"d$i\",\"v\":{\"w\":$i},\"ts\":$((1000+i)),\"d\":\"dev$i\"},{\"k\":\"cfg\",\"r\":\"shared\",\"v\":{\"by\":$i},\"ts\":$((5000+i)),\"d\":\"dev$i\"}]'))->>'applied';"; } | $PSQL > $OUT/s.$i ) & done; wait
+for i in $(seq 1 24); do ( { as $U2; echo "select (public.sync_exchange(1,0,'[{\"k\":\"bw\",\"r\":\"d$i\",\"v\":{\"w\":$i},\"ts\":$((1000+i)),\"d\":\"dev$i\"},{\"k\":\"cfg\",\"r\":\"shared\",\"v\":{\"by\":$i},\"ts\":$((5000+i)),\"d\":\"dev$i\"}]'))->>'applied';"; } | $PSQL > $OUT/s.$i ) & done; wait
 chk "all 25 distinct records stored" "$($PSQL -c "select count(*) from public.sync_records where user_id='$U2'")" 25
 chk "shared record: newest ts wins (24)" "$($PSQL -c "select data->>'by' from public.sync_records where user_id='$U2' and rid='shared'")" 24
 chk "seq values unique" "$($PSQL -c "select count(distinct seq)=count(*) from public.sync_records where user_id='$U2'")" t
 chk "meta seq equals highest seq" "$($PSQL -c "select (select seq from public.sync_meta where user_id='$U2')=(select max(seq) from public.sync_records where user_id='$U2')")" t
+$PSQL -c "update public.quota_settings set period='day',user_max=100,global_max=500 where bucket='ai'"
 rm -rf $OUT
 exit $fail

@@ -1,8 +1,8 @@
 /* Cloudflare Worker: بوابة الذكاء الاصطناعي + مسارات ترحيل/حذف الحسابات القديمة.
-   الهوية: JWT من Supabase Auth (HS256 بسرّ SUPABASE_JWT_SECRET أو ES256/RS256 عبر JWKS). الحصص ذرّية في Postgres عبر الدالة consume_quota بجلسة المستخدم نفسها (فيرفضها الخادم إن أُبطلت الجلسة أو حُذف الحساب).
+   الهوية: JWT من Supabase Auth (HS256 بسرّ SUPABASE_JWT_SECRET أو ES256/RS256 عبر JWKS). الحصص ذرّية في Postgres عبر الدالة consume_quota_trusted التي لا ينفذها إلا مفتاح الخدمة SUPABASE_SERVICE_KEY (Secret)؛ حدود المستخدم والحد الكلي في جدول quota_settings على الخادم لا في هذا الملف، والدالة تتحقق من أن الجلسة قائمة.
    المزامنة صارت مباشرة بين التطبيق وSupabase (الدالة sync_exchange)؛ مسارات /api/state هنا للترحيل من النسخ القديمة فقط.
-   المتغيرات: ANTHROPIC_API_KEY (Secret)، STATE (KV)، ALLOW_ORIGIN (قائمة نطاقات مفصولة بفاصلة)، SUPABASE_URL، SUPABASE_ANON_KEY (المفتاح العام)، SUPABASE_JWT_SECRET (اختياري، للمشاريع ذات HS256)،
-   AUTH_MODE: 'supabase' (الافتراضي حين يُضبط SUPABASE_URL: يُرفض رمز الوسيط القديم للذكاء والكتابة) أو 'transition' (الافتراضي بلا SUPABASE_URL: يُقبل الرمز القديم)، AI_USER_DAILY (افتراضي 100)، AI_DAILY_CAP (سقف يومي كلي، افتراضي 500)، LEGACY_SYNC='0' يعطّل مسارات الحسابات القديمة.
+   المتغيرات: ANTHROPIC_API_KEY (Secret)، STATE (KV)، ALLOW_ORIGIN (قائمة نطاقات مفصولة بفاصلة)، SUPABASE_URL، SUPABASE_ANON_KEY (المفتاح العام)، SUPABASE_SERVICE_KEY (Secret، مفتاح service_role: للحصص فقط، لا يوضع في الواجهة ولا المستودع)، SUPABASE_JWT_SECRET (اختياري، للمشاريع ذات HS256)،
+   AUTH_MODE: 'supabase' (الافتراضي حين يُضبط SUPABASE_URL: يُرفض رمز الوسيط القديم للذكاء والكتابة) أو 'transition' (الافتراضي بلا SUPABASE_URL: يُقبل الرمز القديم)، AI_DAILY_CAP (سقف يومي كلي لوضع الانتقال فقط، افتراضي 500؛ في وضع supabase الحدود من quota_settings)، LEGACY_SYNC='0' يعطّل مسارات الحسابات القديمة.
    ملاحظة: حدود المعدل على KV تقريبية (القراءة ثم الكتابة غير ذرّية)؛ السقف اليومي الكلي هو الحماية الفعلية للتكلفة. PBKDF2 مثبّت على 100,000 دورة لأنه الحد الأقصى في Workers. */
 const MODELS={default:'claude-sonnet-5-5',fast:'claude-haiku-5-5'};
 const hex=b=>[...new Uint8Array(b)].map(x=>('0'+x.toString(16)).slice(-2)).join('');
@@ -21,10 +21,13 @@ async function verifyJwt(t,env){try{const[a,b,c]=t.split('.');const H=JSON.parse
  if(!(P.aud==='authenticated'||(Array.isArray(P.aud)&&P.aud.indexOf('authenticated')>=0)))return null;
  if(env.SUPABASE_URL&&P.iss!==env.SUPABASE_URL.replace(/\/$/,'')+'/auth/v1')return null;
  if(!/^[0-9a-f-]{36}$/i.test(P.sub||'')||(P.role&&P.role!=='authenticated'))return null;
- return{kind:'sb',uid:P.sub,jwt:t}}catch(e){return null}}
+ return{kind:'sb',uid:P.sub,sid:P.session_id,jwt:t}}catch(e){return null}}
 /* حصة ذرّية في Postgres. true/false، أو 'auth' (جلسة مُبطلة/حساب محذوف)، أو null (الخدمة غير متاحة: نرفض لحماية التكلفة). */
-async function sbQuota(env,jwt){try{const r=await fetch(env.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/consume_quota',{method:'POST',headers:{'content-type':'application/json',apikey:env.SUPABASE_ANON_KEY||'',Authorization:'Bearer '+jwt},body:JSON.stringify({p_bucket:'ai',p_period:'day',p_max:+env.AI_USER_DAILY||100,p_global_max:+env.AI_DAILY_CAP||500})});
- if(r.status===401||r.status===403)return'auth';if(!r.ok){let m='';try{m=(await r.json()).message||''}catch(e){}return/session revoked|not signed in/.test(m)?'auth':null}
+/* المسار الموثوق الوحيد لتعديل العدّادات: دالة consume_quota_trusted بمفتاح الخدمة (سرّ Worker، لا يوجد في الواجهة ولا المستودع).
+   الحدود لا تُمرَّر من هنا: تُقرأ من جدول quota_settings في قاعدة البيانات. تعذّر التحقق (لا مفتاح، عطل، ردّ غير مفهوم) = null = 503. */
+async function sbQuota(env,id){try{if(!env.SUPABASE_SERVICE_KEY||!/^[0-9a-f-]{36}$/i.test(String(id.uid))||!/^[0-9a-f-]{36}$/i.test(String(id.sid||'')))return id.sid?null:'auth';
+ const r=await fetch(env.SUPABASE_URL.replace(/\/$/,'')+'/rest/v1/rpc/consume_quota_trusted',{method:'POST',headers:{'content-type':'application/json',apikey:env.SUPABASE_SERVICE_KEY,Authorization:'Bearer '+env.SUPABASE_SERVICE_KEY},body:JSON.stringify({p_uid:id.uid,p_sid:id.sid,p_bucket:'ai'})});
+ if(!r.ok){let m='';try{m=(await r.json()).message||''}catch(e){}return/session revoked|not signed in/.test(m)?'auth':null}
  const j=await r.json();return j===true?true:j===false?false:null}catch(e){return null}}
 export default{async fetch(req,env){
  const og=req.headers.get('Origin')||'',al=String(env.ALLOW_ORIGIN||'').split(',').map(x=>x.trim()).filter(Boolean),ok=!!og&&al.indexOf(og)>=0,H={'Access-Control-Allow-Headers':'Content-Type,Authorization','Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,OPTIONS','Content-Type':'application/json','Vary':'Origin','X-Content-Type-Options':'nosniff'};
@@ -72,7 +75,7 @@ export default{async fetch(req,env){
  if(p==='/api/ai'&&req.method==='POST'){
   let b;try{b=await req.json()}catch(e){return J({error:'bad_json'},400)}
   if(b.image&&String(b.image).length>2000000)return J({error:'too_big'},413);
-  if(id.kind==='sb'){const q=await sbQuota(env,id.jwt);if(q==='auth')return J({error:'session'},401);if(q===null)return J({error:'unavailable'},503);if(!q)return J({error:'rate'},429)}
+  if(id.kind==='sb'){const q=await sbQuota(env,id);if(q==='auth')return J({error:'session'},401);if(q===null)return J({error:'unavailable'},503);if(!q)return J({error:'rate'},429)}
   else{if(mode!=='transition')return J({error:'login_required'},401);
    /* وضع الانتقال (رموز قديمة بلا هوية): حدود تقريبية على KV وغير ذرّية؛ السقف اليومي الكلي هو الحماية الفعلية */
    if(!(await hit('r:'+tok+':'+hr,60,7200))||!(await hit('rip:'+ip+':'+hr,40,7200))||!(await hit('cap:'+day,+env.AI_DAILY_CAP||500,90000)))return J({error:'rate'},429)}

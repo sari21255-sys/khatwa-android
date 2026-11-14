@@ -1,0 +1,489 @@
+psql:supabase/migrations/p1_sync.sql:12: NOTICE:  relation "sync_meta" already exists, skipping
+psql:supabase/migrations/p1_sync.sql:23: NOTICE:  relation "sync_records" already exists, skipping
+psql:supabase/migrations/p1_sync.sql:24: NOTICE:  relation "sync_records_user_seq" already exists, skipping
+psql:supabase/migrations/p1_sync.sql:26: NOTICE:  column "deleted_at" of relation "sync_meta" already exists, skipping
+psql:supabase/migrations/p1_sync.sql:27: NOTICE:  column "written_at" of relation "sync_records" already exists, skipping
+psql:supabase/migrations/p1_sync.sql:30: NOTICE:  relation "quota_counters" already exists, skipping
+psql:supabase/migrations/p1_sync.sql:124: NOTICE:  relation "quota_settings" already exists, skipping
+psql:supabase/migrations/p1_sync.sql:158: NOTICE:  function public.consume_quota(text,text,pg_catalog.int4,pg_catalog.int4) does not exist, skipping
+ as_user 
+---------
+ 
+(1 row)
+
+                                                                                                                                                                                                                                                                 sync_exchange                                                                                                                                                                                                                                                                  
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "closed": false, "cursor": 4, "applied": 4, "ignored": 0, "records": [{"d": "lostdev1", "k": "bw", "r": "2026-01-01", "s": 1, "v": {"w": 91}, "x": false, "ts": 1000}, {"d": "lostdev1", "k": "bw", "r": "2026-01-02", "s": 2, "v": {"w": 92}, "x": false, "ts": 2000}, {"d": "lostdev2", "k": "meals", "r": "2026-01-01", "s": 3, "v": [{"n": "وجبة لا يحملها أي جهاز"}], "x": false, "ts": 3000}, {"d": "lostdev2", "k": "bw", "r": "2026-01-03", "s": 4, "v": null, "x": true, "ts": 4000}], "readonly": false}
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+                                                                                                     sync_exchange                                                                                                     
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "closed": false, "cursor": 1, "applied": 1, "ignored": 0, "records": [{"d": "lostdev3", "k": "bw", "r": "2026-02-01", "s": 1, "v": {"w": 80}, "x": false, "ts": 500}], "readonly": false}
+(1 row)
+
+               delete_sync_data                
+-----------------------------------------------
+ {"epoch": 2, "closed": true, "deleted": true}
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+                                                                                                     sync_exchange                                                                                                     
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "closed": false, "cursor": 1, "applied": 1, "ignored": 0, "records": [{"d": "lostdev4", "k": "bw", "r": "2026-03-01", "s": 1, "v": {"w": 70}, "x": false, "ts": 700}], "readonly": false}
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+                                                                                                     sync_exchange                                                                                                     
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "closed": false, "cursor": 1, "applied": 1, "ignored": 0, "records": [{"d": "lostdev5", "k": "bw", "r": "2026-04-01", "s": 1, "v": {"w": 60}, "x": false, "ts": 800}], "readonly": false}
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+                                                                                                     sync_exchange                                                                                                     
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "closed": false, "cursor": 1, "applied": 1, "ignored": 0, "records": [{"d": "lostdev6", "k": "bw", "r": "2026-05-01", "s": 1, "v": {"w": 50}, "x": false, "ts": 900}], "readonly": false}
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+                                                                                                                                                 sync_exchange                                                                                                                                                 
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "closed": false, "cursor": 2, "applied": 2, "ignored": 0, "records": [{"d": "lostdev7", "k": "bw", "r": "old-a", "s": 1, "v": {"w": 61}, "x": false, "ts": 5000}, {"d": "lostdev7", "k": "bw", "r": "old-b", "s": 2, "v": {"w": 62}, "x": false, "ts": 5001}], "readonly": false}
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+                                                                                                                                                  sync_exchange                                                                                                                                                  
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "closed": false, "cursor": 2, "applied": 2, "ignored": 0, "records": [{"d": "lostdev8", "k": "bw", "r": "keep-a", "s": 1, "v": {"w": 71}, "x": false, "ts": 6000}, {"d": "lostdev8", "k": "bw", "r": "keep-b", "s": 2, "v": {"w": 72}, "x": false, "ts": 6001}], "readonly": false}
+(1 row)
+
+psql:supabase/migrations/p1_sync_rollback.sql:23: NOTICE:  function public.consume_quota(text,text,pg_catalog.int4,pg_catalog.int4) does not exist, skipping
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ delete_my_account 
+-------------------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ delete_my_account 
+-------------------
+ 
+(1 row)
+
+psql:supabase/migrations/p1_sync.sql:26: NOTICE:  column "deleted_at" of relation "sync_meta" already exists, skipping
+psql:supabase/migrations/p1_sync.sql:27: NOTICE:  column "written_at" of relation "sync_records" already exists, skipping
+psql:supabase/migrations/p1_sync.sql:158: NOTICE:  function public.consume_quota(text,text,pg_catalog.int4,pg_catalog.int4) does not exist, skipping
+ as_user 
+---------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+               delete_sync_data                
+-----------------------------------------------
+ {"epoch": 2, "closed": true, "deleted": true}
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+psql:supabase/migrations/p1_sync_restore.sql:78: NOTICE:  p1 restore: 4 accounts copied, 2 merged | 7 records restored | skipped: 0 accounts closed now, 0 accounts deleted, 2 records older than a deletion, 0 records of unknown age under a live deletion
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+psql:supabase/migrations/p1_sync_restore.sql:78: NOTICE:  p1 restore: 0 accounts copied, 5 merged | 0 records restored | skipped: 1 accounts closed now, 0 accounts deleted, 2 records older than a deletion, 0 records of unknown age under a live deletion
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ must_fail 
+-----------
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+               delete_sync_data                
+-----------------------------------------------
+ {"epoch": 2, "closed": true, "deleted": true}
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+ delete_my_account 
+-------------------
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+psql:supabase/migrations/p1_sync_rollback.sql:23: NOTICE:  function public.consume_quota(text,text,pg_catalog.int4,pg_catalog.int4) does not exist, skipping
+ eq 
+----
+ 
+(1 row)
+
+psql:supabase/migrations/p1_sync.sql:26: NOTICE:  column "deleted_at" of relation "sync_meta" already exists, skipping
+psql:supabase/migrations/p1_sync.sql:27: NOTICE:  column "written_at" of relation "sync_records" already exists, skipping
+psql:supabase/migrations/p1_sync.sql:158: NOTICE:  function public.consume_quota(text,text,pg_catalog.int4,pg_catalog.int4) does not exist, skipping
+ eq 
+----
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+                                                                                                    sync_exchange                                                                                                    
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "closed": false, "cursor": 1, "applied": 1, "ignored": 0, "records": [{"d": "lostdev9", "k": "bw", "r": "legacy-a", "s": 1, "v": {"w": 1}, "x": false, "ts": 3000}], "readonly": false}
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+                                                                                                    sync_exchange                                                                                                    
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"more": false, "epoch": 1, "closed": false, "cursor": 1, "applied": 1, "ignored": 0, "records": [{"d": "lostdev9", "k": "bw", "r": "legacy-b", "s": 1, "v": {"w": 2}, "x": false, "ts": 3001}], "readonly": false}
+(1 row)
+
+psql:supabase/migrations/p1_sync_rollback.sql:23: NOTICE:  function public.consume_quota(text,text,pg_catalog.int4,pg_catalog.int4) does not exist, skipping
+psql:supabase/migrations/p1_sync.sql:26: NOTICE:  column "deleted_at" of relation "sync_meta" already exists, skipping
+psql:supabase/migrations/p1_sync.sql:27: NOTICE:  column "written_at" of relation "sync_records" already exists, skipping
+psql:supabase/migrations/p1_sync.sql:158: NOTICE:  function public.consume_quota(text,text,pg_catalog.int4,pg_catalog.int4) does not exist, skipping
+ as_user 
+---------
+ 
+(1 row)
+
+               delete_sync_data                
+-----------------------------------------------
+ {"epoch": 2, "closed": true, "deleted": true}
+(1 row)
+
+        start_new_sync         
+-------------------------------
+ {"epoch": 3, "closed": false}
+(1 row)
+
+psql:supabase/migrations/p1_sync_restore.sql:78: NOTICE:  p1 restore: 1 accounts copied, 1 merged | 1 records restored | skipped: 0 accounts closed now, 0 accounts deleted, 0 records older than a deletion, 1 records of unknown age under a live deletion
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ eq 
+----
+ 
+(1 row)
+
+ as_user 
+---------
+ 
+(1 row)
+
+               delete_sync_data                
+-----------------------------------------------
+ {"epoch": 2, "closed": true, "deleted": true}
+(1 row)
+
+        start_new_sync         
+-------------------------------
+ {"epoch": 3, "closed": false}
+(1 row)
+
+psql:supabase/migrations/p1_sync_restore.sql:78: NOTICE:  p1 restore: 0 accounts copied, 2 merged | 0 records restored | skipped: 0 accounts closed now, 0 accounts deleted, 0 records older than a deletion, 2 records of unknown age under a live deletion
+ eq 
+----
+ 
+(1 row)
+
+             result             
+--------------------------------
+ ROLLBACK + RESTORE TEST PASSED
+(1 row)
+
