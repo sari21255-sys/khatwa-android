@@ -1,0 +1,14 @@
+FAIL T20-320 لا فيض أفقي على 320px عبر 29 شاشة — tab:dash:325, tab:train:325, tab:food:325, tab:pg:325, tab:club:325, tab:ex:325, sub:plan:325, sub:prog:325, sub:arch:325, sub:tools:325, sub:watch:325, sub:prg:325, sub:mpg:325, sub:ach:325, sub:cul:325, sub:wgt:325, sub:exl:325, sub:set:325, sub:coach:325, sub:aip:325, sub:gyms:325, sub:vis:325, sub:rem:325, sub:rpt:325, sub:link:342, sub:nau:325, sub:comm:325, sub:nc:325
+PASS T20-360 لا فيض أفقي على 360px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T20-390 لا فيض أفقي على 390px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T20-768 لا فيض أفقي على 768px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T20-1280 لا فيض أفقي على 1280px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T21a لغة واتجاه الصفحة والـviewport — {"lang":"ar","dir":"rtl","vp":"width=device-width,initial-scale=1,viewport-fit=cover","zoomBlocked":false}
+PASS T21b أزرار بلا اسم قابل للقراءة — 0 من 216 (تراكمية عبر 7 تبويبات)
+PASS T21c أهداف لمس أصغر من 32px — 4 عنصر
+PASS T21d صور بلا alt / حقول بلا تسمية — صور:0 حقول:0
+PASS T22a manifest: حقول إلزامية وأيقونات 192/512 وmaskable والملفات موجودة — {"miss":[],"has192":true,"has512":true,"mask":true,"filesOk":true,"display":"standalone","start":"./index.html?source=pwa"}
+FAIL T22b ترويسات الأمان في _headers (CSP، X-Content-Type-Options، Referrer-Policy) —   Cache-Control: no-cache |   Content-Type: application/manifest+json; charset=utf-8 |   Cache-Control: no-cache |   Content-Type: application/json |   Access-Control-Allow-Origin: * |   Content-Type: application/json |   Access-Control-Allow-Origin: *
+PASS T23a حجم ملف التطبيق — 1578 KB (index.html، غير مضغوط)
+PASS T23b أداء الرسم والحفظ مع بيانات سنتين (730 يومًا) — {"renderMs":11.3,"renderBigMs":11.8,"progMs":8,"saveMs":5.6,"stateKB":275,"quotaOK":true,"heapMB":10,"dom":404}
+PASS T24 أوضاع اللغة الثلاثة ترسم الرئيسية بلا أخطاء — {"nobi":1860,"en1":1860,"bi":1860}
