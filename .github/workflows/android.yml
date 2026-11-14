@@ -2,7 +2,7 @@ name: Build Android
 on:
   workflow_dispatch:
   push:
-    branches: [main, master]
+    branches: [main, master, 'p0/**']
 permissions:
   contents: write
 jobs:
@@ -25,14 +25,33 @@ jobs:
           npx cap add android
           python3 scripts/patch_android.py
           npx cap sync android
+      - name: Inspect plugin sources (diagnostic)
+        run: |
+          grep -rniE "calorie|READ_|WRITE_" node_modules/@capgo/capacitor-health/android/src/main/AndroidManifest.xml || true
+          grep -rniE "calories|ActiveCalories|TotalCalories" node_modules/@capgo/capacitor-health/android/src/main/java | head -20 || true
+          grep -rn "uses-permission" node_modules/@capacitor/local-notifications/android/src/main/AndroidManifest.xml || true
       - name: Build debug APK (installable directly)
         working-directory: android
         run: ./gradlew assembleDebug
+      - name: Build release APK (unsigned) and verify manifest
+        working-directory: android
+        run: |
+          ./gradlew assembleRelease
+          cd ..
+          python3 scripts/check_manifest.py android/app/build/outputs/apk/release/app-release-unsigned.apk --release | tee manifest-release.txt
+          python3 scripts/check_manifest.py android/app/build/outputs/apk/debug/app-debug.apk --debug | tee manifest-debug.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: manifest-reports
+          path: |
+            manifest-release.txt
+            manifest-debug.txt
       - uses: actions/upload-artifact@v4
         with:
           name: khatwa-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
       - name: Publish APK as a downloadable release link
+        if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
