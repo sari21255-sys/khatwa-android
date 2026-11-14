@@ -2,7 +2,7 @@ name: Tests
 on:
   pull_request:
   push:
-    branches: [main, master]
+    branches: [main, master, 'p0/**', 'p1/**']
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,6 +17,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
+      - name: Generated files match the committed ones (index, _headers, CSP hashes)
+        run: python3 tools/build.py --check
+      - run: npm ci
       - name: Worker tests
         run: node tests/worker.test.mjs
       - name: App tests (Playwright)
@@ -24,6 +27,8 @@ jobs:
           npm i -g playwright
           npx playwright install --with-deps chromium
           NODE_PATH="$(npm root -g)" node tests/app.e2e.js
+      - name: P0 acceptance (security headers + CSP, offline eq-db, 320px, worker failure)
+        run: NODE_PATH="$(npm root -g)" node docs/technical-audit/evidence/p0-acceptance.mjs
       - name: Supabase schema + RLS tests
         env: { PGPASSWORD: pg }
         run: |

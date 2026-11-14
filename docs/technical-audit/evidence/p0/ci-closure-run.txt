@@ -1,0 +1,47 @@
+# CI run 43579033737 (commit 0134c4c) — annotations
+## aab-signature
+== jarsigner
+jar verified.
+== certificate
+Owner: CN=Sari, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown
+Issuer: CN=Sari, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown
+Valid from: Mon Nov 02 18:46:41 UTC 2026 until: Fri Mar 20 18:46:41 UTC 2054
+	 SHA256: 8F:33:2A:78:99:AE:6F:5A:13:65:F4:06:32:40:F9:05:0E:6B:EF:68:25:4E:67:F5:A1:12:9D:3C:1F:AC:B1:8A
+Signature algorithm name: SHA384withRSA
+
+## manifest-debug
+سطور SDK: [('minSdkVersion', '26'), ('targetSdkVersion', '36')]
+ملف: android/app/build/outputs/apk/debug/app-debug.apk
+minSdk 26 targetSdk 36 debuggable True allowBackup false
+الأذونات:
+   android.permission.INTERNET
+   android.permission.POST_NOTIFICATIONS
+   android.permission.RECEIVE_BOOT_COMPLETED
+   android.permission.WAKE_LOCK
+   android.permission.health.READ_ACTIVE_CALORIES_BURNED
+   android.permission.health.READ_DISTANCE
+   android.permission.health.READ_HEART_RATE
+   android.permission.health.READ_STEPS
+   com.***.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+PASS: الأذونات متوافقة مع الوظائف وسياسة الخصوصية
+
+## manifest-release
+سطور SDK: [('minSdkVersion', '26'), ('targetSdkVersion', '36')]
+ملف: android/app/build/outputs/apk/release/app-release-unsigned.apk
+minSdk 26 targetSdk 36 debuggable False allowBackup false
+الأذونات:
+   android.permission.INTERNET
+   android.permission.POST_NOTIFICATIONS
+   android.permission.RECEIVE_BOOT_COMPLETED
+   android.permission.WAKE_LOCK
+   android.permission.health.READ_ACTIVE_CALORIES_BURNED
+   android.permission.health.READ_DISTANCE
+   android.permission.health.READ_HEART_RATE
+   android.permission.health.READ_STEPS
+   com.***.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+PASS: الأذونات متوافقة مع الوظائف وسياسة الخصوصية
+
+
+## Tests (run 43579033748): success — includes: tools/build.py --check, npm ci, worker, app e2e, P0 acceptance (T22c strict, P0-06b strict), RLS.
+## Build Android (run 43579033737): success — build drift check, npm ci, debug (test-only artifact), release manifest check, signed AAB built, signature verified. No release/latest publication step exists anymore.
+## AAB certificate is self-signed (Owner=Issuer, CN=Sari). The owner must compare the SHA256 fingerprint above with his own keystore (keytool -list -v) — not verifiable from CI whether this is the production upload key.

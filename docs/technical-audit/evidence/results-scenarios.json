@@ -45,7 +45,7 @@
   "id": "T06",
   "name": "شاشة التقدّم ترسم رسومًا وأرقامًا",
   "result": "PASS",
-  "evidence": "{\"svg\":44,\"len\":638230}",
+  "evidence": "{\"svg\":44,\"len\":638603}",
   "severity": ""
  },
  {
@@ -94,7 +94,7 @@
   "id": "T10a",
   "name": "تسجيل Service Worker وملء الكاش",
   "result": "PASS",
-  "evidence": "{\"reg\":true,\"active\":true,\"caches\":[\"khatwa-v63\"]}",
+  "evidence": "{\"reg\":true,\"active\":true,\"caches\":[\"khatwa-v64\"]}",
   "severity": ""
  },
  {
@@ -107,9 +107,9 @@
  {
   "id": "T10c",
   "name": "قاعدة الأجهزة (eq-db.js) متاحة دون اتصال قبل أول فتح",
-  "result": "FAIL",
-  "evidence": "{\"err\":\"fetch failed offline\"} — الملف لا يُخزَّن مسبقًا في الكاش",
-  "severity": "P2"
+  "result": "PASS",
+  "evidence": "{\"status\":200} — الملف لا يُخزَّن مسبقًا في الكاش",
+  "severity": ""
  },
  {
   "id": "T11",

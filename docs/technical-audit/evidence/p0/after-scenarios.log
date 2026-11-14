@@ -1,0 +1,23 @@
+(node:3286) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/claude/khatwa-android/worker/ai-proxy.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/claude/khatwa-android/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS T01 مستخدم جديد يكمل التسجيل الأولي عبر الواجهة (7 خطوات) — {"ob":1,"name":"سالم","kcal":2270,"p":179,"days":3,"ex":15,"mp":7,"prg":"fb3"}
+PASS T02 إغلاق وفتح التطبيق يحفظ الملف والخطة — {"name":"سالم","ob":1,"ex":15}
+PASS T03 تسجيل تمرين (وزن×تكرار) يُحفظ ويدخل سجل الأداء — {"n":"سكوات","w":25,"done":true,"base":25,"inLifts":true}
+PASS T04a منتقي الأطعمة: بحث بالعربية وإضافة وجبة بالجرامات — {"foods":742,"found":3,"added":1,"kcal":500,"name":"ستيك لحم بقري مشوي (200 غ)"}
+PASS T04b حساب السعرات حسب الجرامات (القيم لكل 100 غ: 250 × 2 = 500) — الفعلي 500
+PASS T05 تسجيل الوزن ونسبة الدهون — {"bw":84.2,"bf":22}
+PASS T06 شاشة التقدّم ترسم رسومًا وأرقامًا — {"svg":44,"len":639387}
+PASS T07 بناء خطة بالذكاء الاصطناعي (وسيط حقيقي + Anthropic وهمي) — {"res":{"name":"خطة اختبار","days":2,"ex":8,"skipped":0},"msg":"","busy":0,"SM":true}
+PASS T08a رد غير JSON من الذكاء: رسالة خطأ بلا انهيار — {"res":null,"msg":"تعذّر الحصول على النتيجة، حاول مرة أخرى.","busy":0,"SM":true}
+PASS T08b فشل المزوّد 500: رسالة خطأ بلا انهيار — {"res":null,"msg":"تعذّر الحصول على النتيجة، حاول مرة أخرى.","busy":0,"SM":true}
+PASS T08c تمارين غير موجودة في المكتبة تُستبعد — {"res":null,"msg":"تعذّر الحصول على النتيجة، حاول مرة أخرى.","busy":0,"SM":true}
+PASS T09a الجهاز الثاني يسحب حالة الأول عبر الرمز — {"r":"pulled","name":"سالم","ex":15}
+FAIL T09b تعديلان متزامنان من جهازين: هل يُدمجان؟ — الخادم يحتفظ بآخر كتابة كاملة؛ تعديل الجهاز الأول فُقد (last-write-wins بلا دمج)
+PASS T10a تسجيل Service Worker وملء الكاش — {"reg":true,"active":true,"caches":["khatwa-v64"]}
+PASS T10b فتح التطبيق دون إنترنت وإضافة وجبة — {"name":"أوفلاين","saved":1}
+PASS T10c قاعدة الأجهزة (eq-db.js) متاحة دون اتصال قبل أول فتح — {"status":200} — محاولة جلب eq-db.js دون اتصال بعد تثبيت الـService Worker
+PASS T11 تصدير ثم استيراد في جهاز نظيف يعيد البيانات — {"ok":true,"name":"أوفلاين","meals":1}
+PASS T12 رمز غريب لا يرى حالة مستخدم آخر — status 404
+PASS T13 أخطاء JS خلال كل السيناريوهات — [[],[],[],[]]

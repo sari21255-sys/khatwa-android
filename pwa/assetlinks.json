@@ -1,0 +1,1 @@
+[{"relation": ["delegate_permission/common.handle_all_urls"], "target": {"namespace": "android_app", "package_name": "com.khatwa.twa", "sha256_cert_fingerprints": ["DD:E1:CC:CB:C8:F2:87:8C:C6:B8:F5:DD:9F:BE:18:6F:61:4C:1C:86:BD:28:2C:8B:20:3E:BA:D7:80:88:00:FA"]}}]

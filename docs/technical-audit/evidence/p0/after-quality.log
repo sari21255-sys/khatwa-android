@@ -1,0 +1,20 @@
+(node:3393) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/claude/khatwa-android/worker/ai-proxy.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/claude/khatwa-android/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+PASS T20-320 لا فيض أفقي على 320px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T20-360 لا فيض أفقي على 360px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T20-390 لا فيض أفقي على 390px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T20-412 لا فيض أفقي على 412px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T20-768 لا فيض أفقي على 768px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T20-1024 لا فيض أفقي على 1024px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T20-1280 لا فيض أفقي على 1280px عبر 29 شاشة — لا فيض، لا أخطاء
+PASS T21a لغة واتجاه الصفحة والـviewport — {"lang":"ar","dir":"rtl","vp":"width=device-width,initial-scale=1,viewport-fit=cover","zoomBlocked":false}
+PASS T21b أزرار بلا اسم قابل للقراءة — 0 من 216 (تراكمية عبر 7 تبويبات)
+PASS T21c أهداف لمس أصغر من 32px — 4 عنصر
+PASS T21d صور بلا alt / حقول بلا تسمية — صور:0 حقول:0
+PASS T22a manifest: حقول إلزامية وأيقونات 192/512 وmaskable والملفات موجودة — {"miss":[],"has192":true,"has512":true,"mask":true,"filesOk":true,"display":"standalone","start":"./index.html?source=pwa"}
+PASS T22b ترويسات الأمان في _headers (CSP، X-Content-Type-Options، Referrer-Policy) —   X-Content-Type-Options: nosniff |   Referrer-Policy: strict-origin-when-cross-origin |   X-Frame-Options: DENY |   Strict-Transport-Security: max-age=31536000; includeSubDomains |   Permissions-Policy: camera=(self), microphone=(self), geolocation=(self), payment=(), usb=(), bluetooth=(), serial=(
+PASS T23a حجم ملف التطبيق — 1579 KB (index.html، غير مضغوط)
+PASS T23b أداء الرسم والحفظ مع بيانات سنتين (730 يومًا) — {"renderMs":7.4,"renderBigMs":7.1,"progMs":5.3,"saveMs":3.8,"stateKB":275,"quotaOK":true,"heapMB":10,"dom":404}
+PASS T24 أوضاع اللغة الثلاثة ترسم الرئيسية بلا أخطاء — {"nobi":1860,"en1":1860,"bi":1860}

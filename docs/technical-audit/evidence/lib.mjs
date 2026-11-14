@@ -5,7 +5,13 @@ const require=createRequire(import.meta.url);
 export const {chromium}=require(process.env.NODE_PATH?path.join(process.env.NODE_PATH,'playwright'):'playwright');
 export const SITE=process.env.SITE||'/tmp/aud/site';
 const MIME={'.html':'text/html; charset=utf-8','.js':'text/javascript','.json':'application/json','.webmanifest':'application/manifest+json','.png':'image/png','.svg':'image/svg+xml','.css':'text/css'};
-export function staticServer(port){return new Promise(r=>{const s=http.createServer((q,res)=>{let p=decodeURIComponent(q.url.split('?')[0]);if(p.endsWith('/'))p+='index.html';const f=path.join(SITE,p);if(!f.startsWith(SITE)||!fs.existsSync(f)||fs.statSync(f).isDirectory()){res.writeHead(404);return res.end('nf')}res.writeHead(200,{'Content-Type':MIME[path.extname(f)]||'application/octet-stream','Cache-Control':'no-cache'});fs.createReadStream(f).pipe(res)});s.listen(port,'127.0.0.1',()=>r(s))})}
+
+// يطبّق ملف _headers الخاص بالموقع كما يفعل Netlify (كتلة /* ثم كتلة المسار المطابق). upgrade-insecure-requests يُحذف لأن الاختبار يعمل على http محلي.
+export function siteHeaders(p){const f=SITE+'/_headers';if(!fs.existsSync(f))return{};const out={};let cur=null;
+ for(const l of fs.readFileSync(f,'utf8').split('\n')){if(/^\S/.test(l)){cur=l.trim()}else if(cur&&l.trim()&&(cur==='/*'||cur===p)){const i=l.indexOf(':');out[l.slice(0,i).trim()]=l.slice(i+1).trim()}}
+ if(out['Content-Security-Policy'])out['Content-Security-Policy']=out['Content-Security-Policy'].replace(/;?\s*upgrade-insecure-requests/,'');
+ return out}
+export function staticServer(port){return new Promise(r=>{const s=http.createServer((q,res)=>{let p=decodeURIComponent(q.url.split('?')[0]);if(p.endsWith('/'))p+='index.html';const f=path.join(SITE,p);if(!f.startsWith(SITE)||!fs.existsSync(f)||fs.statSync(f).isDirectory()){res.writeHead(404);return res.end('nf')}res.writeHead(200,{'Content-Type':MIME[path.extname(f)]||'application/octet-stream','Cache-Control':'no-cache',...siteHeaders(p)});fs.createReadStream(f).pipe(res)});s.listen(port,'127.0.0.1',()=>r(s))})}
 export const MODE={ai:'ok',calls:[]};
 const kv=()=>{const m=new Map();return{m,get:async(k,t)=>{const v=m.get(k);return v==null?null:(t==='json'?JSON.parse(v):v)},put:async(k,v)=>m.set(k,String(v))}};
 export const KV=kv();

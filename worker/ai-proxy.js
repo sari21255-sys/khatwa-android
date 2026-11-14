@@ -6,8 +6,8 @@ const hex=b=>[...new Uint8Array(b)].map(x=>('0'+x.toString(16)).slice(-2)).join(
 const rnd=n=>hex(crypto.getRandomValues(new Uint8Array(n)));
 async function pbk(pw,salt){const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveBits']);return hex(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:new TextEncoder().encode(salt),iterations:100000},k,256))}
 export default{async fetch(req,env){
- const og=req.headers.get('Origin')||'',al=String(env.ALLOW_ORIGIN||'').split(',').map(x=>x.trim()).filter(Boolean),ok=al.indexOf('*')>=0||al.indexOf(og)>=0,H={'Access-Control-Allow-Headers':'Content-Type,Authorization','Access-Control-Allow-Methods':'GET,PUT,POST,OPTIONS','Content-Type':'application/json','Vary':'Origin','X-Content-Type-Options':'nosniff'};
- if(ok)H['Access-Control-Allow-Origin']=al.indexOf('*')>=0?'*':og;
+ const og=req.headers.get('Origin')||'',al=String(env.ALLOW_ORIGIN||'').split(',').map(x=>x.trim()).filter(Boolean),ok=!!og&&al.indexOf(og)>=0,H={'Access-Control-Allow-Headers':'Content-Type,Authorization','Access-Control-Allow-Methods':'GET,PUT,POST,OPTIONS','Content-Type':'application/json','Vary':'Origin','X-Content-Type-Options':'nosniff'};
+ if(ok)H['Access-Control-Allow-Origin']=og;
  const ip=req.headers.get('CF-Connecting-IP')||'0';
  const hit=async(k,max,ttl)=>{const n=+(await env.STATE.get(k)||0);if(n>=max)return false;await env.STATE.put(k,String(n+1),{expirationTtl:ttl});return true};
  const hr=new Date().toISOString().slice(0,13),day=new Date().toISOString().slice(0,10);

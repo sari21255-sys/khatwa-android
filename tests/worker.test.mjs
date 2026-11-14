@@ -15,6 +15,9 @@ r=await call(e,'/api/state',{method:'PUT',tok:T,body:{plan:[1]}});ok(r.status===
 r=await call(e,'/api/state',{tok:'z'+T.slice(1)});ok(r.status===404,'رمز آخر لا يرى حالتي');
 r=await call(e,'/api/state',{tok:T,origin:'https://evil.example'});ok(r.status===403,'نطاق غير مسموح = 403');
 r=await call(e,'/api/state',{tok:T});ok(r.headers.get('Access-Control-Allow-Origin')==='https://app.example','ترويسة CORS للنطاق المسموح فقط');
+{const ew=env({ALLOW_ORIGIN:'*'});r=await call(ew,'/api/state',{tok:T,origin:'https://any.example'});ok(r.status===403&&!r.headers.get('Access-Control-Allow-Origin'),'ALLOW_ORIGIN=* لا يُقبل (الطلبات تحمل رمز اعتماد)')}
+{const eo=env({ALLOW_ORIGIN:''});r=await call(eo,'/api/state',{tok:T,origin:'https://app.example'});ok(r.status===403,'ALLOW_ORIGIN فارغ = رفض كل أصول المتصفح (الإغلاق عند الفشل)')}
+r=await call(e,'/api/state',{tok:T});ok(/Origin/.test(r.headers.get('Vary')||''),'ترويسة Vary: Origin موجودة')
 r=await call(e,'/api/register',{method:'POST',body:{email:'a@b.co',password:'short'}});ok(r.status===400,'كلمة مرور ضعيفة تُرفض');
 r=await call(e,'/api/register',{method:'POST',body:{email:'a@b.co',password:'longenough1'}});const reg=await r.json();ok(r.status===200&&reg.token,'تسجيل ناجح');
 r=await call(e,'/api/register',{method:'POST',body:{email:'a@b.co',password:'longenough1'},ip:'9.9.9.9'});ok(r.status===409,'بريد مكرر = 409');

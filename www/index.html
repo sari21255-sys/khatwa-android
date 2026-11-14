@@ -28,6 +28,7 @@ h2 .ico{color:var(--ac)}
 .logo .ar b{display:inline-block;font-size:var(--s);font-weight:900;white-space:nowrap}
 .logo .en{margin-top:.22em;direction:ltr}
 .logo .en b{display:inline-block;font-family:var(--fe);font-weight:700;font-size:var(--es,12px);letter-spacing:.14em;color:var(--ac);white-space:nowrap;transform:translateX(.07em)}
+.tbr{gap:8px;flex-wrap:nowrap}@media(max-width:340px){.tbr{gap:3px}}
 .av{width:42px;height:42px;border-radius:50%;border:2px solid var(--ac);background:var(--card2);color:var(--ac);font-weight:900;overflow:hidden;display:grid;place-items:center;flex:none}
 .av img{width:100%;height:100%;object-fit:cover}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:14px;margin:0 0 12px}
@@ -110,7 +111,7 @@ label.f input,label.f select{margin-top:4px}
 .lnk{display:flex;align-items:center;gap:12px;width:100%;padding:13px 4px;border-top:1px solid var(--bd);text-align:start}
 .lnk:first-of-type{border-top:0}
 .lnk .ico{color:var(--ac);width:22px;height:22px}
-.lnk span.t{flex:1;font-weight:800}
+.lnk span.t{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:800}
 .quick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .quick button{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:800;font-size:13px}
 .quick .ico{color:var(--ac);width:26px;height:26px}
@@ -342,7 +343,7 @@ h1{font-size:30px;font-weight:700;letter-spacing:-.3px}
 .wkh small{display:block;opacity:.75;letter-spacing:1.5px;font-size:11px;font-weight:700}
 .wkh b{display:block;font-size:22px;margin:2px 0 10px}
 .wkh .bar{background:rgba(255,255,255,.28)}.wkh .bar i{background:#fff}
-.dgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:14px}
+.dgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-bottom:14px}
 .dt{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 2px 10px;border-radius:14px;background:var(--card);border:1.5px solid transparent;color:var(--ac2)}
 .dt .pic{width:30px;height:30px}.dt b{font-size:10.5px;color:var(--tx);font-weight:700}
 .dt.on{border-color:var(--ac2)}.dt.rs{opacity:.5}
@@ -367,7 +368,7 @@ h1{font-size:30px;font-weight:700;letter-spacing:-.3px}
 .statcard .t,.goalcard .t{flex:1}.statcard .ch{width:70px!important;height:70px!important}
 .statcard .ch circle:nth-child(odd){stroke:var(--track)}
 .sechead{display:flex;align-items:center;justify-content:space-between;margin:18px 0 10px}.sechead h2{margin:0;font-size:22px}
-.jt{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.jt{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
 .jtile{background:var(--card);border-radius:18px;padding:14px 10px;text-align:center}
 .jtile b{display:block;font-size:30px;line-height:1.1}.jtile span{display:flex;justify-content:center;align-items:center;gap:4px;color:var(--ac2);margin-top:4px}.jtile small{font-size:10px;letter-spacing:1.2px;color:var(--mu);font-weight:700}
 .medrow{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}.medrow::-webkit-scrollbar{display:none}
@@ -675,7 +676,7 @@ html body .top{padding-top:max(6px,env(safe-area-inset-top,0px))}
 .x2l b em{font:400 11px Qomra,Inter,sans-serif;font-style:normal;color:#a3a3a3;margin-inline-start:3px}
 .x2s{margin-top:12px;position:relative}
 .x2s .top{display:flex;justify-content:space-between;font-size:12px;color:#d4d4d4;margin-bottom:7px;gap:8px}
-.x2s .seg5{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.x2s .seg5{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
 .x2s .seg5 i{height:7px;border-radius:4px;background:#262626}
 .x2w{display:flex;gap:7px;margin:0 0 12px}
 .x2w div{flex:1;text-align:center;font-size:11px;color:var(--mu,#737373);min-width:0}
@@ -708,7 +709,7 @@ html body .top{padding-top:max(6px,env(safe-area-inset-top,0px))}
 .x2k svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 .x2k.g{background:rgba(34,197,94,.2);color:#4ade80}.x2k.r{background:rgba(239,68,68,.2);color:#f87171}.x2k.y{background:rgba(234,179,8,.2);color:#facc15}.x2k.w{background:rgba(255,255,255,.1);color:#d4d4d4}
 .x2k.lg{background:#e7f9ee;color:var(--t-gr)}.x2k.lr{background:#ffe9e9;color:var(--t-rd)}.x2k.lo{background:#fff1e6;color:var(--t-or)}.x2k.lb{background:#e8f0ff;color:var(--t-bl)}
-.x2p{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 12px}
+.x2p{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 12px}
 .x2p>div{background:#fff;border-radius:22px;padding:12px 8px;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.05)}
 .x2p small{display:block;font-size:11px;color:#737373;margin-top:5px}
 .x2p .nv{font:700 24px Inter,sans-serif;letter-spacing:-.04em;display:flex;align-items:center;justify-content:center;gap:3px;height:54px;direction:ltr}
@@ -767,7 +768,7 @@ html body .seg button{flex:1 0 auto!important;white-space:nowrap!important;width
 .dro{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .drw{position:absolute;top:0;bottom:0;left:0;width:min(86vw,360px);padding:calc(env(safe-area-inset-top,0px) + 18px) 16px 24px;color:#fff;background:linear-gradient(160deg,rgba(18,18,20,.82),rgba(40,40,46,.7));-webkit-backdrop-filter:blur(28px) saturate(1.5);backdrop-filter:blur(28px) saturate(1.5);border-inline-end:1px solid rgba(255,255,255,.18);border-radius:0 30px 30px 0;overflow-y:auto;animation:drin .28s ease}
 @keyframes drin{from{transform:translateX(-30px);opacity:0}to{transform:none;opacity:1}}
-.dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 8px}
+.dgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 8px}
 .dt{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;background:none;border:0;color:#fff;font:600 12px/1.3 inherit;text-align:center;padding:4px 0}
 .dt .fi{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.22);width:58px;height:58px}
 .dt.add .fi{border-style:dashed}
@@ -819,7 +820,7 @@ html body a.lnk{text-decoration:none!important;color:inherit!important}
 .fpr .t{flex:1;display:flex;flex-direction:column;min-width:0}.fpr .t small{font-size:12px}
 .fpm{display:flex;flex-direction:column;align-items:center;min-width:52px}.fpm b{font-size:17px}.fpm small{font-size:10px;color:var(--mu)}
 .fpd{border-top:1px solid #e5e5e5;padding-top:10px;margin-top:6px}
-.fpq{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.fpq .lc b{text-align:center;font-size:17px}
+.fpq{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.fpq .lc b{text-align:center;font-size:17px}
 .fps>*{flex-shrink:0}.fps .fpl{flex:1 1 auto;flex-shrink:1}.fps .rail{min-height:92px}
 
 .ddm{position:relative;margin:4px 0 12px}
@@ -1971,6 +1972,7 @@ function vSet(){
  h+=pinCard()+profCard();
  if(!IN_CLAUDE&&(CFG.syncUrl||CFG.aiUrl)){h+='<div class="card"><h2>'+ic('watch')+'المزامنة والأجهزة</h2><div class="mu" style="margin-bottom:8px">رمزك الخاص يربط بياناتك بين أجهزتك ويفعّل المساعد الذكي. لا تشاركه مع أحد.</div><label class="f">رمز المزامنة<input id="tok" type="text" dir="ltr" value="'+esc(SYNC.token)+'"></label><div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="copytok">نسخ الرمز</button><button class="btn sm" data-a="synctok">استعمال هذا الرمز</button></div><div class="tag'+(SYNC.st==='err'?' bad':'')+'" style="margin-top:8px">'+(SYNC.st==='err'?'تعذّرت المزامنة، البيانات محفوظة على الجهاز':'المزامنة تعمل')+'</div></div>'}
  if(INST)h+='<div class="card hl"><button class="btn" data-a="install">تثبيت التطبيق على الشاشة الرئيسية</button></div>';
+ h+='<div class="card"><h2>'+ic('info')+'الخصوصية والبيانات</h2><a class="lnk" href="privacy.html">'+ic('info')+'<span class="t">سياسة الخصوصية</span>'+ic('next')+'</a><a class="lnk" href="delete-account.html">'+ic('trash')+'<span class="t">حذف الحساب والبيانات</span>'+ic('next')+'</a></div>';
  return h}
 
 /* ---------- sub views ---------- */
@@ -2094,7 +2096,7 @@ function sheetHtml(){
  const lim=SM&&SMI;
  let h='<div class="ov" data-a="shclose"><div class="sh" role="dialog" aria-modal="true" aria-label="المساعد" data-stop="1"><div class="shh"><b>'+ic('spark')+' المساعد</b><button class="chip" data-a="shclose" aria-label="إغلاق">'+ic('x')+'</button></div>'+seg([['text','كتابة أو إملاء'],['photo','صورة']],'at',UI.at);
  if(UI.at==='text'){
-  h+='<div class="mu" style="margin-bottom:8px">اكتب أو املِ ما فعلته اليوم، وسأحوّله إلى تسجيلات. مثال: وزني 82.5 ونمت 7 ساعات ومشيت على الجهاز 30 دقيقة، وأكلت صدر دجاج 250 سعرة.</div><textarea id="qt" placeholder="تحدّث أو اكتب هنا">'+esc(UI.txt)+'</textarea><div class="row" style="margin-top:10px"><button class="btn" data-a="mic">'+ic('mic')+(UI.listen?'إيقاف الاستماع':'إملاء بالصوت')+'</button><button class="btn ghost" data-a="runtext"'+(UI.busy?' disabled':'')+'>'+ic('spark')+'تحليل وتسجيل</button></div>'+(SM?'':'<div class="note" style="margin-top:10px">يعمل هنا تحليل أساسي للجمل. التحليل الكامل متاح في نسخة Claude المنشورة.</div>')}
+  h+='<div class="mu" style="margin-bottom:8px">اكتب أو املِ ما فعلته اليوم، وسأحوّله إلى تسجيلات. مثال: وزني 82.5 ونمت 7 ساعات ومشيت على الجهاز 30 دقيقة، وأكلت صدر دجاج 250 سعرة.</div><textarea id="qt" placeholder="تحدّث أو اكتب هنا">'+esc(UI.txt)+'</textarea><div class="row" style="margin-top:10px">'+(NAT?'':'<button class="btn" data-a="mic">'+ic('mic')+(UI.listen?'إيقاف الاستماع':'إملاء بالصوت')+'</button>')+'<button class="btn ghost" data-a="runtext"'+(UI.busy?' disabled':'')+'>'+ic('spark')+'تحليل وتسجيل</button></div>'+(SM?'':'<div class="note" style="margin-top:10px">يعمل هنا تحليل أساسي للجمل. التحليل الكامل متاح في نسخة Claude المنشورة.</div>')}
  else{
   h+=seg([['machine','جهاز تمرين'],['display','شاشة كارديو'],['food','وجبة']],'ak',UI.ak)+(lim?'<div class="row"><button class="btn" data-a="pick" data-v="ph-cam">'+ic('camera')+'تصوير بالكاميرا</button><button class="btn ghost" data-a="pick" data-v="ph-gal">'+ic('image')+'من المعرض</button></div><input id="ph-cam" type="file" accept="image/*" capture="environment" hidden><input id="ph-gal" type="file" accept="image/*" hidden><div class="mu" style="margin-top:8px">'+(UI.ak==='machine'?'صوّر الجهاز لأعرّفك به وبطريقة استخدامه وأضيفه لخطتك.':(UI.ak==='display'?'صوّر شاشة جهاز الكارديو لأقرأ الزمن والمسافة والسعرات وأسجّل الجلسة.':'صوّر وجبتك لتقدير سعراتها ومكوناتها الغذائية.'))+'</div>':'<div class="note">التعرف على الصور يعمل في نسخة Claude المنشورة بعد أن تسمح للصفحة بالاستعانة بـ Claude. المايك والكاميرا المباشرة غير متاحين لصفحات Claude، لذلك يفتح الزر كاميرا جوالك ثم يعيد الصورة.</div>')}
  if(UI.busy)h+='<div class="note" style="margin-top:12px">جارٍ التحليل…</div>';
@@ -2239,7 +2241,7 @@ function reportHtml(auto){
  '<h2>التغذية</h2><span class="k">متوسط السعرات '+(ks.length?F(ak/ks.length):'—')+'</span><span class="k">متوسط البروتين '+(ks.length?F(ap/ks.length):'—')+' غ</span><span class="k">الهدف '+F(S.nt.kcal)+' سعرة</span>'+
  '<h2>هذا الأسبوع</h2><span class="k">خطوات '+F(wt.reduce((a,q)=>a+q.steps,0))+'</span><span class="k">سعرات محروقة '+F(wt.reduce((a,q)=>a+q.kcal,0))+'</span><span class="k">كارديو '+F(wt.reduce((a,q)=>a+q.min,0))+' دقيقة</span>'+
  '<h2>الالتزام</h2><span class="k">السلسلة الحالية '+x.cur+' يوم</span><span class="k">أفضل سلسلة '+x.best+'</span><span class="k">تمارين منجزة '+x.wo+'</span>'+
- (auto?'<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>':'')+'</body></html>'}
+ '</body></html>'}
 function ppAdd(f){const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const k=Math.min(1,480/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);PP.push({d:TD(),w:curW()||0,img:c.toDataURL('image/jpeg',.7)});PP=PP.slice(-30);if(!savePP()){PP.pop();UI.msg='مساحة التخزين ممتلئة، احذف بعض الصور'}else UI.msg='أُضيفت الصورة';render()};im.onerror=()=>{URL.revokeObjectURL(u);UI.msg='تعذّرت قراءة الصورة';render()};im.src=u}
 
 /* ---------- sports culture: coaches + peer-reviewed articles ---------- */
@@ -2325,7 +2327,7 @@ function nauLoad(){
  if(NAUS)return;NAUS=1;
  const sc=document.createElement('script');sc.src='eq-db.js';
  sc.onload=()=>{NAUR=(window.EQDB||[]).map(a=>({id:a[0],br:a[1],ba:a[2],ln:a[3],en:a[4],ar:a[5],te:a[6],ta:a[7],ge:a[8],ga:a[9],m:a[10],u:a[11],n:a[5]+' – '+a[2]}));{const c={};NAUR.forEach(m=>c[m.n]=(c[m.n]||0)+1);NAUR.forEach(m=>{if(c[m.n]>1)m.n+=' '+(m.m||m.id)})}NAUS=2;if(S.sub==='nau'||S.sub==='nad')render()};
- sc.onerror=()=>{NAUS=3;if(S.sub==='nau'||S.sub==='nad')render()};
+ sc.onerror=()=>{sc.remove();NAUS=3;if(S.sub==='nau'||S.sub==='nad')render()};
  document.head.appendChild(sc)}
 const nauIm=m=>(window.EQIMG&&EQIMG[m.id])?EQIMG_P+EQIMG[m.id]:'';
 const NAUG=[['','الكل'],['chest','الصدر'],['back','الظهر'],['shoulders','الأكتاف'],['biceps','الباي سبس'],['triceps','التراي سبس'],['arms','الذراعان'],['legs','الأرجل'],['glutes','الأرداف والفخذ'],['calves','السمانة'],['core','البطن والجذع'],['lower_back','أسفل الظهر'],['neck','الرقبة'],['grip','الساعد والقبضة'],['cardio','لياقة قلبية'],['full_body','الجسم كامل / تجهيزات']];
@@ -2333,7 +2335,7 @@ const NAUT=[['','كل الأنواع'],['selectorized','أثقال مدمجة'],
 const NAUB=[['','كل الماركات'],['Nautilus','نوتيلس'],['Life Fitness','لايف فتنس'],['Hammer Strength','هامر سترنث'],['Cybex','سايبكس'],['Matrix','ماتريكس'],['Technogym','تكنوجيم'],['Anatomy','أناتومي']];
 function nauMx(m){return (S.mx&&S.mx[m.id])||null}
 function nauList(){
- if(NAUS===3)return '<div class="emp">تعذّر تحميل قاعدة الأجهزة. تأكد من وجود الملف eq-db.js بجانب التطبيق</div>';
+ if(NAUS===3)return '<div class="emp">تعذّر تحميل قاعدة الأجهزة. إن كنت دون اتصال فافتح التطبيق مرة واحدة بالإنترنت لتُحفظ على جهازك.<div style="margin-top:8px"><button class="btn sm ghost" data-a="nauretry">إعادة المحاولة</button></div></div>';
  if(NAUS<2)return '<div class="emp">جارٍ تحميل القاعدة…</div>';
  const q=nrmF(UI.nq||''),L=NAUR.filter(m=>(!UI.ng||m.ge===UI.ng)&&(!UI.nt||m.te===UI.nt)&&(!UI.nl||m.br===UI.nl)&&(!q||nrmF(m.ar+' '+m.en+' '+m.ba+' '+m.br+' '+m.m).indexOf(q)>=0)&&(!UI.nm||nauMx(m)));
  if(!L.length)return '<div class="emp">لا نتائج بهذه المواصفات</div>';
@@ -3112,7 +3114,7 @@ async function offCode(code){
  o.busy=0;render()}
 function offCard(){
  const o=UI.off,det='BarcodeDetector' in window;
- let h='<div class="card"><h2>'+ic('image')+'بحث الأطعمة والباركود</h2><div class="mu" style="margin-bottom:8px">قاعدة Open Food Facts المفتوحة (تحتاج إنترنت). التغطية للمنتجات العربية متفاوتة.</div><div class="row" style="flex-wrap:nowrap"><input id="off-q" type="search" placeholder="مثال: زبادي، oats" value="'+esc(o.q)+'"><button class="btn sm" data-a="offgo">بحث</button></div><div class="row" style="margin-top:8px;flex-wrap:nowrap"><input id="off-c" type="text" inputmode="numeric" dir="ltr" placeholder="رقم الباركود"><button class="btn sm ghost" data-a="offcode">بحث بالرقم</button></div>'+(det?'<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="scan">'+ic('camera')+'مسح الباركود بالكاميرا</button></div>':'<div class="mu" style="margin-top:6px;font-size:12px">متصفحك لا يدعم قراءة الباركود بالكاميرا، اكتب الرقم.</div>');
+ let h='<div class="card"><h2>'+ic('image')+'بحث الأطعمة والباركود</h2><div class="mu" style="margin-bottom:8px">قاعدة Open Food Facts المفتوحة (تحتاج إنترنت). التغطية للمنتجات العربية متفاوتة.</div><div class="row" style="flex-wrap:nowrap"><input id="off-q" type="search" placeholder="مثال: زبادي، oats" value="'+esc(o.q)+'"><button class="btn sm" data-a="offgo">بحث</button></div><div class="row" style="margin-top:8px;flex-wrap:nowrap"><input id="off-c" type="text" inputmode="numeric" dir="ltr" placeholder="رقم الباركود"><button class="btn sm ghost" data-a="offcode">بحث بالرقم</button></div>'+(det&&!NAT?'<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="scan">'+ic('camera')+'مسح الباركود بالكاميرا</button></div>':'<div class="mu" style="margin-top:6px;font-size:12px">'+(NAT?'قراءة الباركود بالكاميرا غير متاحة في نسخة أندرويد حاليًا، اكتب الرقم.':'متصفحك لا يدعم قراءة الباركود بالكاميرا، اكتب الرقم.')+'</div>');
  if(o.busy)h+='<div class="note" style="margin-top:10px">جارٍ البحث…</div>';
  if(o.msg)h+='<div class="note" style="margin-top:10px;color:var(--tx)">'+esc(o.msg)+'</div>';
  o.res.forEach((m,i)=>{h+='<div class="mealrow" style="align-items:flex-end"><div class="t"><b>'+esc(m.n)+'</b><span class="mu">'+(m.b?esc(m.b)+' · ':'')+'لكل 100 غ: '+F(m.kcal)+' سعرة · ب '+F(m.p,1)+' · ك '+F(m.c,1)+' · د '+F(m.f,1)+'</span></div><input type="number" inputmode="decimal" data-gi="'+i+'" value="100" style="width:72px" aria-label="الكمية بالغرام"><button class="btn sm" data-a="offadd" data-i="'+i+'">أضف</button></div>'});
@@ -3379,7 +3381,9 @@ const soc={ig:h=>'https://instagram.com/'+h,x:h=>'https://x.com/'+h,tt:h=>'https
 const SOCN={ig:'Instagram',x:'X',tt:'TikTok',fb:'Facebook',sn:'Snapchat'};
 const lnkA=(u,t)=>'<a class="chip" href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">'+t+'</a>';
 const mono=c=>'<div class="gl">'+esc((c.en||c.n).replace(/[^A-Za-z\u0600-\u06FF ]/g,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join(''))+'</div>';
-const logoH=c=>c.logo?'<img class="gl" src="'+esc(c.logo)+'" alt="" referrerpolicy="no-referrer" onerror="this.outerHTML=\'<div class=&quot;gl&quot;>'+esc((c.en||c.n)[0])+'</div>\'">':mono(c);
+const logoH=c=>c.logo?'<img class="gl" src="'+esc(c.logo)+'" alt="" referrerpolicy="no-referrer" data-ml="'+esc((c.en||c.n)[0])+'">':mono(c);
+/* شعار النادي يفشل تحميله: يُستبدل بحرف أول. معالج عام بدل onerror مضمّن كي تعمل سياسة CSP بلا unsafe-inline */
+document.addEventListener('error',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.classList&&t.classList.contains('gl')&&t.dataset.ml!==undefined){const d=document.createElement('div');d.className='gl';d.textContent=t.dataset.ml;t.replaceWith(d)}},true);
 const gDist=c=>{const l=UI.lc;if(l&&c.lat)return hav(l.lat,l.lon,c.lat,c.lon);return null};
 function gyFiltered(){
  const city=curCity(),q=(UI.gq||'').trim().toLowerCase(),h=gy().home;
@@ -3965,7 +3969,8 @@ setInterval(dayTick,30000);setTimeout(dayTick,3000);
 /* ===== v38: الأندرويد الأصلي (Capacitor): Health Connect + إشعارات الخلفية + مشاركة + حسابات ===== */
 const NAT=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
 const NP=n=>{try{return window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins[n]}catch(e){return null}};
-const HC_READ=['steps','calories','distance','heartRate','sleep'];
+/* إضافة capgo 7.2.15 تدعم steps وcalories (النشطة) وdistance وheartRate وweight فقط؛ طلب 'sleep' كان سيُفشل طلب الإذن كله، فالنوم يبقى إدخالًا يدويًا */
+const HC_READ=['steps','calories','distance','heartRate'];
 const HC={st:'',busy:0};
 function hcRows(r){if(!r)return[];if(Array.isArray(r))return r;return r.samples||r.records||r.buckets||r.data||[]}
 function hcVal(x){const v=x.value!==undefined?x.value:(x.values&&x.values[0]&&x.values[0].value);return +v||0}
@@ -3980,7 +3985,7 @@ async function hcSync(ask){
   if(ask){await H.requestAuthorization({read:HC_READ})}
   else{const c=await H.checkAuthorization({read:HC_READ});if(c&&c.readAuthorized&&!c.readAuthorized.length){HC.st='لم يُمنح إذن بعد';return 0}}
   const to=new Date(),from=new Date();from.setDate(from.getDate()-13);from.setHours(0,0,0,0);
-  const [st,kc,km,sl]=await Promise.all([hcAgg(H,'steps',from,to),hcAgg(H,'calories',from,to),hcAgg(H,'distance',from,to),hcAgg(H,'sleep',from,to)]);
+  const [st,kc,km,sl]=await Promise.all([hcAgg(H,'steps',from,to),hcAgg(H,'calories',from,to),hcAgg(H,'distance',from,to),Promise.resolve({})]);
   let hrs={};try{const r=await H.readSamples({dataType:'heartRate',startDate:from.toISOString(),endDate:to.toISOString(),limit:3000});const a={};hcRows(r).forEach(x=>{const d=hcDay(x),v=hcVal(x);if(d&&v>30&&v<220)(a[d]=a[d]||[]).push(v)});Object.keys(a).forEach(d=>{hrs[d]=Math.round(Math.min.apply(null,a[d].slice().sort((x,y)=>x-y).slice(0,Math.max(1,Math.round(a[d].length*.05))).concat([999])))})}catch(e){lg(e)}
   let n=0;const days=new Set([].concat(Object.keys(st),Object.keys(kc),Object.keys(km),Object.keys(sl),Object.keys(hrs)));
   days.forEach(d=>{const o=S.cd[d]=S.cd[d]||{};if(st[d])o.steps=Math.round(st[d]);if(kc[d])o.kcal=Math.round(kc[d]);if(km[d])o.km=+(km[d]>500?km[d]/1000:km[d]).toFixed(1);if(hrs[d])o.hr=hrs[d];if(sl[d]){const h=sl[d]>1000?sl[d]/3600:(sl[d]>24?sl[d]/60:sl[d]);if(h>0&&h<16)S.sleep[d]=+h.toFixed(1)}n++});
@@ -4024,7 +4029,7 @@ function accCard(){
 function hcCard(){
  const P=S.prof;
  if(!NAT)return '<div class="card"><h2>'+ic('watch')+'Health Connect</h2><div class="mu">تتوفر المزامنة التلقائية مع الساعات (Galaxy Watch، Pixel Watch، Garmin، Fitbit، Xiaomi عبر تطبيقاتها) داخل تطبيق «خطوة» على الأندرويد. افتح التطبيق المثبّت من ملف APK لتفعيلها.</div></div>';
- return '<div class="card hl"><h2>'+ic('watch')+'Health Connect — مزامنة الساعة</h2><div class="mu" style="margin-bottom:6px">يقرأ الخطوات والسعرات والمسافة والنبض والنوم من أي ساعة أو تطبيق يكتب في Health Connect، آخر 14 يومًا، ويتحدّث تلقائيًا عند فتح التطبيق.</div><div class="hc-st'+(P.hcOn?' on':'')+'"><i></i>'+(P.hcOn?'مفعّل'+(P.hcAt?' · آخر مزامنة '+new Date(P.hcAt).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}):''):'غير مفعّل')+'</div><div class="row"><button class="btn sm" data-a="hcgo">'+(P.hcOn?'زامن الآن':'تفعيل الربط')+'</button>'+(P.hcOn?'<button class="btn sm ghost" data-a="hcoff">إيقاف</button>':'')+'</div>'+(HC.st?'<div class="note" style="margin-top:8px">'+esc(HC.st)+'</div>':'')+'</div>'}
+ return '<div class="card hl"><h2>'+ic('watch')+'Health Connect — مزامنة الساعة</h2><div class="mu" style="margin-bottom:6px">يقرأ الخطوات والسعرات والمسافة والنبض من أي ساعة أو تطبيق يكتب في Health Connect، آخر 14 يومًا، ويتحدّث تلقائيًا عند فتح التطبيق.</div><div class="hc-st'+(P.hcOn?' on':'')+'"><i></i>'+(P.hcOn?'مفعّل'+(P.hcAt?' · آخر مزامنة '+new Date(P.hcAt).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}):''):'غير مفعّل')+'</div><div class="row"><button class="btn sm" data-a="hcgo">'+(P.hcOn?'زامن الآن':'تفعيل الربط')+'</button>'+(P.hcOn?'<button class="btn sm ghost" data-a="hcoff">إيقاف</button>':'')+'</div>'+(HC.st?'<div class="note" style="margin-top:8px">'+esc(HC.st)+'</div>':'')+'</div>'}
 natBoot();
 
 /* ===== v40 design : readiness, hero, indicators ===== */
@@ -4283,7 +4288,7 @@ function render(){
  clearTimeout(renderT);dirty=false;
  if(locked()){$('#app').innerHTML=vLock();$('#nav').innerHTML='';fitLogos();return}
  if(S.tab==='home')S.tab='dash';const y=window.scrollY,onb=!S.prof.ob,LA=!onb&&S.tab==='home'&&!S.sub;document.body.classList.toggle('lau-on',LA);document.body.classList.toggle('oh',!!S.prof.oh);document.body.classList.toggle('ohl',S.prof.oh==='l');
- const WKM=S.sub==='wk',head=(onb||LA||WKM||(S.tab==='me'&&!S.sub))?'':'<div class="top"><button class="logob" data-a="go" data-v="dash" aria-label="الرئيسية">'+logo(21)+'</button><span class="row" style="gap:8px;flex-wrap:nowrap"><button class="av tb" data-a="srch" aria-label="بحث">'+ic('search')+'</button><button class="av tb" data-a="langm" aria-label="اللغة">'+ic('lang')+'</button><button class="av tb" data-a="drop" data-v="open" aria-label="اختصاراتي">'+ic('grid')+'</button><button class="av tb" data-a="sub" data-v="nc" aria-label="الإشعارات">'+ic('bell')+(ncUnread()?'<i class="nbd">'+ncUnread()+'</i>':'')+'</button><button class="av" data-a="go" data-v="me" aria-label="حسابي">'+(S.prof.av?'<img alt="" src="'+S.prof.av+'">':esc((S.prof.name||'س').charAt(0)))+'</button></span></div>';
+ const WKM=S.sub==='wk',head=(onb||LA||WKM||(S.tab==='me'&&!S.sub))?'':'<div class="top"><button class="logob" data-a="go" data-v="dash" aria-label="الرئيسية">'+logo(21)+'</button><span class="row tbr"><button class="av tb" data-a="srch" aria-label="بحث">'+ic('search')+'</button><button class="av tb" data-a="langm" aria-label="اللغة">'+ic('lang')+'</button><button class="av tb" data-a="drop" data-v="open" aria-label="اختصاراتي">'+ic('grid')+'</button><button class="av tb" data-a="sub" data-v="nc" aria-label="الإشعارات">'+ic('bell')+(ncUnread()?'<i class="nbd">'+ncUnread()+'</i>':'')+'</button><button class="av" data-a="go" data-v="me" aria-label="حسابي">'+(S.prof.av?'<img alt="" src="'+S.prof.av+'">':esc((S.prof.name||'س').charAt(0)))+'</button></span></div>';
  $('#app').innerHTML=head+view()+((onb||LA||WKM)?'':(UI.fab?'<div class="fabm"><button data-a="fgo" data-v="food">'+ic('fork')+'تسجيل وجبة</button><button data-a="fgo" data-v="train">'+ic('dumbbell')+'بدء تمرين</button><button data-a="fgo" data-v="dash" data-sc="1">'+ic('scale')+'تسجيل وزن أو نوم</button><button data-a="ai" data-t="text">'+ic('mic')+'إملاء أو تصوير</button></div>':'')+'<button class="fab" data-a="fab" aria-label="إضافة سريعة">'+ic(UI.fab?'x':'plus')+'</button>')+sheetHtml()+drawerHtml()+langMenu()+fpHtml();
  const N=[['dash','home','الرئيسية'],['train','dumbbell','التمرين'],['food','fork','التغذية'],['ex','compass','استكشف']];
  const N4=N.filter(n=>n[0]!=='me'),nb=n=>'<button class="'+(n[0]===S.tab?'on':'')+'" data-a="go" data-v="'+n[0]+'" aria-label="'+n[2]+'">'+ic(n[1])+'<span>'+n[2]+'</span></button>';
@@ -4375,7 +4380,7 @@ Object.assign(ACT,{
  algt:b=>{const a=S.prof.alg=S.prof.alg||[],i=a.indexOf(b.dataset.v);if(i>=0)a.splice(i,1);else a.push(b.dataset.v)},
  recalc:()=>{toast(calcTargets()?'حُسبت أهدافك الغذائية':'أكمل العمر والطول والوزن أولًا')},
  ppdel:b=>{PP.splice(+b.dataset.i,1);savePP()},
- report:()=>{const fn='khatwa-report-'+TD()+'.html';if(IN_CLAUDE){doExport(fn,reportHtml(false))}else{let w=null;try{w=window.open(URL.createObjectURL(new Blob([reportHtml(true)],{type:'text/html'})),'_blank')}catch(e){lg(e)}if(!w)doExport(fn,reportHtml(false))}return false}
+ report:()=>{const fn='khatwa-report-'+TD()+'.html';if(IN_CLAUDE){doExport(fn,reportHtml(false))}else{let w=null;try{w=window.open(URL.createObjectURL(new Blob([reportHtml(true)],{type:'text/html'})),'_blank')}catch(e){lg(e)}if(!w)doExport(fn,reportHtml(false));else{let n=0;const t=setInterval(()=>{n++;try{if(w.closed||n>40){clearInterval(t)}else if(w.location.protocol==='blob:'&&w.document.readyState==='complete'){clearInterval(t);w.print()}}catch(e){clearInterval(t);lg(e)}},250)}}return false}
 })}
 Object.assign(ACT,{
  bz:b=>{UI.ag=b.dataset.g||''},
@@ -4604,6 +4609,7 @@ Object.assign(ACT,{
  cqr:()=>{cqStart(UI.cq.u);window.scrollTo(0,0)}});
 
 Object.assign(ACT,{
+ nauretry:()=>{NAUS=0;nauLoad();render();return false},
  nad:b=>{nauLoad();UI.nd=b.dataset.id;S.sub='nad';window.scrollTo(0,0)},
  nauf:b=>{UI[b.dataset.k]=b.dataset.v},
  nadadd:b=>{const m=NAUR.find(a=>a.id===b.dataset.id),d=+$('#nad-day').value,s=+$('#nad-s').value||3,r=+$('#nad-r').value||10,x=nauMx(m);
@@ -4616,7 +4622,7 @@ document.addEventListener('change',ev=>{const t=ev.target,d=t.dataset||{};
 document.addEventListener('keydown',ev=>{if(ev.key==='Enter'&&ev.target.id==='wz-v'){ev.preventDefault();const b=document.querySelector('[data-a="wznext"]');if(b)b.click()}if(ev.key==='Enter'&&ev.target.id==='co-q'){ev.preventDefault();const b=document.querySelector('[data-a="csend"]');if(b)b.click()}});
 
 Object.assign(ACT,{
- gloc:()=>{if(!navigator.geolocation){UI.locMsg='المتصفح لا يدعم تحديد الموقع.';return}UI.locBusy=1;UI.locMsg='جارٍ تحديد الموقع…';render();
+ gloc:()=>{if(NAT){UI.locMsg='تحديد الموقع غير متاح في نسخة أندرويد حاليًا. اختر مدينتك من القائمة.';return}if(!navigator.geolocation){UI.locMsg='المتصفح لا يدعم تحديد الموقع.';return}UI.locBusy=1;UI.locMsg='جارٍ تحديد الموقع…';render();
   navigator.geolocation.getCurrentPosition(p=>{UI.lc={lat:p.coords.latitude,lon:p.coords.longitude,ts:Date.now()};try{localStorage.setItem('fit_loc',JSON.stringify(UI.lc))}catch(e){lg(e)}UI.gc='';UI.locBusy=0;UI.locMsg='';render()},e=>{UI.locMsg=e&&e.code===1?'لم تسمح بالوصول إلى الموقع. اختر مدينتك يدويًا.':'تعذّر تحديد الموقع الآن. اختر مدينتك يدويًا.';UI.locBusy=0;render()},{timeout:12000,maximumAge:600000});return false},
  gx:b=>{UI.gx=UI.gx===b.dataset.id?'':b.dataset.id},
  gf:b=>{UI[b.dataset.k]=b.dataset.v},
@@ -4628,7 +4634,7 @@ Object.assign(ACT,{
  gnew:()=>{UI.ge={add:1,f:{g:'b',am:[],city:curCity()==='all'?'':curCity()}};S.sub='gye';window.scrollTo(0,0)},
  geg:b=>{geSync();UI.ge.f.g=b.dataset.v},
  gea:b=>{geSync();const a=UI.ge.f.am=UI.ge.f.am||[],i=a.indexOf(b.dataset.v);if(i>=0)a.splice(i,1);else a.push(b.dataset.v)},
- gepos:()=>{geSync();if(!navigator.geolocation){toast('الموقع غير مدعوم');return false}navigator.geolocation.getCurrentPosition(p=>{UI.ge.f.lat=+p.coords.latitude.toFixed(5);UI.ge.f.lon=+p.coords.longitude.toFixed(5);render()},()=>toast('تعذّر تحديد الموقع'),{timeout:12000});return false},
+ gepos:()=>{geSync();if(NAT){toast('تحديد الموقع غير متاح في نسخة أندرويد حاليًا');return false}if(!navigator.geolocation){toast('الموقع غير مدعوم');return false}navigator.geolocation.getCurrentPosition(p=>{UI.ge.f.lat=+p.coords.latitude.toFixed(5);UI.ge.f.lon=+p.coords.longitude.toFixed(5);render()},()=>toast('تعذّر تحديد الموقع'),{timeout:12000});return false},
  gesave:()=>{geSync();const f=UI.ge.f;if(!f.n){toast('اكتب اسم النادي');return false}
   ['lat','lon'].forEach(k=>{if(f[k]===''||f[k]==null||isNaN(+f[k]))delete f[k];else f[k]=+f[k]});
   if(f.tel)f.tel=telDigits(f.tel);
@@ -4712,5 +4718,4 @@ window.addEventListener('resize',fitLogos);
   if(sn.exists){const x=JSON.parse(JSON.stringify(sn.data()));if(x&&x.plan&&load(x)){const tab=S.tab;ref=r;try{localStorage.setItem('fit1',JSON.stringify(S))}catch(e){lg(e)}render();return}}
   ref=r;save();render()}catch(e){render()}})();
 </script>
-
 </body></html>

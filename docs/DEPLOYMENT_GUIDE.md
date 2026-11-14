@@ -36,3 +36,10 @@
 - تعديل التطبيق: عدّل `fitness-tracker.html` ثم `python3 build.py` ثم انشر.
 - النسخ الاحتياطي: المستخدم يصدّر من الإعدادات. Supabase: فعّل النسخ اليومي في خطة مدفوعة أو نفّذ `pg_dump` دوريًا.
 - قبل أي نشر: `bash tests/run-all.sh`.
+
+## 7) ما تغيّر في P0 (2026-11-14) وما يلزمك عند النشر
+- **ترويسات الأمان:** `pwa/_headers` يُولَّد آليًا. بعد أي تعديل على `index.html` أو `install.html` أو `config.js` شغّل `python3 tools/build.py` (يبني الصفحات ويولّد `_headers`) وإلا تُحظر السكربتات المضمّنة بسياسة CSP. اختبار `p0-acceptance.mjs` يفشل إن كان الملف قديمًا.
+- **نطاقات الاتصال في CSP:** تُؤخذ من `config.js` (`aiUrl` و`syncUrl` و`sbUrl`). قبل ضبطها تُسمح نطاقات `*.workers.dev` و`*.supabase.co` افتراضيًا. إن استعملت نطاقًا مخصصًا فضعه في `config.js` ثم أعد التوليد.
+- **ALLOW_ORIGIN في الوسيط:** لم يعد `*` مقبولًا. ضع نطاق موقعك بالضبط (مثل `https://اسم-موقعك.netlify.app`) مع `https://localhost,capacitor://localhost` لتطبيق أندرويد.
+- **أندرويد:** `targetSdk=36` و`compileSdk=36` (متطلب Google Play منذ 2026-08-31)، `allowBackup=false`، أذونات القراءة فقط. بعد كل بناء يشغّل CI `scripts/check_manifest.py` ويفشل إن ظهر إذن غير مسموح أو debuggable في Release.
+- **التوقيع:** أسرار `KEYSTORE_B64` و`KEYSTORE_PASSWORD` و`KEY_ALIAS` و`KEY_PASSWORD` تُضاف من GitHub ← Settings ← Secrets فقط، ولا تُكتب في المستودع أو المحادثة. لتوليد الملف على جهازك: `keytool -genkeypair -v -keystore release.jks -alias khatwa -keyalg RSA -keysize 2048 -validity 10000` ثم `base64 -w0 release.jks` وضع الناتج في `KEYSTORE_B64`. احتفظ بنسخة من `release.jks` في مكان آمن خارج المستودع، وفعّل Play App Signing.

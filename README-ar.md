@@ -35,7 +35,7 @@ npx cap open android      # ثم Run
 4. **المعرّف**: `com.khatwa.app` في `capacitor.config.json`؛ غيّره قبل أول رفع لأنه لا يتغير بعد النشر.
 
 ## تحديث التطبيق لاحقًا
-ضع ملف `pwa/index.html` الجديد في أي مكان ثم: `bash scripts/prepare-www.sh مسار_الملف` وارفع التغيير؛ يعيد GitHub بناء الـAPK.
+عدّل `app/fitness-tracker.html` ثم شغّل `python3 tools/build.py` (يولّد `www/index.html` و`pwa/index.html` و`pwa/_headers`) وارفع التغيير؛ يعيد GitHub بناء الـAPK.
 
 ## ملاحظات صريحة
 - مكتبة Health Connect المستعملة `@capgo/capacitor-health` (مجانية). الأسماء التي يقرؤها الكود: steps, calories, distance, heartRate, sleep. إن اختلفت صيغة الاستجابة في إصدار أحدث، يتعامل الكود مع عدة أشكال، وبعدها يُعدَّل `hcAgg` في الملف.

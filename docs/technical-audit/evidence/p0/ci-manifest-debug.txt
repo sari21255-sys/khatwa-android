@@ -1,0 +1,15 @@
+سطور SDK: [('minSdkVersion', '26'), ('targetSdkVersion', '36')]
+ملف: android/app/build/outputs/apk/debug/app-debug.apk
+minSdk 26 targetSdk 36 debuggable True allowBackup false
+الأذونات:
+   android.permission.INTERNET
+   android.permission.POST_NOTIFICATIONS
+   android.permission.RECEIVE_BOOT_COMPLETED
+   android.permission.WAKE_LOCK
+   android.permission.health.READ_ACTIVE_CALORIES_BURNED
+   android.permission.health.READ_DISTANCE
+   android.permission.health.READ_HEART_RATE
+   android.permission.health.READ_STEPS
+   com.***.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+PASS: الأذونات متوافقة مع الوظائف وسياسة الخصوصية
+
