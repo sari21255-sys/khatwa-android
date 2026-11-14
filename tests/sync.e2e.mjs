@@ -91,6 +91,41 @@ try{
   await n.fill('#olem',lem);await n.fill('#olpw','legacypass123');await n.click('[data-a=lglogin]');await n.waitForFunction(()=>!!SYNC.token);
   await n.click('[data-a=rsmig]');await n.waitForFunction(()=>RSM.migrated===1,null,{timeout:8000});const v=await get(n,"S.bw['2026-09-09']");const frozen=await fetch('http://127.0.0.1:8792/api/state',{method:'PUT',headers:{Authorization:'Bearer '+tk,Origin:'http://127.0.0.1:8790'},body:JSON.stringify(st)});
   rec('MIG-04','حساب مزامنة قديم (بريد وكلمة مرور) على جهاز جديد: الدخول من الإعدادات ثم النقل يجلب بياناته ويجمّد النسخة القديمة',v===91&&frozen.status===410&&!!reg.token,JSON.stringify({v,frozen:frozen.status}));await n.ctx.close()}
+ /* ---- F-TIE: تعادل التوقيت والحذف بين جهازين: الطرفان يحسمان بالقاعدة نفسها (الجهاز الأكبر يفوز) ---- */
+ {const em=email('tie');const X=await device();await X.evaluate(SEED);await up(X,em);await sync(X);const u=await uidOf(X);const Y=await device();await login(Y,em);await sync(Y);
+  const dx=await get(X,'RSM.dev'),dy=await get(Y,'RSM.dev'),xWins=dx>dy,[W1,L1]=xWins?[X,Y]:[Y,X];
+  const T=Date.now();for(const p of[X,Y])await p.clock.setFixedTime(T);
+  const srv=k=>dbq(`select data->>'v' from public.sync_records where user_id='${u}' and kind='bw' and rid='${k}'`);
+  const pend=p=>get(p,"Object.values(RSM.rec).filter(e=>e.p).length");
+  const loc=(p,k)=>get(p,`S.bw['${k}']`);
+  const state=async k=>({x:await loc(X,k),y:await loc(Y,k),s:Number(await srv(k)),px:await pend(X),py:await pend(Y)});
+  const same=(st,v)=>st.x===v&&st.y===v&&st.s===v&&st.px===0&&st.py===0;
+  // أ) X يصل الخادم أولًا ثم Y
+  await edit(X,"S.bw['2026-09-10']=61");await edit(Y,"S.bw['2026-09-10']=62");const tsx=await get(X,"RSM.rec['bw\\u00012026-09-10'].t"),tsy=await get(Y,"RSM.rec['bw\\u00012026-09-10'].t");
+  await sync(X);await sync(Y);await sync(X);const v1=xWins?61:62,a=await state('2026-09-10');
+  rec('TIE-01','توقيتان متطابقان لقيمتين مختلفتين (X ثم Y): الجهازان والخادم على قيمة الجهاز الأكبر ولا انتظار باقٍ',tsx===tsy&&same(a,v1),JSON.stringify({tsx,tsy,xWins,a}));
+  // ب) عكس ترتيب وصول الطلبين
+  await edit(X,"S.bw['2026-09-11']=71");await edit(Y,"S.bw['2026-09-11']=72");await sync(Y);await sync(X);await sync(Y);const v2=xWins?71:72,b=await state('2026-09-11');
+  rec('TIE-02','عكس ترتيب وصول الطلبين (Y ثم X): النتيجة نفسها (قيمة الجهاز الأكبر) على الجهازين والخادم',same(b,v2),JSON.stringify({xWins,b}));
+  // ج) إعادة التحميل ثم المزامنة: لا يتغير شيء ولا ينتظر شيء
+  for(const p of[X,Y]){await p.reload();await p.waitForFunction(()=>typeof RSM!=='undefined');await p.waitForTimeout(800)}await sync(X);await sync(Y);
+  const c1=await state('2026-09-10'),c2=await state('2026-09-11');
+  rec('TIE-03','بعد إعادة تحميل الجهازين ومزامنة جديدة: القيم والانتظار كما هي',same(c1,v1)&&same(c2,v2),JSON.stringify({c1,c2}));
+  // د) ضياع الرد: الخاسر يرسل أولًا بعد وصول الفائز، يضيع ردّ الخادم، ثم يعيد
+  const Tn=Date.now();for(const p of[X,Y])await p.clock.setFixedTime(Tn);
+  await edit(X,"S.bw['2026-09-12']=81");await edit(Y,"S.bw['2026-09-12']=82");await sync(W1);
+  await L1.route('**/rest/v1/rpc/sync_exchange',async r=>{await r.fetch();await r.abort()});const lostRes=await sync(L1);await L1.unroute('**/rest/v1/rpc/sync_exchange');
+  const mid=await pend(L1);await sync(L1);await sync(W1);const v3=xWins?81:82,d=await state('2026-09-12');
+  rec('TIE-04','ضياع ردّ الخادم عند الجهاز الخاسر ثم إعادة الإرسال: يستقر الجهازان والخادم على الفائز ويُسوّى الانتظار',same(d,v3),JSON.stringify({lostRes,mid,d}));
+  // هـ) حذف مقابل تعديل بالتوقيت نفسه: التعديل يغلب الحذف على الجهازين والخادم
+  const Tm=Date.now();for(const p of[X,Y])await p.clock.setFixedTime(Tm);
+  await edit(X,"S.bw['2026-09-13']=91");await sync(X);await sync(Y);
+  const Tz=Date.now();for(const p of[X,Y])await p.clock.setFixedTime(Tz);
+  await edit(X,"S.bw['2026-09-13']=92");await edit(Y,"delete S.bw['2026-09-13']");
+  const tx2=await get(X,"RSM.rec['bw\\u00012026-09-13'].t"),ty2=await get(Y,"RSM.rec['bw\\u00012026-09-13'].t");
+  await sync(Y);await sync(X);await sync(Y);const e1=await state('2026-09-13');
+  rec('TIE-05','تعديل وحذف بالتوقيت نفسه: التعديل يغلب في الجهازين والخادم',tx2===ty2&&e1.x===92&&e1.y===92&&e1.s===92&&e1.px===0&&e1.py===0,JSON.stringify({tx2,ty2,e1}));
+  for(const p of[X,Y])await p.ctx.close()}
  /* ---- F1: البيانات المرحّلة تصل السحابة فعلًا (جهاز 1 يرحّل، جهاز 2 فارغ يستقبل) ---- */
  {const LT='http://127.0.0.1:8792',O={Origin:'http://127.0.0.1:8790'};
   const mkLegacy=async(tag)=>{const o2=await fetch(LT+'/api/register',{method:'POST',headers:{'content-type':'application/json',...O,'CF-Connecting-IP':'7.7.'+(Date.now()%200)+'.'+Math.floor(Math.random()*200)},body:JSON.stringify({email:email('f1'+tag),password:'legacypass123'})});const tk=(await o2.json()).token;

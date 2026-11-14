@@ -1048,8 +1048,8 @@ function rsDecomp(s){const o={};RS.skipped=0;
  return o}
 /* يوسم التعديلات المحلية بوقت التعديل. أول مرة (بلا سجل مزامنة) تُوسم السجلات الحالية بوقت آخر حفظ للحالة لتخسر أمام تعديلات أحدث من أجهزة أخرى. */
 function rsMark(first,at){const cur=rsDecomp(S),R=RSM.rec,base=first?(+S.ts||0):0;
- for(const key in cur){const h=rsH(JSON.stringify(cur[key].v)),e=R[key];if(!e||e.x||e.h!==h)R[key]={h,t:(first&&!e)?base:rsTs(at),x:0,p:1}}
- for(const key in R){if(!cur[key]&&!R[key].x)R[key]={h:0,t:rsTs(at),x:1,p:1}}
+ for(const key in cur){const h=rsH(JSON.stringify(cur[key].v)),e=R[key];if(!e||e.x||e.h!==h)R[key]={h,t:(first&&!e)?base:rsTs(at),x:0,p:1,d:RSM.dev}}
+ for(const key in R){if(!cur[key]&&!R[key].x)R[key]={h:0,t:rsTs(at),x:1,p:1,d:RSM.dev}}
  return cur}
 function rsChanges(cur){const ch=[];for(const key in RSM.rec){const e=RSM.rec[key];if(!e.p)continue;const i=key.indexOf('\u0001'),k=key.slice(0,i),r=key.slice(i+1);
  if(e.x)ch.push({k,r,x:true,ts:e.t,d:RSM.dev});else{const c=cur[key];if(c)ch.push({k,r,v:{m:c.m,e:c.e,v:c.v},ts:e.t,d:RSM.dev})}}
@@ -1066,10 +1066,12 @@ function rsPut(r){const k=r.k,v=r.v;
  return val}
 function rsApply(recs){let n=0;
  for(const r of recs){if(!r||typeof r.k!=='string'||typeof r.r!=='string')continue;const key=r.k+'\u0001'+r.r,e=RSM.rec[key],x=!!r.x;
-  if(e){if(e.t===+r.ts&&!!e.x===x){delete e.p;continue}                                       /* السجل نفسه (صدى تعديلنا) */
-   if(!rsWins(+r.ts,x,String(r.d),e.t,!!e.x,RSM.dev))continue}                                  /* المحلي أحدث: يبقى وسيُرسل */
+  const rd=String(r.d);
+  if(e){const ed=e.d||(e.p?RSM.dev:null);                                                      /* الجهاز الكاتب لما عندنا: معروف دائمًا لما كتبناه أو استلمناه بعد هذا التعديل */
+   if(e.t===+r.ts&&!!e.x===x&&(ed===null||ed===rd)){delete e.p;if(!e.d)e.d=rd;continue}       /* السجل نفسه (صدى كتابتنا أو تكرار): نفس التوقيت والحذف ونفس الجهاز */
+   if(!rsWins(+r.ts,x,rd,e.t,!!e.x,ed||RSM.dev))continue}                                       /* المحلي يفوز (يشمل تعادل التوقيت بفارق الجهاز): يبقى وسيُرسل */
   const val=rsPut(r);if(val===null)continue;
-  RSM.rec[key]={h:x?0:rsH(JSON.stringify(val)),t:+r.ts,x:x?1:0};n++}
+  RSM.rec[key]={h:x?0:rsH(JSON.stringify(val)),t:+r.ts,x:x?1:0,d:rd};n++}                       /* قرار الخادم: القيمة والتوقيت والجهاز الفائز وزوال الانتظار */
  if(n){try{norm();localStorage.setItem('fit1',JSON.stringify(S))}catch(e){lg(e)}}
  return n}
 async function rsCall(body){if(!(await SB.fresh()))throw{code:SB.ses?'net':'auth'};
@@ -1108,7 +1110,7 @@ async function rsLegacyImport(){
  const snap=rsDecomp(cleanData(x)),ts=+x.ts||1,recs=Object.values(snap).map(c=>({k:c.k,r:c.r,v:{m:c.m,e:c.e,v:c.v},ts,d:'legacy',x:false}));
  const n=rsApply(recs);
  /* السجلات المستوردة تبقى معلّقة (p) حتى يردّ الخادم على رفعها؛ فلا يكفي أنها صارت في الجهاز */
- let pend=0;for(const c of recs){const e=RSM.rec[c.k+'\u0001'+c.r];if(e&&e.t===ts&&!e.x){e.p=1;pend++}}
+ let pend=0;for(const c of recs){const e=RSM.rec[c.k+'\u0001'+c.r];if(e&&e.t===ts&&!e.x){e.p=1;e.d=RSM.dev;pend++}}
  RSM.mig={stage:'imported',n,total:recs.length,at:Date.now()};rsSave();return{n,total:recs.length,pend}}
 async function bootPwa(){
  if((CFG.aiUrl||CFG.syncUrl)&&!CFG.sbUrl){if(!SYNC.token){SYNC.token=genToken();try{localStorage.setItem('fit_sync',SYNC.token)}catch(e){lg(e)}}}
