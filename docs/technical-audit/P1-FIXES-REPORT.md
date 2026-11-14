@@ -144,8 +144,8 @@
 
 روابط CI:
 - Tests (الالتزام المرشح): https://github.com/sari21255-sys/khatwa-android/actions/runs/43583442412
-- Build Android (الالتزام المرشح): https://github.com/sari21255-sys/khatwa-android/actions/runs/43583442417 (الحالة في القسم 5)
-- طلب الدمج: انظر القسم 5.
+- Build Android (الالتزام المرشح): https://github.com/sari21255-sys/khatwa-android/actions/runs/43583442417 — النتيجة: success (يشمل بناء debug وRelease وفحص manifest وAAB موقّعًا وفحص توقيعه؛ هذا لا يثبت أن المفتاح هو مفتاح الرفع الحقيقي)
+- طلب الدمج (مسودة): https://github.com/sari21255-sys/khatwa-android/pull/3
 
 ## 4. ما لم يُختبر
 
