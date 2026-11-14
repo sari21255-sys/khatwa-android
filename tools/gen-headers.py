@@ -2,7 +2,7 @@
 """يولّد pwa/_headers (ترويسات الأمان لـNetlify) من محتوى الصفحات الفعلي:
 - يحسب SHA-256 لكل سكربت مضمّن في صفحات HTML فتُسمح هذه السكربتات بالضبط بلا unsafe-inline في script-src.
 - يقرأ pwa/config.js ويضيف أصول (origins) aiUrl وsyncUrl وsbUrl إلى connect-src.
-يُشغَّل بعد كل تعديل على index.html/install.html/privacy.html/config.js:  python3 scripts/gen-headers.py pwa"""
+يُشغَّل بعد كل تعديل على index.html/install.html/privacy.html/config.js:  python3 tools/gen-headers.py pwa"""
 import base64,hashlib,re,sys,glob,os
 from urllib.parse import urlparse
 d=sys.argv[1] if len(sys.argv)>1 else 'pwa'

@@ -54,7 +54,7 @@
 - لم أرفع Capacitor إلى 8 ولا أي إضافة. البناء نجح في CI بهذه الإعدادات.
 
 ### P0-03 ترويسات الأمان
-- `scripts/gen-headers.py` يولّد `pwa/_headers`: `X-Content-Type-Options: nosniff`، `Referrer-Policy: strict-origin-when-cross-origin`، `X-Frame-Options: DENY`، `Strict-Transport-Security`، `Permissions-Policy`، و`Content-Security-Policy` تشمل `frame-ancestors 'none'` و`object-src 'none'` و`base-uri 'self'` و`form-action 'self'` و`upgrade-insecure-requests`.
+- `tools/gen-headers.py` يولّد `pwa/_headers`: `X-Content-Type-Options: nosniff`، `Referrer-Policy: strict-origin-when-cross-origin`، `X-Frame-Options: DENY`، `Strict-Transport-Security`، `Permissions-Policy`، و`Content-Security-Policy` تشمل `frame-ancestors 'none'` و`object-src 'none'` و`base-uri 'self'` و`form-action 'self'` و`upgrade-insecure-requests`.
 - `script-src`: `'self'` + تجزئات SHA-256 للسكربتات المضمّنة الثلاثة، **بلا `unsafe-inline` ولا `unsafe-eval`**. المولّد يعيد حساب التجزئات من الصفحات، واختبار يفشل إن كان الملف قديمًا.
 - لجعل ذلك ممكنًا: حُذف معالج `onerror` المضمّن لشعار النادي (صار مستمع `error` عامًا)، وسكربت الطباعة داخل صفحة التقرير (تُطبع الآن من النافذة الأم)، وسكربت صفحة الخصوصية (ملف `legal.js`).
 - `connect-src` يُبنى من `config.js` (`aiUrl` و`syncUrl` و`sbUrl`)، وقبل ضبطها يسمح بـ`*.workers.dev` و`*.supabase.co`.
@@ -97,7 +97,7 @@
 | `scripts/check_manifest.py` (جديد) | فحص APK آليًا (أذونات، debuggable، backup، targetSdk) |
 | `.github/workflows/android.yml` | بناء Release غير موقّع وفحصه؛ تقارير النتائج؛ النشر إلى Release «latest» لـ`main` فقط؛ تشغيل على فروع `p0/**` |
 | `.github/workflows/ci.yml`، `tests/run-all.sh` | تشغيل اختبار قبول P0 |
-| `scripts/gen-headers.py` (جديد)، `scripts/sync-pwa.sh` (جديد)، `pwa/_headers` | الترويسات وCSP |
+| `tools/gen-headers.py` (جديد)، `scripts/sync-pwa.sh` (جديد)، `pwa/_headers` | الترويسات وCSP |
 | `pwa/` (مجلد جديد في المستودع) | ملفات النشر: `sw.js`، `index.html`، الصفحات القانونية، `config.js`... |
 | `pwa/sw.js` | precache لـ`eq-db.js` وإصدار v64 |
 | `pwa/index.html`، `www/index.html` (ناتج بناء من `fitness-tracker.html`) | تعديلات المصدر أدناه |
@@ -166,7 +166,7 @@
 
 ## 10. ما أحتاجه منك
 
-1. **بريد دعم حقيقي** تملكه ← `supportEmail` في `pwa/config.js` (ثم `python3 scripts/gen-headers.py pwa`).
+1. **بريد دعم حقيقي** تملكه ← `supportEmail` في `pwa/config.js` (ثم `python3 tools/gen-headers.py pwa`).
 2. **حساب Cloudflare:** نشر الوسيط (`wrangler kv namespace create STATE`، `wrangler secret put ANTHROPIC_API_KEY`، `wrangler deploy`) ثم `ALLOW_ORIGIN` = نطاق موقعك الفعلي + `https://localhost,capacitor://localhost`، ثم `aiUrl` و`syncUrl`.
 3. **مشروع Supabase:** تنفيذ `supabase/schema.sql`، ثم `sbUrl` و`sbKey` (مفتاح anon فقط).
 4. **رابط المتجر** `storeUrl` بعد إنشاء الصفحة.

@@ -4,7 +4,7 @@ import fs from 'node:fs';import path from 'node:path';import cp from 'node:child
 const ROOT=path.resolve(new URL('../../../',import.meta.url).pathname)+'/';
 const TMP='/tmp/p0site';fs.rmSync(TMP,{recursive:true,force:true});fs.cpSync(ROOT+'pwa',TMP,{recursive:true});
 fs.writeFileSync(TMP+'/config.js','window.APP_CONFIG={aiUrl:"http://127.0.0.1:8788/api/ai",syncUrl:"http://127.0.0.1:8788/api/state",sbUrl:"",sbKey:"",supportEmail:"",storeUrl:""};\n');
-cp.execSync(`python3 ${ROOT}scripts/gen-headers.py ${TMP}`,{stdio:'pipe'});
+cp.execSync(`python3 ${ROOT}tools/gen-headers.py ${TMP}`,{stdio:'pipe'});
 process.env.SITE=TMP;
 const {chromium,staticServer,workerServer,MODE,KV,rec,results,siteHeaders}=await import('./lib.mjs');
 const A='http://127.0.0.1:8081';const st=await staticServer(8081),wk=await workerServer(8788,A);
@@ -22,8 +22,8 @@ try{
  const cspOk=!/unsafe-eval/.test(csp)&&!/unsafe-inline/.test(dir('script-src'))&&dir('frame-ancestors')==="'none'"&&dir('object-src')==="'none'"&&dir('base-uri')==="'self'"&&/'sha256-/.test(dir('script-src'));
  rec('T22b-csp','CSP: لا unsafe-eval ولا unsafe-inline في script-src، frame-ancestors/object-src none، سكربتات مضمّنة بالتجزئة',cspOk,'script-src: '+dir('script-src').slice(0,90)+'… | style-src: '+dir('style-src'),'P2');
  /* حداثة التجزئات: _headers المُلتزَم به يطابق ما يولّده المولّد من الصفحات الحالية */
- const gen=fs.readFileSync(ROOT+'pwa/_headers','utf8');fs.mkdirSync('/tmp/p0chk',{recursive:true});fs.cpSync(ROOT+'pwa','/tmp/p0chk',{recursive:true});cp.execSync(`python3 ${ROOT}scripts/gen-headers.py /tmp/p0chk`,{stdio:'pipe'});
- rec('T22b-fresh','ملف pwa/_headers المُلتزَم به محدّث (تجزئات السكربتات تطابق الصفحات الحالية)',gen===fs.readFileSync('/tmp/p0chk/_headers','utf8'),'إن فشل: python3 scripts/gen-headers.py pwa','P2');
+ const gen=fs.readFileSync(ROOT+'pwa/_headers','utf8');fs.mkdirSync('/tmp/p0chk',{recursive:true});fs.cpSync(ROOT+'pwa','/tmp/p0chk',{recursive:true});cp.execSync(`python3 ${ROOT}tools/gen-headers.py /tmp/p0chk`,{stdio:'pipe'});
+ rec('T22b-fresh','ملف pwa/_headers المُلتزَم به محدّث (تجزئات السكربتات تطابق الصفحات الحالية)',gen===fs.readFileSync('/tmp/p0chk/_headers','utf8'),'إن فشل: python3 tools/gen-headers.py pwa','P2');
 
  /* T22c: كل الوظائف تعمل تحت CSP: صفر مخالفات وصفر أخطاء */
  const ctx=await b.newContext({viewport:{width:390,height:844},acceptDownloads:true});const p=await ctx.newPage();const w=watch(p);

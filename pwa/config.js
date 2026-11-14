@@ -3,7 +3,7 @@
    sbUrl           : رابط مشروع Supabase، مثال: https://xxxx.supabase.co
    sbKey           : مفتاح anon (publishable) فقط. مفتاح service_role سرّي ولا يوضع هنا إطلاقًا.
    supportEmail    : بريد حقيقي تملكه لطلبات الخصوصية والحذف (يظهر في صفحتي الخصوصية وحذف الحساب).
-   بعد تعديل هذا الملف شغّل: python3 scripts/gen-headers.py pwa   لتحديث سياسة CSP (connect-src) تلقائيًا. */
+   بعد تعديل هذا الملف شغّل: python3 tools/gen-headers.py pwa   لتحديث سياسة CSP (connect-src) تلقائيًا. */
 window.APP_CONFIG={
   aiUrl:"",
   syncUrl:"",

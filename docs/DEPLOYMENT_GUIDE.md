@@ -38,7 +38,7 @@
 - قبل أي نشر: `bash tests/run-all.sh`.
 
 ## 7) ما تغيّر في P0 (2026-11-14) وما يلزمك عند النشر
-- **ترويسات الأمان:** `pwa/_headers` يُولَّد آليًا. بعد أي تعديل على `index.html` أو `install.html` أو `config.js` شغّل `python3 scripts/gen-headers.py pwa` (أو `bash scripts/sync-pwa.sh` بعد `build.py`) وإلا تُحظر السكربتات المضمّنة بسياسة CSP. اختبار `p0-acceptance.mjs` يفشل إن كان الملف قديمًا.
+- **ترويسات الأمان:** `pwa/_headers` يُولَّد آليًا. بعد أي تعديل على `index.html` أو `install.html` أو `config.js` شغّل `python3 tools/build.py` (يبني الصفحات ويولّد `_headers`) وإلا تُحظر السكربتات المضمّنة بسياسة CSP. اختبار `p0-acceptance.mjs` يفشل إن كان الملف قديمًا.
 - **نطاقات الاتصال في CSP:** تُؤخذ من `config.js` (`aiUrl` و`syncUrl` و`sbUrl`). قبل ضبطها تُسمح نطاقات `*.workers.dev` و`*.supabase.co` افتراضيًا. إن استعملت نطاقًا مخصصًا فضعه في `config.js` ثم أعد التوليد.
 - **ALLOW_ORIGIN في الوسيط:** لم يعد `*` مقبولًا. ضع نطاق موقعك بالضبط (مثل `https://اسم-موقعك.netlify.app`) مع `https://localhost,capacitor://localhost` لتطبيق أندرويد.
 - **أندرويد:** `targetSdk=36` و`compileSdk=36` (متطلب Google Play منذ 2026-08-31)، `allowBackup=false`، أذونات القراءة فقط. بعد كل بناء يشغّل CI `scripts/check_manifest.py` ويفشل إن ظهر إذن غير مسموح أو debuggable في Release.

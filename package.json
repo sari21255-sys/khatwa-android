@@ -4,11 +4,12 @@
   "private": true,
   "description": "خطوة — غلاف Capacitor للأندرويد",
   "scripts": {
-    "prepare-www": "bash scripts/prepare-www.sh",
+    "build": "python3 tools/build.py",
+    "build:check": "python3 tools/build.py --check",
+    "test": "bash tests/run-all.sh",
     "android:add": "npx cap add android",
     "android:sync": "npx cap sync android",
-    "android:patch": "python3 scripts/patch_android.py",
-    "android:open": "npx cap open android"
+    "android:patch": "python3 scripts/patch_android.py"
   },
   "dependencies": {
     "@capacitor/android": "^7.0.0",
