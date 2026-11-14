@@ -13,7 +13,7 @@ export function siteHeaders(p){const f=SITE+'/_headers';if(!fs.existsSync(f))ret
  return out}
 export function staticServer(port){return new Promise(r=>{const s=http.createServer((q,res)=>{let p=decodeURIComponent(q.url.split('?')[0]);if(p.endsWith('/'))p+='index.html';const f=path.join(SITE,p);if(!f.startsWith(SITE)||!fs.existsSync(f)||fs.statSync(f).isDirectory()){res.writeHead(404);return res.end('nf')}res.writeHead(200,{'Content-Type':MIME[path.extname(f)]||'application/octet-stream','Cache-Control':'no-cache',...siteHeaders(p)});fs.createReadStream(f).pipe(res)});s.listen(port,'127.0.0.1',()=>r(s))})}
 export const MODE={ai:'ok',calls:[]};
-const kv=()=>{const m=new Map();return{m,get:async(k,t)=>{const v=m.get(k);return v==null?null:(t==='json'?JSON.parse(v):v)},put:async(k,v)=>m.set(k,String(v))}};
+const kv=()=>{const m=new Map();return{m,get:async(k,t)=>{const v=m.get(k);return v==null?null:(t==='json'?JSON.parse(v):v)},put:async(k,v)=>m.set(k,String(v)),delete:async k=>{m.delete(k)}}};
 export const KV=kv();
 const realFetch=globalThis.fetch;
 globalThis.fetch=async(u,o)=>{if(String(u).includes('api.anthropic.com')){const b=JSON.parse(o.body);const txt=JSON.stringify(b);MODE.calls.push(txt.slice(0,400));
