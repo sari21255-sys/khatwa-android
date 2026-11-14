@@ -73,7 +73,7 @@ try{
  rec('T10b','فتح التطبيق دون إنترنت وإضافة وجبة',off.name==='أوفلاين'&&off.saved===1,JSON.stringify(off),'P0');
  /* قاعدة الأجهزة دون اتصال (لم تُحمَّل مسبقًا) */
  const nauOff=await ev(pO,async()=>{try{const r=await fetch('eq-db.js');return{status:r.status}}catch(e){return{err:'fetch failed offline'}}});
- rec('T10c','قاعدة الأجهزة (eq-db.js) متاحة دون اتصال قبل أول فتح',nauOff.status===200,JSON.stringify(nauOff)+' — الملف لا يُخزَّن مسبقًا في الكاش','P2');
+ rec('T10c','قاعدة الأجهزة (eq-db.js) متاحة دون اتصال قبل أول فتح',nauOff.status===200,JSON.stringify(nauOff)+' — محاولة جلب eq-db.js دون اتصال بعد تثبيت الـService Worker','P2');
  await cO.setOffline(false);
  /* T11 تصدير واستيراد */
  const exp=await ev(pO,()=>JSON.stringify(S));

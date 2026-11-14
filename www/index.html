@@ -28,6 +28,7 @@ h2 .ico{color:var(--ac)}
 .logo .ar b{display:inline-block;font-size:var(--s);font-weight:900;white-space:nowrap}
 .logo .en{margin-top:.22em;direction:ltr}
 .logo .en b{display:inline-block;font-family:var(--fe);font-weight:700;font-size:var(--es,12px);letter-spacing:.14em;color:var(--ac);white-space:nowrap;transform:translateX(.07em)}
+.tbr{gap:8px;flex-wrap:nowrap}@media(max-width:340px){.tbr{gap:3px}}
 .av{width:42px;height:42px;border-radius:50%;border:2px solid var(--ac);background:var(--card2);color:var(--ac);font-weight:900;overflow:hidden;display:grid;place-items:center;flex:none}
 .av img{width:100%;height:100%;object-fit:cover}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:20px;padding:14px;margin:0 0 12px}
@@ -110,7 +111,7 @@ label.f input,label.f select{margin-top:4px}
 .lnk{display:flex;align-items:center;gap:12px;width:100%;padding:13px 4px;border-top:1px solid var(--bd);text-align:start}
 .lnk:first-of-type{border-top:0}
 .lnk .ico{color:var(--ac);width:22px;height:22px}
-.lnk span.t{flex:1;font-weight:800}
+.lnk span.t{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:800}
 .quick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .quick button{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:800;font-size:13px}
 .quick .ico{color:var(--ac);width:26px;height:26px}
@@ -2094,7 +2095,7 @@ function sheetHtml(){
  const lim=SM&&SMI;
  let h='<div class="ov" data-a="shclose"><div class="sh" role="dialog" aria-modal="true" aria-label="المساعد" data-stop="1"><div class="shh"><b>'+ic('spark')+' المساعد</b><button class="chip" data-a="shclose" aria-label="إغلاق">'+ic('x')+'</button></div>'+seg([['text','كتابة أو إملاء'],['photo','صورة']],'at',UI.at);
  if(UI.at==='text'){
-  h+='<div class="mu" style="margin-bottom:8px">اكتب أو املِ ما فعلته اليوم، وسأحوّله إلى تسجيلات. مثال: وزني 82.5 ونمت 7 ساعات ومشيت على الجهاز 30 دقيقة، وأكلت صدر دجاج 250 سعرة.</div><textarea id="qt" placeholder="تحدّث أو اكتب هنا">'+esc(UI.txt)+'</textarea><div class="row" style="margin-top:10px"><button class="btn" data-a="mic">'+ic('mic')+(UI.listen?'إيقاف الاستماع':'إملاء بالصوت')+'</button><button class="btn ghost" data-a="runtext"'+(UI.busy?' disabled':'')+'>'+ic('spark')+'تحليل وتسجيل</button></div>'+(SM?'':'<div class="note" style="margin-top:10px">يعمل هنا تحليل أساسي للجمل. التحليل الكامل متاح في نسخة Claude المنشورة.</div>')}
+  h+='<div class="mu" style="margin-bottom:8px">اكتب أو املِ ما فعلته اليوم، وسأحوّله إلى تسجيلات. مثال: وزني 82.5 ونمت 7 ساعات ومشيت على الجهاز 30 دقيقة، وأكلت صدر دجاج 250 سعرة.</div><textarea id="qt" placeholder="تحدّث أو اكتب هنا">'+esc(UI.txt)+'</textarea><div class="row" style="margin-top:10px">'+(NAT?'':'<button class="btn" data-a="mic">'+ic('mic')+(UI.listen?'إيقاف الاستماع':'إملاء بالصوت')+'</button>')+'<button class="btn ghost" data-a="runtext"'+(UI.busy?' disabled':'')+'>'+ic('spark')+'تحليل وتسجيل</button></div>'+(SM?'':'<div class="note" style="margin-top:10px">يعمل هنا تحليل أساسي للجمل. التحليل الكامل متاح في نسخة Claude المنشورة.</div>')}
  else{
   h+=seg([['machine','جهاز تمرين'],['display','شاشة كارديو'],['food','وجبة']],'ak',UI.ak)+(lim?'<div class="row"><button class="btn" data-a="pick" data-v="ph-cam">'+ic('camera')+'تصوير بالكاميرا</button><button class="btn ghost" data-a="pick" data-v="ph-gal">'+ic('image')+'من المعرض</button></div><input id="ph-cam" type="file" accept="image/*" capture="environment" hidden><input id="ph-gal" type="file" accept="image/*" hidden><div class="mu" style="margin-top:8px">'+(UI.ak==='machine'?'صوّر الجهاز لأعرّفك به وبطريقة استخدامه وأضيفه لخطتك.':(UI.ak==='display'?'صوّر شاشة جهاز الكارديو لأقرأ الزمن والمسافة والسعرات وأسجّل الجلسة.':'صوّر وجبتك لتقدير سعراتها ومكوناتها الغذائية.'))+'</div>':'<div class="note">التعرف على الصور يعمل في نسخة Claude المنشورة بعد أن تسمح للصفحة بالاستعانة بـ Claude. المايك والكاميرا المباشرة غير متاحين لصفحات Claude، لذلك يفتح الزر كاميرا جوالك ثم يعيد الصورة.</div>')}
  if(UI.busy)h+='<div class="note" style="margin-top:12px">جارٍ التحليل…</div>';
@@ -2239,7 +2240,7 @@ function reportHtml(auto){
  '<h2>التغذية</h2><span class="k">متوسط السعرات '+(ks.length?F(ak/ks.length):'—')+'</span><span class="k">متوسط البروتين '+(ks.length?F(ap/ks.length):'—')+' غ</span><span class="k">الهدف '+F(S.nt.kcal)+' سعرة</span>'+
  '<h2>هذا الأسبوع</h2><span class="k">خطوات '+F(wt.reduce((a,q)=>a+q.steps,0))+'</span><span class="k">سعرات محروقة '+F(wt.reduce((a,q)=>a+q.kcal,0))+'</span><span class="k">كارديو '+F(wt.reduce((a,q)=>a+q.min,0))+' دقيقة</span>'+
  '<h2>الالتزام</h2><span class="k">السلسلة الحالية '+x.cur+' يوم</span><span class="k">أفضل سلسلة '+x.best+'</span><span class="k">تمارين منجزة '+x.wo+'</span>'+
- (auto?'<script>window.onload=function(){setTimeout(function(){window.print()},300)}<\/script>':'')+'</body></html>'}
+ '</body></html>'}
 function ppAdd(f){const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const k=Math.min(1,480/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);PP.push({d:TD(),w:curW()||0,img:c.toDataURL('image/jpeg',.7)});PP=PP.slice(-30);if(!savePP()){PP.pop();UI.msg='مساحة التخزين ممتلئة، احذف بعض الصور'}else UI.msg='أُضيفت الصورة';render()};im.onerror=()=>{URL.revokeObjectURL(u);UI.msg='تعذّرت قراءة الصورة';render()};im.src=u}
 
 /* ---------- sports culture: coaches + peer-reviewed articles ---------- */
@@ -2325,7 +2326,7 @@ function nauLoad(){
  if(NAUS)return;NAUS=1;
  const sc=document.createElement('script');sc.src='eq-db.js';
  sc.onload=()=>{NAUR=(window.EQDB||[]).map(a=>({id:a[0],br:a[1],ba:a[2],ln:a[3],en:a[4],ar:a[5],te:a[6],ta:a[7],ge:a[8],ga:a[9],m:a[10],u:a[11],n:a[5]+' – '+a[2]}));{const c={};NAUR.forEach(m=>c[m.n]=(c[m.n]||0)+1);NAUR.forEach(m=>{if(c[m.n]>1)m.n+=' '+(m.m||m.id)})}NAUS=2;if(S.sub==='nau'||S.sub==='nad')render()};
- sc.onerror=()=>{NAUS=3;if(S.sub==='nau'||S.sub==='nad')render()};
+ sc.onerror=()=>{sc.remove();NAUS=3;if(S.sub==='nau'||S.sub==='nad')render()};
  document.head.appendChild(sc)}
 const nauIm=m=>(window.EQIMG&&EQIMG[m.id])?EQIMG_P+EQIMG[m.id]:'';
 const NAUG=[['','الكل'],['chest','الصدر'],['back','الظهر'],['shoulders','الأكتاف'],['biceps','الباي سبس'],['triceps','التراي سبس'],['arms','الذراعان'],['legs','الأرجل'],['glutes','الأرداف والفخذ'],['calves','السمانة'],['core','البطن والجذع'],['lower_back','أسفل الظهر'],['neck','الرقبة'],['grip','الساعد والقبضة'],['cardio','لياقة قلبية'],['full_body','الجسم كامل / تجهيزات']];
@@ -2333,7 +2334,7 @@ const NAUT=[['','كل الأنواع'],['selectorized','أثقال مدمجة'],
 const NAUB=[['','كل الماركات'],['Nautilus','نوتيلس'],['Life Fitness','لايف فتنس'],['Hammer Strength','هامر سترنث'],['Cybex','سايبكس'],['Matrix','ماتريكس'],['Technogym','تكنوجيم'],['Anatomy','أناتومي']];
 function nauMx(m){return (S.mx&&S.mx[m.id])||null}
 function nauList(){
- if(NAUS===3)return '<div class="emp">تعذّر تحميل قاعدة الأجهزة. تأكد من وجود الملف eq-db.js بجانب التطبيق</div>';
+ if(NAUS===3)return '<div class="emp">تعذّر تحميل قاعدة الأجهزة. إن كنت دون اتصال فافتح التطبيق مرة واحدة بالإنترنت لتُحفظ على جهازك.<div style="margin-top:8px"><button class="btn sm ghost" data-a="nauretry">إعادة المحاولة</button></div></div>';
  if(NAUS<2)return '<div class="emp">جارٍ تحميل القاعدة…</div>';
  const q=nrmF(UI.nq||''),L=NAUR.filter(m=>(!UI.ng||m.ge===UI.ng)&&(!UI.nt||m.te===UI.nt)&&(!UI.nl||m.br===UI.nl)&&(!q||nrmF(m.ar+' '+m.en+' '+m.ba+' '+m.br+' '+m.m).indexOf(q)>=0)&&(!UI.nm||nauMx(m)));
  if(!L.length)return '<div class="emp">لا نتائج بهذه المواصفات</div>';
@@ -3112,7 +3113,7 @@ async function offCode(code){
  o.busy=0;render()}
 function offCard(){
  const o=UI.off,det='BarcodeDetector' in window;
- let h='<div class="card"><h2>'+ic('image')+'بحث الأطعمة والباركود</h2><div class="mu" style="margin-bottom:8px">قاعدة Open Food Facts المفتوحة (تحتاج إنترنت). التغطية للمنتجات العربية متفاوتة.</div><div class="row" style="flex-wrap:nowrap"><input id="off-q" type="search" placeholder="مثال: زبادي، oats" value="'+esc(o.q)+'"><button class="btn sm" data-a="offgo">بحث</button></div><div class="row" style="margin-top:8px;flex-wrap:nowrap"><input id="off-c" type="text" inputmode="numeric" dir="ltr" placeholder="رقم الباركود"><button class="btn sm ghost" data-a="offcode">بحث بالرقم</button></div>'+(det?'<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="scan">'+ic('camera')+'مسح الباركود بالكاميرا</button></div>':'<div class="mu" style="margin-top:6px;font-size:12px">متصفحك لا يدعم قراءة الباركود بالكاميرا، اكتب الرقم.</div>');
+ let h='<div class="card"><h2>'+ic('image')+'بحث الأطعمة والباركود</h2><div class="mu" style="margin-bottom:8px">قاعدة Open Food Facts المفتوحة (تحتاج إنترنت). التغطية للمنتجات العربية متفاوتة.</div><div class="row" style="flex-wrap:nowrap"><input id="off-q" type="search" placeholder="مثال: زبادي، oats" value="'+esc(o.q)+'"><button class="btn sm" data-a="offgo">بحث</button></div><div class="row" style="margin-top:8px;flex-wrap:nowrap"><input id="off-c" type="text" inputmode="numeric" dir="ltr" placeholder="رقم الباركود"><button class="btn sm ghost" data-a="offcode">بحث بالرقم</button></div>'+(det&&!NAT?'<div class="row" style="margin-top:8px"><button class="btn sm ghost" data-a="scan">'+ic('camera')+'مسح الباركود بالكاميرا</button></div>':'<div class="mu" style="margin-top:6px;font-size:12px">'+(NAT?'قراءة الباركود بالكاميرا غير متاحة في نسخة أندرويد حاليًا، اكتب الرقم.':'متصفحك لا يدعم قراءة الباركود بالكاميرا، اكتب الرقم.')+'</div>');
  if(o.busy)h+='<div class="note" style="margin-top:10px">جارٍ البحث…</div>';
  if(o.msg)h+='<div class="note" style="margin-top:10px;color:var(--tx)">'+esc(o.msg)+'</div>';
  o.res.forEach((m,i)=>{h+='<div class="mealrow" style="align-items:flex-end"><div class="t"><b>'+esc(m.n)+'</b><span class="mu">'+(m.b?esc(m.b)+' · ':'')+'لكل 100 غ: '+F(m.kcal)+' سعرة · ب '+F(m.p,1)+' · ك '+F(m.c,1)+' · د '+F(m.f,1)+'</span></div><input type="number" inputmode="decimal" data-gi="'+i+'" value="100" style="width:72px" aria-label="الكمية بالغرام"><button class="btn sm" data-a="offadd" data-i="'+i+'">أضف</button></div>'});
@@ -4283,7 +4284,7 @@ function render(){
  clearTimeout(renderT);dirty=false;
  if(locked()){$('#app').innerHTML=vLock();$('#nav').innerHTML='';fitLogos();return}
  if(S.tab==='home')S.tab='dash';const y=window.scrollY,onb=!S.prof.ob,LA=!onb&&S.tab==='home'&&!S.sub;document.body.classList.toggle('lau-on',LA);document.body.classList.toggle('oh',!!S.prof.oh);document.body.classList.toggle('ohl',S.prof.oh==='l');
- const WKM=S.sub==='wk',head=(onb||LA||WKM||(S.tab==='me'&&!S.sub))?'':'<div class="top"><button class="logob" data-a="go" data-v="dash" aria-label="الرئيسية">'+logo(21)+'</button><span class="row" style="gap:8px;flex-wrap:nowrap"><button class="av tb" data-a="srch" aria-label="بحث">'+ic('search')+'</button><button class="av tb" data-a="langm" aria-label="اللغة">'+ic('lang')+'</button><button class="av tb" data-a="drop" data-v="open" aria-label="اختصاراتي">'+ic('grid')+'</button><button class="av tb" data-a="sub" data-v="nc" aria-label="الإشعارات">'+ic('bell')+(ncUnread()?'<i class="nbd">'+ncUnread()+'</i>':'')+'</button><button class="av" data-a="go" data-v="me" aria-label="حسابي">'+(S.prof.av?'<img alt="" src="'+S.prof.av+'">':esc((S.prof.name||'س').charAt(0)))+'</button></span></div>';
+ const WKM=S.sub==='wk',head=(onb||LA||WKM||(S.tab==='me'&&!S.sub))?'':'<div class="top"><button class="logob" data-a="go" data-v="dash" aria-label="الرئيسية">'+logo(21)+'</button><span class="row tbr"><button class="av tb" data-a="srch" aria-label="بحث">'+ic('search')+'</button><button class="av tb" data-a="langm" aria-label="اللغة">'+ic('lang')+'</button><button class="av tb" data-a="drop" data-v="open" aria-label="اختصاراتي">'+ic('grid')+'</button><button class="av tb" data-a="sub" data-v="nc" aria-label="الإشعارات">'+ic('bell')+(ncUnread()?'<i class="nbd">'+ncUnread()+'</i>':'')+'</button><button class="av" data-a="go" data-v="me" aria-label="حسابي">'+(S.prof.av?'<img alt="" src="'+S.prof.av+'">':esc((S.prof.name||'س').charAt(0)))+'</button></span></div>';
  $('#app').innerHTML=head+view()+((onb||LA||WKM)?'':(UI.fab?'<div class="fabm"><button data-a="fgo" data-v="food">'+ic('fork')+'تسجيل وجبة</button><button data-a="fgo" data-v="train">'+ic('dumbbell')+'بدء تمرين</button><button data-a="fgo" data-v="dash" data-sc="1">'+ic('scale')+'تسجيل وزن أو نوم</button><button data-a="ai" data-t="text">'+ic('mic')+'إملاء أو تصوير</button></div>':'')+'<button class="fab" data-a="fab" aria-label="إضافة سريعة">'+ic(UI.fab?'x':'plus')+'</button>')+sheetHtml()+drawerHtml()+langMenu()+fpHtml();
  const N=[['dash','home','الرئيسية'],['train','dumbbell','التمرين'],['food','fork','التغذية'],['ex','compass','استكشف']];
  const N4=N.filter(n=>n[0]!=='me'),nb=n=>'<button class="'+(n[0]===S.tab?'on':'')+'" data-a="go" data-v="'+n[0]+'" aria-label="'+n[2]+'">'+ic(n[1])+'<span>'+n[2]+'</span></button>';
@@ -4375,7 +4376,7 @@ Object.assign(ACT,{
  algt:b=>{const a=S.prof.alg=S.prof.alg||[],i=a.indexOf(b.dataset.v);if(i>=0)a.splice(i,1);else a.push(b.dataset.v)},
  recalc:()=>{toast(calcTargets()?'حُسبت أهدافك الغذائية':'أكمل العمر والطول والوزن أولًا')},
  ppdel:b=>{PP.splice(+b.dataset.i,1);savePP()},
- report:()=>{const fn='khatwa-report-'+TD()+'.html';if(IN_CLAUDE){doExport(fn,reportHtml(false))}else{let w=null;try{w=window.open(URL.createObjectURL(new Blob([reportHtml(true)],{type:'text/html'})),'_blank')}catch(e){lg(e)}if(!w)doExport(fn,reportHtml(false))}return false}
+ report:()=>{const fn='khatwa-report-'+TD()+'.html';if(IN_CLAUDE){doExport(fn,reportHtml(false))}else{let w=null;try{w=window.open(URL.createObjectURL(new Blob([reportHtml(true)],{type:'text/html'})),'_blank')}catch(e){lg(e)}if(!w)doExport(fn,reportHtml(false));else{let n=0;const t=setInterval(()=>{n++;try{if(w.closed||n>40){clearInterval(t)}else if(w.location.protocol==='blob:'&&w.document.readyState==='complete'){clearInterval(t);w.print()}}catch(e){clearInterval(t);lg(e)}},250)}}return false}
 })}
 Object.assign(ACT,{
  bz:b=>{UI.ag=b.dataset.g||''},
@@ -4604,6 +4605,7 @@ Object.assign(ACT,{
  cqr:()=>{cqStart(UI.cq.u);window.scrollTo(0,0)}});
 
 Object.assign(ACT,{
+ nauretry:()=>{NAUS=0;nauLoad();render();return false},
  nad:b=>{nauLoad();UI.nd=b.dataset.id;S.sub='nad';window.scrollTo(0,0)},
  nauf:b=>{UI[b.dataset.k]=b.dataset.v},
  nadadd:b=>{const m=NAUR.find(a=>a.id===b.dataset.id),d=+$('#nad-day').value,s=+$('#nad-s').value||3,r=+$('#nad-r').value||10,x=nauMx(m);

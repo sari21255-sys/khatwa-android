@@ -7,7 +7,7 @@ const SUBS=['plan','prog','arch','tools','watch','prg','mpg','ach','cul','wgt','
 const TABS=['dash','train','food','pg','me','club','ex'];
 try{
  /* T20 تجاوب: تمرير كل الشاشات على 5 أحجام وقياس الفيض الأفقي */
- const sizes=[[320,568],[360,640],[390,844],[768,1024],[1280,800]];
+ const sizes=[[320,568],[360,640],[390,844],[412,915],[768,1024],[1024,768],[1280,800]];
  const over={};let shots=0;
  for(const [w,h] of sizes){const c=await b.newContext({viewport:{width:w,height:h}});const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));await p.goto(A+'/');await p.waitForFunction(()=>typeof S!=='undefined');await p.evaluate(seed);
   const bad=await p.evaluate(async({TABS,SUBS})=>{const out=[];const chk=n=>{const d=document.documentElement;if(d.scrollWidth>innerWidth+1)out.push(n+':'+d.scrollWidth)};for(const t of TABS){S.tab=t;S.sub=null;render();await new Promise(r=>setTimeout(r,60));chk('tab:'+t)}for(const s of SUBS){S.tab='ex';S.sub=s;render();await new Promise(r=>setTimeout(r,80));chk('sub:'+s)}return out},{TABS,SUBS});
@@ -27,7 +27,7 @@ try{
  const filesOk=ic.every(i=>fs.existsSync(SITE+'/'+i.src.replace(/^\.?\//,'')));
  rec('T22a','manifest: حقول إلزامية وأيقونات 192/512 وmaskable والملفات موجودة',!miss.length&&has192&&has512&&mask&&filesOk,JSON.stringify({miss,has192,has512,mask,filesOk,display:man.display,start:man.start_url}),'P1');
  const hdr=fs.readFileSync(SITE+'/_headers','utf8');
- rec('T22b','ترويسات الأمان في _headers (CSP، X-Content-Type-Options، Referrer-Policy)',/Content-Security-Policy/i.test(hdr)&&/nosniff/i.test(hdr),hdr.split('\n').filter(l=>/:/.test(l)&&!/^\s*\//.test(l)).slice(0,8).join(' | ').slice(0,300),'P2');
+ rec('T22b','ترويسات الأمان في _headers (CSP، X-Content-Type-Options، Referrer-Policy)',/Content-Security-Policy/i.test(hdr)&&/nosniff/i.test(hdr)&&/Referrer-Policy/i.test(hdr)&&/frame-ancestors 'none'/i.test(hdr)&&!/unsafe-eval/.test(hdr),hdr.split('\n').filter(l=>/:/.test(l)&&!/^\s*\//.test(l)).slice(0,8).join(' | ').slice(0,300),'P2');
  /* T23 أداء: حجم وتحميل وبيانات سنتين */
  const html=fs.statSync(SITE+'/index.html').size;
  const perf=await p.evaluate(async()=>{const t0=performance.now();for(let i=0;i<10;i++){S.tab='dash';render()}const rd=(performance.now()-t0)/10;
