@@ -19,6 +19,8 @@ jobs:
         with: { node-version: 20 }
       - name: Generated files match the committed ones (index, _headers, CSP hashes)
         run: python3 tools/build.py --check
+      - name: gen-headers emits LF even when text-mode writes translate to CRLF (Windows simulation)
+        run: python3 tests/crlf-sim.py tools/gen-headers.py
       - run: npm ci
       - name: Worker tests
         run: node tests/worker.test.mjs
@@ -42,3 +44,28 @@ jobs:
           PSQL="psql -h localhost -U postgres -d postgres -q -At" bash supabase/tests/03_concurrency.sh
           node tests/worker.p1.test.mjs
           PSQL="psql -h localhost -U postgres -d postgres -q -At" NODE_PATH="$(npm root -g)" node tests/sync.e2e.mjs
+  build-reproducible:
+    name: build --check (${{ matrix.os }}) from a clean clone, no manual file setup
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Generated files match the committed ones
+        run: python tools/build.py --check
+      - name: No CR in generated files, and SHA-256 equals tools/build.sha256 (same bytes on every OS)
+        shell: python
+        run: |
+          import hashlib,sys
+          bad=0
+          for line in open('tools/build.sha256',encoding='utf-8'):
+              h,f=line.split()
+              b=open(f,'rb').read()
+              ok=(b'\r' not in b) and hashlib.sha256(b).hexdigest()==h
+              print('OK  ' if ok else 'FAIL', f, hashlib.sha256(b).hexdigest(), 'CR' if b'\r' in b else 'LF')
+              bad+=0 if ok else 1
+          sys.exit(1 if bad else 0)
