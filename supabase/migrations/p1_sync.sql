@@ -7,6 +7,7 @@ create table if not exists public.sync_meta(
   user_id uuid primary key references auth.users(id) on delete cascade,
   seq bigint not null default 0,
   epoch int not null default 1,
+  closed boolean not null default false,   -- true بعد حذف نسخة السحابة: لا كتابة من أي جهاز حتى يبدأ المستخدم مزامنة جديدة صراحةً
   updated_at timestamptz not null default now());
 create table if not exists public.sync_records(
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -45,7 +46,7 @@ returns jsonb language plpgsql security definer set search_path=public,auth as $
 declare
   uid uuid := auth.uid(); m public.sync_meta; c jsonb; ex public.sync_records;
   v_kind text; v_rid text; v_ts bigint; v_dev text; v_del boolean; v_data jsonb; applied int:=0; ignored int:=0;
-  out_rows jsonb; v_max bigint; v_more boolean;
+  out_rows jsonb; v_max bigint; v_more boolean; ro boolean:=false;
 begin
   perform public.assert_session();
   if p_changes is null then p_changes:='[]'::jsonb; end if;
@@ -55,6 +56,8 @@ begin
   select * into m from public.sync_meta where user_id=uid for update;   -- يسلسل التبادلات المتزامنة للمستخدم نفسه
   if p_epoch is not null and p_epoch<m.epoch then
     return jsonb_build_object('reset',true,'epoch',m.epoch); end if;
+  -- جهاز بلا معلومات مزامنة (p_epoch فارغ) أو حساب أُغلق بعد الحذف: قراءة فقط، لا يُطبَّق أي تغيير
+  if p_epoch is null or m.closed then p_changes:='[]'::jsonb; ro:=true; end if;
   for c in select * from jsonb_array_elements(p_changes) loop
     v_kind:=c->>'k'; v_rid:=c->>'r'; v_ts:=(c->>'ts')::bigint; v_dev:=c->>'d'; v_del:=coalesce((c->>'x')::boolean,false); v_data:=c->'v';
     if v_kind is null or v_rid is null or v_ts is null or v_dev is null then raise exception 'bad_change' using errcode='22023'; end if;
@@ -74,10 +77,11 @@ begin
   select coalesce(jsonb_agg(jsonb_build_object('k',kind,'r',rid,'v',data,'ts',ts,'d',dev,'x',del,'s',seq) order by seq),'[]'::jsonb), coalesce(max(seq),p_cursor,0), count(*)>=3000
     into out_rows, v_max, v_more
     from (select * from public.sync_records where user_id=uid and seq>coalesce(p_cursor,0) order by seq limit 3000) q;
-  return jsonb_build_object('epoch',m.epoch,'cursor',case when v_more then v_max else greatest(m.seq,coalesce(p_cursor,0)) end,'more',v_more,'records',out_rows,'applied',applied,'ignored',ignored);
+  return jsonb_build_object('epoch',m.epoch,'cursor',case when v_more then v_max else greatest(m.seq,coalesce(p_cursor,0)) end,'more',v_more,'records',out_rows,'applied',applied,'ignored',ignored,'closed',m.closed,'readonly',ro);
 end $$;
 
--- حذف نسخة المزامنة السحابية (الحساب يبقى). يرفع epoch فلا تستطيع أجهزة قديمة إعادة رفع النسخة المحذوفة.
+-- حذف نسخة المزامنة السحابية (الحساب يبقى). يرفع epoch ويغلق المزامنة: لا جهاز (قديم أو جديد أو بلا معلومات مزامنة)
+-- يستطيع الكتابة حتى يستدعي المستخدم start_new_sync() صراحةً. بيانات الأجهزة المحلية لا تُمس.
 create or replace function public.delete_sync_data() returns jsonb
 language plpgsql security definer set search_path=public,auth as $$
 declare uid uuid := auth.uid(); e int;
@@ -86,8 +90,23 @@ begin
   insert into public.sync_meta(user_id) values(uid) on conflict do nothing;
   perform 1 from public.sync_meta where user_id=uid for update;
   delete from public.sync_records where user_id=uid;
-  update public.sync_meta set epoch=epoch+1,updated_at=now() where user_id=uid returning epoch into e;
-  return jsonb_build_object('epoch',e,'deleted',true);
+  update public.sync_meta set epoch=epoch+1,closed=true,updated_at=now() where user_id=uid returning epoch into e;
+  return jsonb_build_object('epoch',e,'deleted',true,'closed',true);
+end $$;
+
+-- قرار المستخدم الصريح ببدء مزامنة جديدة لبيانات جهازه. إن كانت المزامنة مغلقة تُفتح ويرتفع epoch فلا يكتب بعدها
+-- جهاز كان يحمل الإصدار السابق إلا بقراره هو الآخر. إن كانت مفتوحة أصلًا تعيد الإصدار الحالي دون تغيير.
+create or replace function public.start_new_sync() returns jsonb
+language plpgsql security definer set search_path=public,auth as $$
+declare uid uuid := auth.uid(); m public.sync_meta;
+begin
+  perform public.assert_session();
+  insert into public.sync_meta(user_id) values(uid) on conflict do nothing;
+  select * into m from public.sync_meta where user_id=uid for update;
+  if m.closed then
+    update public.sync_meta set epoch=epoch+1,closed=false,updated_at=now() where user_id=uid returning * into m;
+  end if;
+  return jsonb_build_object('epoch',m.epoch,'closed',false);
 end $$;
 
 -- حدود الحصص يملكها الخادم: لا يمررها العميل ولا الـWorker. تُعدَّل من لوحة SQL بحساب المالك فقط.
@@ -141,8 +160,8 @@ begin
   delete from auth.users where id=auth.uid();
 end $$;
 
-revoke all on function public.assert_session(), public.sync_exchange(int,bigint,jsonb), public.delete_sync_data(), public.consume_quota_trusted(uuid,uuid,text) from public, anon, authenticated;
-grant execute on function public.sync_exchange(int,bigint,jsonb), public.delete_sync_data() to authenticated;
+revoke all on function public.assert_session(), public.sync_exchange(int,bigint,jsonb), public.delete_sync_data(), public.start_new_sync(), public.consume_quota_trusted(uuid,uuid,text) from public, anon, authenticated;
+grant execute on function public.sync_exchange(int,bigint,jsonb), public.delete_sync_data(), public.start_new_sync() to authenticated;
 grant execute on function public.consume_quota_trusted(uuid,uuid,text) to service_role;
 revoke all on function public.delete_my_account() from public, anon;
 grant execute on function public.delete_my_account() to authenticated;

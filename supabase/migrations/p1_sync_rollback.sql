@@ -2,6 +2,7 @@
 -- تحذير: يحذف سجلات المزامنة السحابية. بيانات الأجهزة المحلية تبقى. خذ نسخة من الجدول قبل التنفيذ إن لزم.
 drop function if exists public.sync_exchange(int,bigint,jsonb);
 drop function if exists public.delete_sync_data();
+drop function if exists public.start_new_sync();
 drop function if exists public.consume_quota_trusted(uuid,uuid,text);
 drop function if exists public.consume_quota(text,text,int,int);
 drop function if exists public.assert_session();

@@ -21,7 +21,7 @@ $PSQL -c "update public.quota_settings set period='day',user_max=100,global_max=
 for u in $U1 $U2 $U3 $U4; do for i in $(seq 1 15); do ( q $u | $PSQL > $OUT/q2.$u.$i ) & done; done; wait
 chk "global cap under 60 parallel requests" "$(cat $OUT/q2.* | grep -c '^t$')" 7
 # 3) 24 جهازًا يرفعون بالتوازي سجلات مختلفة + سجل واحد مشترك بأوقات مختلفة
-for i in $(seq 1 24); do ( { as $U2; echo "select (public.sync_exchange(null,0,'[{\"k\":\"bw\",\"r\":\"d$i\",\"v\":{\"w\":$i},\"ts\":$((1000+i)),\"d\":\"dev$i\"},{\"k\":\"cfg\",\"r\":\"shared\",\"v\":{\"by\":$i},\"ts\":$((5000+i)),\"d\":\"dev$i\"}]'))->>'applied';"; } | $PSQL > $OUT/s.$i ) & done; wait
+for i in $(seq 1 24); do ( { as $U2; echo "select (public.sync_exchange(1,0,'[{\"k\":\"bw\",\"r\":\"d$i\",\"v\":{\"w\":$i},\"ts\":$((1000+i)),\"d\":\"dev$i\"},{\"k\":\"cfg\",\"r\":\"shared\",\"v\":{\"by\":$i},\"ts\":$((5000+i)),\"d\":\"dev$i\"}]'))->>'applied';"; } | $PSQL > $OUT/s.$i ) & done; wait
 chk "all 25 distinct records stored" "$($PSQL -c "select count(*) from public.sync_records where user_id='$U2'")" 25
 chk "shared record: newest ts wins (24)" "$($PSQL -c "select data->>'by' from public.sync_records where user_id='$U2' and rid='shared'")" 24
 chk "seq values unique" "$($PSQL -c "select count(distinct seq)=count(*) from public.sync_records where user_id='$U2'")" t

@@ -20,7 +20,7 @@ select pg_temp.must_fail($$insert into public.sync_records(user_id,kind,rid,ts,d
 select pg_temp.must_fail($$select * from public.quota_counters$$,'direct select quota');
 
 -- جهاز 1 يرفع سجلين
-select pg_temp.eq((pg_temp.ex(null,0,'[{"k":"bw","r":"2026-11-01","v":{"w":85},"ts":1000,"d":"dev1"},{"k":"meals","r":"2026-11-01","v":[{"n":"بيض"}],"ts":1001,"d":"dev1"}]'))->>'applied','2','two applied');
+select pg_temp.eq((pg_temp.ex(1,0,'[{"k":"bw","r":"2026-11-01","v":{"w":85},"ts":1000,"d":"dev1"},{"k":"meals","r":"2026-11-01","v":[{"n":"بيض"}],"ts":1001,"d":"dev1"}]'))->>'applied','2','two applied');
 -- جهاز 2 (جلسة المستخدم نفسه) يعدّل سجلًا مختلفًا بدون أن يعرف عن الأول: كلاهما يظهر لكليهما (T09b)
 select pg_temp.eq(jsonb_array_length((pg_temp.ex(1,0,'[{"k":"bw","r":"2026-11-02","v":{"w":84},"ts":2000,"d":"dev2"}]'))->'records'),3,'dev2 sees all 3');
 select pg_temp.eq(jsonb_array_length((pg_temp.ex(1,0,'[]'))->'records'),3,'dev1 sees all 3 on next pull');
@@ -56,7 +56,7 @@ select pg_temp.must_fail($$select public.sync_exchange(1,0,'[{"k":"bw","r":"neg"
 -- عزل المستخدمين
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000b1','11111111-1111-1111-1111-1111111111b1');
 select pg_temp.eq(jsonb_array_length((pg_temp.ex(null,0,'[]'))->'records'),0,'B sees nothing of A');
-select pg_temp.ex(null,0,'[{"k":"bw","r":"2026-11-01","v":{"w":70},"ts":10,"d":"b1"}]');
+select pg_temp.ex(1,0,'[{"k":"bw","r":"2026-11-01","v":{"w":70},"ts":10,"d":"b1"}]');
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1','11111111-1111-1111-1111-1111111111a1');
 select pg_temp.eq(pg_temp.val(pg_temp.ex(1,0,'[]'),'bw','2026-11-01'),'{"w":83}'::jsonb,'A unaffected by B same key');
 
@@ -75,14 +75,25 @@ select pg_temp.must_fail($$select public.sync_exchange(null,0,'[]')$$,'anon exec
 select pg_temp.must_fail($$select public.consume_quota_trusted('00000000-0000-0000-0000-0000000000b1','11111111-1111-1111-1111-2222222222b1')$$,'anon cannot call trusted quota');
 set role authenticated;
 
--- حذف نسخة المزامنة: epoch يرتفع وجهاز قديم لا يعيد الرفع
+-- جهاز بلا معلومات مزامنة (epoch فارغ) يقرأ ولا يكتب
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000a1','11111111-1111-1111-1111-1111111111a1');
+select pg_temp.eq((pg_temp.ex(null,0,'[{"k":"bw","r":"nullep","v":{"w":1},"ts":5,"d":"newdev"}]'))->>'applied','0','null-epoch device applies nothing');
+select pg_temp.eq((pg_temp.ex(null,0,'[]'))->>'readonly','true','null-epoch call is read-only');
+reset role; select pg_temp.eq((select count(*) from public.sync_records where user_id='00000000-0000-0000-0000-0000000000a1' and rid='nullep'),0::bigint,'null-epoch write not stored'); set role authenticated;
+select pg_temp.eq(jsonb_array_length((pg_temp.ex(null,0,'[]'))->'records')>0,true,'null-epoch device can still read the account data');
+-- حذف نسخة المزامنة: يغلق المزامنة ويرفع epoch؛ لا كتابة من أي جهاز حتى القرار الصريح
 select pg_temp.eq((public.delete_sync_data())->>'epoch','2','epoch bumped');
 select pg_temp.eq((public.delete_sync_data())->>'epoch','3','repeated delete is safe');
 select pg_temp.eq((pg_temp.ex(1,0,'[{"k":"bw","r":"stale","v":{"w":1},"ts":99999,"d":"old"}]'))->>'reset','true','stale device told to reset');
-reset role; select pg_temp.eq((select count(*) from public.sync_records where user_id='00000000-0000-0000-0000-0000000000a1'),0::bigint,'nothing from stale device stored and old data gone'); set role authenticated;
-select pg_temp.eq((pg_temp.ex(3,0,'[{"k":"bw","r":"new","v":{"w":2},"ts":1,"d":"d"}]'))->>'applied','1','device at new epoch uploads');
-select pg_temp.eq((pg_temp.ex(null,0,'[]'))->>'epoch','3','new device learns current epoch');
+select pg_temp.eq((pg_temp.ex(null,0,'[{"k":"bw","r":"lost","v":{"w":1},"ts":99999,"d":"lostdev"}]'))->>'closed','true','device without sync info sees closed');
+select pg_temp.eq((pg_temp.ex(3,0,'[{"k":"bw","r":"cur","v":{"w":2},"ts":1,"d":"d"}]'))->>'applied','0','even a device holding the current epoch cannot write while closed');
+reset role; select pg_temp.eq((select count(*) from public.sync_records where user_id='00000000-0000-0000-0000-0000000000a1'),0::bigint,'cloud stays empty after stale, lost-info and current-epoch attempts'); set role authenticated;
+-- القرار الصريح: بدء مزامنة جديدة يفتح ويرفع epoch، فالجهاز الذي كان على 3 يُطلب منه القرار هو الآخر
+select pg_temp.eq((public.start_new_sync())->>'epoch','4','explicit start opens sync at a new epoch');
+select pg_temp.eq((public.start_new_sync())->>'epoch','4','start is idempotent when already open');
+select pg_temp.eq((pg_temp.ex(3,0,'[{"k":"bw","r":"old3","v":{"w":1},"ts":5,"d":"old3"}]'))->>'reset','true','device that held previous epoch is reset after start');
+select pg_temp.eq((pg_temp.ex(4,0,'[{"k":"bw","r":"new","v":{"w":2},"ts":1,"d":"d"}]'))->>'applied','1','device at the new epoch uploads');
+reset role; select pg_temp.eq((select count(*) from public.sync_records where user_id='00000000-0000-0000-0000-0000000000a1'),1::bigint,'only the explicit upload is stored'); set role authenticated;
 -- بيانات المستخدم الآخر لم تُمس
 select pg_temp.as_user('00000000-0000-0000-0000-0000000000b1','11111111-1111-1111-1111-1111111111b1');
 reset role; insert into auth.sessions(id,user_id) values('11111111-1111-1111-1111-2222222222b1','00000000-0000-0000-0000-0000000000b1'); select pg_temp.eq((select count(*) from public.sync_records where user_id='00000000-0000-0000-0000-0000000000b1'),1::bigint,'B data intact'); set role authenticated;

@@ -129,6 +129,36 @@ try{
   await n1.evaluate(()=>ACT.rsmig());const g1=await get(n1,"S.bw['2026-08-01']");await sync(n2);const g2=await get(n2,"S.bw['2026-08-01']");
   rec('F1-07','سجل أحدث موجود على الخادم يغلب المرحَّل: الجهازان ينتهيان على 55 والترحيل يكتمل',g1===55&&g2===55&&(await get(n1,"RSM.migrated"))===1,JSON.stringify({g1,g2}));
   for(const x of [m1,m2,n1,n2])await x.ctx.close()}
+ /* ---- F3: بعد حذف السحابة لا يرفع أي جهاز (قديم أو فاقد معلومات المزامنة) إلا بقرار صريح ---- */
+ {const em=email('f3');const cnt=u=>Number(dbq(`select count(*) from public.sync_records where user_id='${u}'`));
+  const a=await device();await a.evaluate(SEED);await up(a,em);await edit(a,"S.bw['2026-07-01']=77;S.bw['2026-07-02']=76");await sync(a);const u=await uidOf(a);
+  const b=await device();await login(b,em);await sync(b);await edit(b,"S.bw['2026-07-03']=75");await sync(b);   // الجهاز ب: يحمل epoch 1
+  const before=cnt(u);
+  await a.evaluate(()=>ACT.rsdel());const afterDel=cnt(u);
+  // الجهاز ب يحتفظ ببياناته ويفقد معلومات المزامنة (مثل مسح بيانات المتصفح للمزامنة أو إعادة تثبيت مع بقاء النسخة المحلية)
+  const keepB=await get(b,"JSON.stringify([S.bw['2026-07-01'],S.bw['2026-07-03']])");
+  await b.evaluate(()=>{localStorage.removeItem('fit_rs');localStorage.removeItem('fit_rs_off')});
+  await b.reload();await b.waitForFunction(()=>typeof RSM!=='undefined'&&typeof rsSync==='function');await b.waitForTimeout(1500);
+  const afterOpen=cnt(u),st1=await get(b,"({ep:RSM.epoch,closed:RS.closed||0,bw:S.bw['2026-07-03']})");
+  for(let i=0;i<3;i++){await edit(b,"S.bw['2026-07-0"+(4+i)+"']="+(70+i));await sync(b)}await b.reload();await b.waitForFunction(()=>typeof RSM!=='undefined');await b.waitForTimeout(1200);
+  const afterAuto=cnt(u),st2=await get(b,"({closed:RS.closed||0,bw:S.bw['2026-07-06']})");
+  rec('F3-01','بعد حذف السحابة: جهاز يحتفظ بالبيانات المحلية ويفقد معلومات المزامنة لا يرفع شيئًا عند الدخول ولا عند إعادة الفتح ولا في المحاولات التلقائية (السحابة تبقى فارغة)',Number(before)>5&&afterDel===0&&afterOpen===0&&afterAuto===0&&st1.closed===1&&st2.closed===1&&st2.bw===72&&keepB==='[77,75]',JSON.stringify({before,afterDel,afterOpen,afterAuto,st1,st2,keepB}));
+  // جهاز ثالث بلا بيانات محلية ولا معلومات مزامنة: يقرأ الحالة (مغلقة) ولا يرفع افتراضياته
+  const c=await device();await login(c,em);await sync(c);const cst=await get(c,"({closed:RS.closed||0,ep:RSM.epoch})");
+  rec('F3-02','جهاز جديد يقرأ حالة المزامنة الحالية (مغلقة) دون رفع شيء ودون معلومات إصدار مفروضة',cst.closed===1&&cst.ep===null&&cnt(u)===0,JSON.stringify({cst,n:cnt(u)}));
+  // الجهاز القديم الذي يحمل الإصدار السابق (ب قبل الفقد يمثّله بـ epoch=1): يُرفض كذلك
+  const old=await device();await login(old,em);await old.evaluate(()=>{RSM.epoch=1;RSM.cursor=0;rsSave()});await edit(old,"S.bw['2026-07-09']=60");const ro=await sync(old);
+  rec('F3-03','جهاز يحمل الإصدار القديم يُرفض ويُطلب قراره، والسحابة فارغة',ro==='reset'&&cnt(u)===0&&(await get(old,"S.bw['2026-07-09']"))===60,JSON.stringify({ro,n:cnt(u)}));
+  // قرار صريح من ب: يبدأ مزامنة جديدة ببياناته المحلية
+  const bBefore=await get(b,"JSON.stringify(S.bw)");await b.evaluate(()=>ACT.rsstart());const afterStart=cnt(u),bAfter=await get(b,"JSON.stringify(S.bw)");
+  rec('F3-04','الرفع يحدث فقط بعد اختيار المستخدم الصريح، وبيانات الجهاز المحلية سليمة',afterStart>=5&&bBefore===bAfter&&(await get(b,"RS.closed||0"))===0,JSON.stringify({afterStart}));
+  // الجهاز القديم بعد البدء: ما زال بإصدار قديم فيُعاد طلب قراره ولا يكتب
+  const n1=cnt(u);const ro2=await sync(old);const n2=cnt(u);
+  rec('F3-05','بعد بدء مزامنة جديدة يبقى الجهاز ذو الإصدار القديم مرفوضًا حتى يقرر هو',ro2==='reset'&&n2===n1,JSON.stringify({ro2,n1,n2}));
+  await old.evaluate(()=>ACT.rsadopt());const n3=cnt(u);
+  await sync(b);const gb=await get(b,"S.bw['2026-07-09']"),go=await get(old,"S.bw['2026-07-06']");
+  rec('F3-06','قرار صريح من الجهاز القديم يدمج بياناته بقاعدة الفوز المعتادة: يصل ب تعديله (60) ويصله ما رفعه ب (72)',n3>n2&&gb===60&&go===72,JSON.stringify({n2,n3,gb,go}));
+  for(const x of [a,b,c,old])await x.ctx.close()}
  /* ---- حذف نسخة المزامنة: جهاز قديم لا يعيد رفعها ---- */
  {const uid=await uidOf(d1);const before=dbq(`select count(*) from public.sync_records where user_id='${uid}'`);
   await d1.evaluate(()=>ACT.rsdel());const after=dbq(`select count(*) from public.sync_records where user_id='${uid}'`),pausedD1=await get(d1,"RS.pause");
