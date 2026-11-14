@@ -36,14 +36,21 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug
       - name: Build release APK (unsigned) and verify manifest
+        shell: bash
         working-directory: android
         run: |
+          set -o pipefail
           ./gradlew assembleRelease
           cd ..
-          python3 scripts/check_manifest.py android/app/build/outputs/apk/release/app-release-unsigned.apk --release | tee manifest-release.txt
-          python3 scripts/check_manifest.py android/app/build/outputs/apk/debug/app-debug.apk --debug | tee manifest-debug.txt
-          echo "::notice title=manifest-release::$(tr '\n' '|' < manifest-release.txt | cut -c1-3500)"
-          echo "::notice title=manifest-debug::$(tr '\n' '|' < manifest-debug.txt | cut -c1-3500)"
+          python3 scripts/check_manifest.py android/app/build/outputs/apk/release/app-release-unsigned.apk --release 2>&1 | tee manifest-release.txt
+          python3 scripts/check_manifest.py android/app/build/outputs/apk/debug/app-debug.apk --debug 2>&1 | tee manifest-debug.txt
+      - name: Report manifest results
+        if: always()
+        shell: bash
+        run: |
+          for f in manifest-release manifest-debug; do
+            [ -f $f.txt ] && echo "::notice title=$f::$(tr '\n' '|' < $f.txt | cut -c1-3500)" || echo "::warning title=$f::no output file"
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: manifest-reports
