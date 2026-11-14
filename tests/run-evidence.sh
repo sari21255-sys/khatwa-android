@@ -3,7 +3,7 @@
 # يحتاج: Postgres محلي (PGHOST/PGPORT/PGUSER) وplaywright عام. الاستعمال: PGCMD="psql -h /tmp -p 5544 -U postgres" bash tests/run-evidence.sh
 set -u
 cd "$(dirname "$0")/.."
-OUT=docs/technical-audit/evidence/p1-fixes; mkdir -p $OUT
+OUT=${EVIDENCE_DIR:-docs/technical-audit/evidence/p1-fixes}; mkdir -p $OUT
 PGCMD="${PGCMD:?set PGCMD, e.g. psql -h localhost -U postgres}"
 DB=t_evidence
 export NODE_PATH="$(npm root -g)"
