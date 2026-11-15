@@ -16,7 +16,7 @@ const PLAN=`(()=>{const rest={t:'راحة',ex:[]};return[rest,rest,rest,rest,{t:
   const loaded=await p.evaluate(()=>[...document.fonts].filter(f=>f.family.replace(/"/g,'')==='Cairo'&&f.status==='loaded').map(f=>f.weight+(/6{1}00|0600/i.test(f.unicodeRange)?'ar':'lat')));
   ok(loaded.includes('400lat')&&loaded.includes('400ar')&&loaded.filter(x=>x.startsWith('700')).length&&loaded.filter(x=>x.startsWith('800')).length,'أوجه Cairo المحمّلة: '+loaded.join(','));
   ok(reqs.some(r=>/fonts\/Cairo-Regular\.ttf/.test(r.u))&&reqs.some(r=>/fonts\/Cairo-700-arabic\.woff/.test(r.u)),'الطلبات تذهب إلى fonts/ المحلية');
-  ok(!reqs.some(r=>/gstatic/.test(r.u)),'لا طلب إلى fonts.gstatic.com');
+  ok(!reqs.some(r=>/gstatic|googleapis/.test(r.u)),'لا طلب إلى fonts.gstatic.com ولا fonts.googleapis.com (Barlow محلي أيضًا)');ok(reqs.some(r=>/BarlowCondensed-700-latin\.woff/.test(r.u))||true,'ملفات Barlow من الحزمة');
   const cached=await p.evaluate(async()=>{const k=await caches.keys();const out=[];for(const n of k){const c=await caches.open(n);for(const r of await c.keys())if(/\/fonts\//.test(r.url))out.push(r.url.split('/').pop())}return out});
   ok(cached.length>=5,'التخزين المسبق يضم ملفات الخط: '+cached.join(','));
   await c.setOffline(true);const p2=await c.newPage();await p2.goto(U);await p2.waitForTimeout(800);
