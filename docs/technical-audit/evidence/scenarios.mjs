@@ -4,7 +4,7 @@ import fs from 'node:fs';
 const A='http://127.0.0.1:8080';
 const st=await staticServer(8080),wk=await workerServer(8788,A);
 const b=await chromium.launch();
-const newDev=async(o={})=>{const c=await b.newContext({viewport:{width:390,height:844},...o});const p=await c.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));await p.goto(A+'/');await p.waitForFunction(()=>typeof S!=='undefined'&&typeof ACT!=='undefined',null,{timeout:8000});return{c,p}};
+const newDev=async(o={})=>{const c=await b.newContext({viewport:{width:390,height:844},...o});await c.addInitScript(()=>{try{localStorage.setItem('fit_ai_ok','1')}catch(e){}});const p=await c.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));await p.goto(A+'/');await p.waitForFunction(()=>typeof S!=='undefined'&&typeof ACT!=='undefined',null,{timeout:8000});return{c,p}};
 const ev=(p,f,a)=>p.evaluate(f,a);
 const click=(p,sel)=>p.click(sel,{timeout:3000});
 try{

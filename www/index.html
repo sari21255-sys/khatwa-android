@@ -3987,7 +3987,7 @@ function vPg(){
  else h+='<button class="goalcard" data-a="sub" data-v="set"><div class="t"><b>حدّد وزنك المستهدف</b><div class="mu">أدخل وزنك الحالي والمستهدف لتظهر رحلتك</div></div>'+ic('next')+'</button>';
  h+='<div class="sechead"><h2>الأوسمة</h2><button class="chip" data-a="sub" data-v="ach">الكل</button></div><div class="medrow">'+medals().join('')+'</div>';
  h+=weekSummary();
- h+='<div class="quick"><button data-a="sub" data-v="wgt">'+ic('scale')+'مراقبة الوزن</button><button data-a="sub" data-v="rpt">'+ic('chart')+'تقاريري</button><button data-a="sub" data-v="prog">'+ic('pulse')+'الإحصاءات</button></div>';
+ h+='<div class="quick"><button data-a="sub" data-v="wgt">'+ic('scale')+'مراقبة الوزن</button><button data-a="sub" data-v="rpt">'+ic('chart')+'تقاريري</button><button data-a="sub" data-v="prog">'+ic('pulse')+'الإحصاءات</button></div><div class="quick" id="pg-more"><button data-a="sub" data-v="arch">'+ic('box')+'الأرشيف</button><button data-a="sub" data-v="ach">'+ic('trophy')+'الأوسمة</button><button data-a="sub" data-v="wgt">'+ic('target')+'قياسات الجسم</button><button data-a="sub" data-v="prog">'+ic('moon')+'النوم</button></div>';
  return h}
 function vDash(){
  let h=vToday();
@@ -4489,7 +4489,7 @@ function commCard(){
 const CTI={curr:['check','#0f766e'],coach:['user','#3b82f6'],art:['book','#8b5cf6'],anat:['pulse','#ef4444'],learn:['target','#22c55e'],myth:['spark','#f59e0b'],gloss:['search','#0891b2'],safe:['heart','#e11d48'],aasn:['star','#d97706'],supp:['drop','#16a34a'],moh:['info','#0369a1']};
 function vEx(){
  const GRP=[['التدريب',['wk','plan','prog','ach','arch','rpt']],['الصحة والتغذية',['meal','wgt','tools','link','rem']],['النادي والمعرفة',['gyms','nau','vis','cul','coach']],['المجتمع والحساب',['comm','nc','set','me']]];
- let h='<h1>استكشف</h1><div class="mu" style="margin-bottom:12px">كل ميزات خطوة في مكان واحد</div>';
+ let h='<h1>المزيد</h1><div class="mu" style="margin-bottom:12px">كل ميزات خطوة في مكان واحد</div>';
  h+='<div class="sechead"><h2>اخترنا لك</h2></div>'+rail(picks().map(chipF));
  h+='<div class="sechead"><h2>اختصاراتي</h2><button class="chip" data-a="drop" data-v="edit">تخصيص</button></div>'+rail(scList().map(i=>chipF(FD[i])));
  h+=commCard();
@@ -4544,10 +4544,10 @@ function render(){
  if(locked()){$('#app').innerHTML=vLock();$('#nav').innerHTML='';fitLogos();return}
  if(S.tab==='home')S.tab='dash';const y=window.scrollY,onb=!S.prof.ob,LA=!onb&&S.tab==='home'&&!S.sub;document.body.classList.toggle('lau-on',LA);document.body.classList.toggle('oh',!!S.prof.oh);document.body.classList.toggle('ohl',S.prof.oh==='l');
  const WKM=S.sub==='wk',head=(onb||LA||WKM||(S.tab==='me'&&!S.sub))?'':'<div class="top"><button class="logob" data-a="go" data-v="dash" aria-label="الرئيسية">'+logo(21)+'</button><span class="row tbr"><button class="av tb" data-a="srch" aria-label="بحث">'+ic('search')+'</button><button class="av tb" data-a="langm" aria-label="اللغة">'+ic('lang')+'</button><button class="av tb" data-a="drop" data-v="open" aria-label="اختصاراتي">'+ic('grid')+'</button><button class="av tb" data-a="sub" data-v="nc" aria-label="الإشعارات">'+ic('bell')+(ncUnread()?'<i class="nbd">'+ncUnread()+'</i>':'')+'</button><button class="av" data-a="go" data-v="me" aria-label="حسابي">'+(S.prof.av?'<img alt="" src="'+S.prof.av+'">':esc((S.prof.name||'س').charAt(0)))+'</button></span></div>';
- $('#app').innerHTML=head+view()+((onb||LA||WKM)?'':(UI.fab?'<div class="fabm"><button data-a="fgo" data-v="food">'+ic('fork')+'تسجيل وجبة</button><button data-a="fgo" data-v="train">'+ic('dumbbell')+'بدء تمرين</button><button data-a="fgo" data-v="dash" data-sc="1">'+ic('scale')+'تسجيل وزن أو نوم</button><button data-a="ai" data-t="text">'+ic('mic')+'إملاء أو تصوير</button></div>':'')+'<button class="fab" data-a="fab" aria-label="إضافة سريعة">'+ic(UI.fab?'x':'plus')+'</button>')+sheetHtml()+aiConsentHtml()+drawerHtml()+langMenu()+fpHtml();
- const N=[['dash','home','الرئيسية'],['train','dumbbell','التمرين'],['food','fork','التغذية'],['ex','compass','استكشف']];
+ $('#app').innerHTML=head+view()+((onb||LA||WKM)?'':(UI.fab?'<div class="fabm"><button data-a="fgo" data-v="food">'+ic('fork')+'تسجيل وجبة</button><button data-a="wkstart" id="fab-start">'+ic('dumbbell')+'بدء تمرين اليوم</button><button data-a="fgo" data-v="dash" data-sc="1">'+ic('scale')+'تسجيل وزن أو نوم</button><button data-a="ai" data-t="text">'+ic('mic')+'إملاء أو تصوير</button></div>':'')+'<button class="fab" data-a="fab" aria-label="إضافة سريعة">'+ic(UI.fab?'x':'plus')+'</button>')+sheetHtml()+aiConsentHtml()+drawerHtml()+langMenu()+fpHtml();
+ const N=[['dash','home','اليوم'],['train','dumbbell','التمرين'],['food','fork','التغذية'],['pg','chart','التقدّم'],['ex','grid','المزيد']];
  const N4=N.filter(n=>n[0]!=='me'),nb=n=>'<button class="'+(n[0]===S.tab?'on':'')+'" data-a="go" data-v="'+n[0]+'" aria-label="'+n[2]+'">'+ic(n[1])+'<span>'+n[2]+'</span></button>';
- $('#nav').innerHTML=(onb||LA||WKM)?'':'<div class="pill2">'+nb(N4[0])+nb(N4[1])+'<span class="nsp"></span>'+nb(N4[2])+nb(N4[3])+'<button class="nfab nobi-x" data-a="wkstart" aria-label="ابدأ التمرين"><b>ابدأ</b><small>التمرين</small></button></div>';
+ $('#nav').innerHTML=(onb||LA||WKM)?'':'<div class="pill2">'+N4.map(nb).join('')+'</div>';
  fitLogos();scanAttach();window.scrollTo(0,y)}
 function soft(){clearTimeout(renderT);renderT=setTimeout(()=>{if(editing())dirty=true;else render()},350)}
 const editing=()=>{const a=document.activeElement;return a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&a.type!=='file'};

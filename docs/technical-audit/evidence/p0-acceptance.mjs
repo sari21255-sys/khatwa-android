@@ -32,6 +32,7 @@ try{
  await p.goto(A+'/');await p.waitForFunction(()=>typeof S!=='undefined');await p.evaluate(seed);
  const TABS=['dash','train','food','pg','me','club','ex'],SUBS=['plan','prog','arch','tools','watch','prg','mpg','ach','cul','wgt','exl','set','coach','aip','gyms','vis','rem','rpt','link','nau','comm','nc'];
  await p.evaluate(async({TABS,SUBS})=>{for(const t of TABS){S.tab=t;S.sub=null;render();await new Promise(r=>setTimeout(r,50))}for(const s of SUBS){S.tab='ex';S.sub=s;render();await new Promise(r=>setTimeout(r,60))}},{TABS,SUBS});
+ await p.evaluate(()=>localStorage.setItem('fit_ai_ok','1'));   /* موافقة المستخدم على الذكاء الاصطناعي (بوابة الموافقة أُضيفت بعد هذا الاختبار؛ tests/consent.e2e.js يغطي حالة عدم الموافقة) */
  MODE.ai='ok';const ai=await p.evaluate(async()=>{S.sub=null;S.tab='train';render();UI.ai=UI.ai||{};const a=UI.ai;a.lvl='b';a.eq='gym';a.dpw=4;a.min=60;a.focus='';a.notes='';a.res=null;await aiGenPlan();return{days:a.res&&a.res.days,msg:a.msg||UI.msg||''}});
  await p.evaluate(()=>{S.ts=Date.now();save();return syncPush()});await p.waitForTimeout(400);
  const syncOk=await p.evaluate(()=>SYNC.st);
@@ -76,7 +77,7 @@ try{
  rec('T20-nohide','الإصلاح بمعالجة السبب: لا overflow-x:hidden عام على html/body',!hid,'html='+ov[320].html+' body='+ov[320].body,'P3');
 
  /* فشل الوسيط: غير متاح / ممنوع الأصل / 500 — رسالة واضحة بلا انهيار */
- const c3=await b.newContext({viewport:{width:390,height:844}});const f=await c3.newPage();const w4=watch(f);await f.goto(A+'/');await f.waitForFunction(()=>typeof S!=='undefined');await f.evaluate(seed);
+ const c3=await b.newContext({viewport:{width:390,height:844}});await c3.addInitScript(()=>{try{localStorage.setItem('fit_ai_ok','1')}catch(e){}});   /* موافقة الذكاء الاصطناعي */const f=await c3.newPage();const w4=watch(f);await f.goto(A+'/');await f.waitForFunction(()=>typeof S!=='undefined');await f.evaluate(seed);
  const aiTry=mode=>f.evaluate(async()=>{S.sub=null;S.tab='train';render();UI.ai=UI.ai||{};const a=UI.ai;a.lvl='b';a.eq='gym';a.dpw=4;a.min=60;a.focus='';a.notes='';a.res=null;UI.msg='';await aiGenPlan();return{res:!!a.res,msg:UI.msg||a.msg||'',busy:UI.busy||0}});
  MODE.ai='500';let r6=await aiTry();rec('P0-06a','وسيط يرد 500: رسالة خطأ واضحة بلا انهيار',!r6.res&&!!r6.msg&&!r6.busy,JSON.stringify(r6),'P1');MODE.ai='ok';
  wk.close();await new Promise(r=>setTimeout(r,200));

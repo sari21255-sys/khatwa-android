@@ -35,6 +35,7 @@ jobs:
           NODE_PATH="$(npm root -g)" node tests/ux2.e2e.js
           NODE_PATH="$(npm root -g)" node tests/font.e2e.js
           NODE_PATH="$(npm root -g)" node tests/consent.e2e.js
+          NODE_PATH="$(npm root -g)" node tests/nav.e2e.js
       - name: P0 acceptance (security headers + CSP, offline eq-db, 320px, worker failure)
         run: NODE_PATH="$(npm root -g)" node docs/technical-audit/evidence/p0-acceptance.mjs
       - name: Supabase schema + RLS tests
