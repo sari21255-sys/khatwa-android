@@ -33,6 +33,7 @@ jobs:
         run: |
           NODE_PATH="$(npm root -g)" node tests/ux.e2e.js
           NODE_PATH="$(npm root -g)" node tests/ux2.e2e.js
+          NODE_PATH="$(npm root -g)" node tests/sxmerge.e2e.js
           NODE_PATH="$(npm root -g)" node tests/font.e2e.js
           NODE_PATH="$(npm root -g)" node tests/consent.e2e.js
           NODE_PATH="$(npm root -g)" node tests/nav.e2e.js

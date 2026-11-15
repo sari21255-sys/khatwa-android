@@ -90,6 +90,27 @@ try{
   rec('SX-05','تراجع على جهاز وإضافة على آخر: المحذوفة تبقى محذوفة والمضافة تبقى',!ids.includes(gone)&&ids.includes(added)&&t1===t2,JSON.stringify({gone,added,in2:ids,in1:ids1,same:t1===t2,t1:t1===t2?'':t1.slice(0,1200),t2:t1===t2?'':t2.slice(0,1200)}));
  }
 
+ /* SX-04b: تعادل تعديل المجموعة نفسها في اللحظة نفسها (up متطابق)، بالترتيبين، مع إعادة تحميل وإعادة إرسال */
+ {const id=await d1.evaluate(()=>{const s=sxList()[0];return s&&s.id}),sid=await d1.evaluate(i=>S.sx[i].ex[0].sets[0].i,id);
+  const setW=(d,w,T)=>d.evaluate(([i,s,w,T])=>{const q=S.sx[i].ex[0].sets.find(x=>x.i===s);q.w=w;q.up=T;S.sx[i].up=T;sxReconcile(S.sx[i]);S.sx[i].vol=sxVol(S.sx[i]);save()},[id,sid,w,T]);
+  const wOf=d=>d.evaluate(([i,s])=>S.sx[i].ex[0].sets.find(q=>q.i===s).w,[id,sid]);
+  const volOf=d=>d.evaluate(i=>({v:S.sx[i].vol,d:sxVol(S.sx[i])}),id);
+  const T1=Date.now()+60000;
+  await setW(d1,30,T1);await setW(d2,40,T1);await sync(d1);await settle(d2,d1);
+  let a=await wOf(d1),b=await wOf(d2);
+  rec('SX-04b1','تعادل 30 (جهاز 1) و40 (جهاز 2) في اللحظة نفسها: 40 على الجهازين',a===40&&b===40,JSON.stringify({a,b}));
+  /* عكس ترتيب الوصول: الجهاز 2 يرسل أولًا */
+  const T2=T1+60000;await setW(d1,31,T2);await setW(d2,41,T2);await sync(d2);await settle(d1,d2);
+  a=await wOf(d1);b=await wOf(d2);rec('SX-04b2','العكس: 31 و41 بالتعادل وبترتيب وصول معاكس: 41 على الجهازين',a===41&&b===41,JSON.stringify({a,b}));
+  /* إعادة تحميل الجهازين ثم مزامنة: القيمة لا تتغير والسجل السحابي يتفق */
+  for(const d of[d1,d2]){await d.reload();await d.waitForFunction(()=>typeof S!=='undefined'&&typeof rsSync==='function');await d.evaluate(HELP)}await d1.waitForTimeout(1200);await settle(d1,d2);
+  a=await wOf(d1);b=await wOf(d2);rec('SX-04b3','بعد إعادة التحميل وإعادة الإرسال: 41 على الجهازين وبصمة الجلسة متطابقة',a===41&&b===41&&(await sess(d1))===(await sess(d2)),JSON.stringify({a,b}));
+  /* جهاز ثالث نظيف يسحب من السحابة */
+  const d3=await device();await d3.evaluate(HELP);await login(d3,em);await sync(d3);await settle(d3,d1);
+  const c3=await wOf(d3).catch(()=>null);rec('SX-04b4','جهاز ثالث نظيف يسحب من السحابة: القيمة نفسها (41)',c3===41,String(c3));
+  const v1=await volOf(d1),v2=await volOf(d2);rec('SX-04b5','الحجم المخزّن = المشتق من المجموعات على الجهازين',v1.v===v1.d&&v2.v===v2.d&&v1.v===v2.v,JSON.stringify({v1,v2}));
+ }
+
  /* SX-06: 50 دورة عشوائية */
  {await d1.evaluate(()=>{Object.keys(S.sx).forEach(k=>delete S.sx[k]);Object.keys(S.done).forEach(k=>delete S.done[k]);save()});await settle(d1,d2);await d2.evaluate(()=>{Object.keys(S.sx).forEach(k=>delete S.sx[k]);save()});await settle(d1,d2);
   let seed=+(process.env.SEED||20261115);const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};const pick=a=>a[Math.floor(rnd()*a.length)];

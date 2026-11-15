@@ -4039,17 +4039,21 @@ function sxProg(s){let d=0,t=0;s.ex.forEach(x=>{t+=x.tg;d+=Math.min(sxCnt(x),x.t
    النتيجة قانونية الترتيب حتى يعطي الجهازان البصمة نفسها ولا يتبادلان الرفع بلا نهاية. ---- */
 const sxRid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3);
 const sxSid=q=>q.i||('l'+q.at+'.'+q.w+'.'+q.r+'.'+q.ty);
+/* حجم الجلسة يُشتق من المجموعات النهائية: مجموع الوزن×التكرار لغير الإحماء. جلسة قديمة بلا مجموعات تحتفظ بقيمتها المخزّنة. */
+function sxVol(s){let n=0,v=0;(s.ex||[]).forEach(x=>{n+=(x.rm||[]).length;(x.sets||[]).forEach(q=>{n++;if(q.ty!=='w')v+=(+q.w||0)*(+q.r||0)})});return n?Math.round(v*100)/100:(+s.vol||0)}
+/* حسم التعادل لنفس المجموعة: الأحدث up يفوز؛ عند التساوي تفوز الأكبر بالترتيب (الوزن ثم التكرار ثم RPE ثم النوع ثم وقت التسجيل) فيصل الجهازان للنتيجة نفسها بأي ترتيب وصول ودون حقول إضافية. */
+function sxSetWins(q,e){const a=q.up||q.at,b=e.up||e.at;if(a!==b)return a>b;const f=['w','r','rp'];for(const k of f){const x=+q[k]||0,y=+e[k]||0;if(x!==y)return x>y}const t=String(q.ty||''),u=String(e.ty||'');if(t!==u)return t>u;return(+q.at||0)>(+e.at||0)}
 function sxCanon(s){const ex=(s.ex||[]).slice().sort((a,b)=>((a.o==null?1e6:a.o)-(b.o==null?1e6:b.o))||(a.d-b.d)||(a.k<b.k?-1:a.k>b.k?1:0));
- const o={id:s.id,wk:s.wk,date:s.date,ts:s.ts,up:s.up||s.ts,dy:s.dy,kd:s.kd,t:s.t,st:s.st,sec:+s.sec||0,vol:+s.vol||0};
+ const o={id:s.id,wk:s.wk,date:s.date,ts:s.ts,up:s.up||s.ts,dy:s.dy,kd:s.kd,t:s.t,st:s.st,sec:+s.sec||0,vol:0};
  if(s.fin)o.fin=s.fin;if(s.dy==null){delete o.dy;delete o.kd}
  o.ex=ex.map(x=>{const rm=Array.from(new Set(x.rm||[])).sort(),dead=new Set(rm);
   const sets=(x.sets||[]).filter(q=>!dead.has(sxSid(q))).sort((a,b)=>(a.at-b.at)||(sxSid(a)<sxSid(b)?-1:1)).map(q=>({i:q.i,w:q.w,r:q.r,ty:q.ty,rp:q.rp||0,at:q.at,up:q.up||q.at}));
   sets.forEach(q=>{if(q.i==null)delete q.i});
   const r={k:x.k,id:x.id,n:x.n,d:x.d,tg:x.tg,tr:x.tr,o:x.o==null?undefined:x.o,sets:sets,rm:rm,dn:x.dn?1:0,sk:x.sk?1:0};if(r.o===undefined)delete r.o;return r});
- return o}
+ o.vol=sxVol({ex:o.ex,vol:s.vol});return o}
 function sxMerge(a,b){const A=sxCanon(a),B=sxCanon(b),by={};
  [A,B].forEach(s=>s.ex.forEach(x=>{const c=by[x.k];if(!c){by[x.k]=JSON.parse(JSON.stringify(x));return}
-  c.rm=Array.from(new Set(c.rm.concat(x.rm))).sort();const m={};c.sets.concat(x.sets).forEach(q=>{const id=sxSid(q),e=m[id];if(!e||(q.up||q.at)>(e.up||e.at))m[id]=q});
+  c.rm=Array.from(new Set(c.rm.concat(x.rm))).sort();const m={};c.sets.concat(x.sets).forEach(q=>{const id=sxSid(q),e=m[id];if(!e||sxSetWins(q,e))m[id]=q});
   c.sets=Object.keys(m).map(i=>m[i]);c.dn=c.dn||x.dn?1:0;c.sk=c.sk&&x.sk?1:0;if(c.o==null&&x.o!=null)c.o=x.o}));
  const o={};Object.keys(A).forEach(k=>{o[k]=A[k]});o.ex=Object.keys(by).map(k=>by[k]);
  o.ts=Math.min(A.ts,B.ts);o.up=Math.max(A.up||0,B.up||0);o.sec=Math.max(A.sec,B.sec);o.vol=Math.max(A.vol,B.vol);
@@ -4067,7 +4071,7 @@ function sxNew(ks){const T=tasks(),id='sx'+Date.now().toString(36)+Math.random()
  const dy=ex.length?ex[0].d:TI();return S.sx[id]={id:id,wk:W(),date:TD(),ts:Date.now(),up:Date.now(),dy:dy,kd:dy===TI()?'t':'m',t:(S.plan[dy]||{}).t||'',st:'p',sec:0,vol:0,ex:ex}}
 function sxRec(t,w,r,ty,rp){const U=UI.wk;let s=U.sid&&S.sx[U.sid];if(!s){s=sxNew(U.ks);U.sid=s.id}
  const x=s.ex.find(q=>q.k===t.k),now=Date.now();if(x)x.sets.push({i:sxRid(),w:w,r:r,ty:ty,rp:rp||0,at:now,up:now});s.up=now;return{s:s,x:x}}
-function sxAfter(s){const U=UI.wk,T=tasks();if(U){s.vol=U.vol;s.sec=Math.round(tmEl())}
+function sxAfter(s){const U=UI.wk,T=tasks();s.vol=sxVol(s);if(U){U.vol=s.vol;s.sec=Math.round(tmEl())}
  if(s.ex.every(x=>x.dn||(T.find(q=>q.k===x.k)||{}).r)){s.st='c';s.fin=Date.now()}}
 function sxBoot(s,ks){TM.acc=s?(+s.sec||0):0;TM.t0=Date.now();TM.run=true;TM.rest=0;
  const U={ks:ks,i:0,s:0,w:null,r:null,vol:s?(+s.vol||0):0,sid:s?s.id:null,ty:'n',rp:0};
@@ -4610,7 +4614,7 @@ const ACT={
  done:b=>{const k=b.dataset.k;mark(k,$('[data-wk="'+k+'"]').value,$('[data-rk="'+k+'"]').value)},
  undo:b=>{const k=b.dataset.k;delete S.done[k];
   /* المسار القديم يلغي الإكمال: نُبقي سجل الجلسة متسقًا (آخر مجموعة عمل تُحذف بعلامة rm، والتمرين غير مكتمل) كي لا يعيد الدمج كتابة S.done */
-  sxList().forEach(s=>{const x=s.ex.find(q=>q.k===k);if(!x||!x.dn)return;const ws=x.sets.filter(q=>q.ty!=='w');const l=ws[ws.length-1];if(l){x.sets.splice(x.sets.indexOf(l),1);x.rm=(x.rm||[]).concat([sxSid(l)]).slice(-60)}x.dn=0;if(s.st==='c'){s.st='p';delete s.fin}s.up=Date.now()})},
+  sxList().forEach(s=>{const x=s.ex.find(q=>q.k===k);if(!x||!x.dn)return;const ws=x.sets.filter(q=>q.ty!=='w');const l=ws[ws.length-1];if(l){x.sets.splice(x.sets.indexOf(l),1);x.rm=(x.rm||[]).concat([sxSid(l)]).slice(-60)}x.dn=0;s.vol=sxVol(s);if(s.st==='c'){s.st='p';delete s.fin}s.up=Date.now()})},
  qd:b=>{const k=b.dataset.k;if(S.done[k])delete S.done[k];else{const p=k.split('|'),e=S.plan[+p[1]].ex.find(x=>x.id===p[2]);mark(k,e.w||S.base[e.n]||lastW(e.n),e.r)}},
  del:b=>{S.plan[+b.dataset.d].ex.splice(+b.dataset.i,1)},
  add:b=>{const c=b.closest('.card'),g=f=>c.querySelector('[data-f="'+f+'"]').value,n=g('n').trim();if(!n)return false;const wv=+g('w')||0;if(wv)S.base[n]=wv;S.plan[+b.dataset.d].ex.push(E(n,+g('s')||3,+g('r')||10,wv))},
@@ -4814,8 +4818,8 @@ Object.assign(ACT,{
  aino:(b,ev)=>{if(ev&&ev.target&&ev.target.closest('[data-stop]')&&!ev.target.closest('button[data-a="aino"]'))return false;aiDone(false)},
  aiwd:()=>{try{localStorage.removeItem('fit_ai_ok')}catch(e){lg(e)}toast('سُحبت الموافقة. سنسألك قبل أي إرسال')},
  wkundo:()=>{const U=UI.wk,sx=U&&U.sid&&S.sx[U.sid];if(!sx)return false;let bx=null;sx.ex.forEach(x=>x.sets.forEach((q,i)=>{if(!bx||q.at>=bx.q.at)bx={x:x,q:q,i:i}}));if(!bx)return false;
-  const x=bx.x,q=bx.q;x.sets.splice(bx.i,1);x.rm=(x.rm||[]).concat([sxSid(q)]).slice(-60);if(x.dn){x.dn=0;delete S.done[x.k]}if(q.ty!=='w')U.vol=Math.max(0,U.vol-(q.w||0)*(q.r||0));
-  sx.vol=U.vol;sx.up=Date.now();if(sx.st==='c'){sx.st='p';delete sx.fin}x.sk=0;const i=U.ks.indexOf(x.k);if(i>=0){U.i=i;U.s=sxCnt(x)}U.w=q.w||null;U.r=q.r||null;U.ty='n';U.rp=0;TM.rest=0;
+  const x=bx.x,q=bx.q;x.sets.splice(bx.i,1);x.rm=(x.rm||[]).concat([sxSid(q)]).slice(-60);if(x.dn){x.dn=0;delete S.done[x.k]}sx.vol=sxVol(sx);U.vol=sx.vol;
+  sx.up=Date.now();if(sx.st==='c'){sx.st='p';delete sx.fin}x.sk=0;const i=U.ks.indexOf(x.k);if(i>=0){U.i=i;U.s=sxCnt(x)}U.w=q.w||null;U.r=q.r||null;U.ty='n';U.rp=0;TM.rest=0;
   if(!sx.ex.some(y=>y.sets.length)){delete S.sx[sx.id];U.sid=null}toast('تراجعت عن آخر مجموعة')},
  wkend:()=>{const U=UI.wk;if(!U){S.sub=null;return}const sx=U.sid&&S.sx[U.sid];
   if(sx){sxAfter(sx);if(sx.st!=='c'){const a=sxProg(sx);UI.wk=null;TM.run=false;TM.rest=0;S.sub=null;S.tab='dash';toast('حُفظ تمرين جزئي: '+a.d+' من '+a.t+' مجموعة');return}U.i=U.ks.length;return}
