@@ -1211,7 +1211,7 @@ function weekCard(T,dn,cmWk,pts){const x=stats(),wd=weekDates(),P=S.prof;
  return '<div class="card"><div class="row" style="margin-bottom:10px"><h2 style="margin:0">'+ic('check')+'هدف الأسبوع</h2><span class="sp"></span><button class="chip" data-a="sub" data-v="ach">'+ic('trophy')+'الإنجازات</button></div><div class="wkg"><div class="strk"><b class="num">'+x.cur+'</b><small>'+ic('flame')+'يوم متتالٍ</small><small class="mu">الأفضل '+F(x.best)+'</small></div><div class="wkb">'+bl(dn,T.length,'التمارين','تمرين')+bl(cmWk,P.cardio,'الكارديو','دقيقة')+bl(pts,P.pts,'نقاط النشاط','نقطة')+'</div></div><div class="dots">'+wd.map((d,i)=>'<span><i class="'+(x.days[d]?'on':'')+'"></i>'+dl(i)+'</span>').join('')+'</div></div>'}
 function burnCard(kc,avg,ti){const has=kc.some(v=>v>0);
  return '<div class="card"><div class="row" style="margin-bottom:'+(has?10:6)+'px"><h2 style="margin:0">'+ic('flame')+'السعرات المحروقة</h2><span class="sp"></span>'+(has?'<span class="lc inl"><small style="--c:#f97316">المتوسط اليومي</small><b class="num">'+F(avg)+'</b></span>':'')+'</div>'+(has?bars(kc,DAYS.map((x,i)=>dl(i)),ti):'<div class="emp"><span class="fi" style="--c:#f97316">'+ic('flame')+'</span><span class="t">لا بيانات حرق هذا الأسبوع</span><button class="chip" data-a="go" data-v="train">'+ic('plus')+'أضف جلسة</button></div>')+'</div>'}
-function logToday(td,P,sc){return '<div class="card" id="logc"><h2>'+ic('pulse')+'تسجيل اليوم</h2><div class="g2">'+inp('الوزن (كغ)','bw',S.bw[td],'step="0.1"')+inp('النوم (ساعات)','sleep',S.sleep[td],'step="0.25"')+inp('النوم العميق (ساعات)','deep',(S.sd[td]||{}).deep,'step="0.25"')+inp('نبض الراحة (نبضة/د)','cd:hr',(S.cd[td]||{}).hr)+'</div>'+(sc?'<div class="mu" style="margin-top:10px">جودة نومك '+sc+' من 100'+(sc>=85?'':'، والهدف '+P.sleep+' ساعات')+'</div>':'')+'</div>'}
+function logToday(td,P,sc){return '<div class="card" id="logc"><h2>'+ic('pulse')+'تسجيل اليوم</h2><div class="g2">'+inp('النوم (ساعات)','sleep',S.sleep[td],'step="0.25"')+inp('النوم العميق (ساعات)','deep',(S.sd[td]||{}).deep,'step="0.25"')+inp('نبض الراحة (نبضة/د)','cd:hr',(S.cd[td]||{}).hr)+'</div>'+(sc?'<div class="mu" style="margin-top:10px">جودة نومك '+sc+' من 100'+(sc>=85?'':'، والهدف '+P.sleep+' ساعات')+'</div>':'')+'</div>'}
 function goalCard(G){
  if(G){const done=G.rem<=0;return '<div class="card"><div class="row" style="margin-bottom:10px"><h2 style="margin:0">'+ic('target')+'هدفي</h2><span class="sp"></span><span class="tag">'+G.p+'%</span></div><div class="goal"><div><small>الحالي</small><b>'+F(G.cw,1)+'</b></div><div>'+ic('arrowl')+'</div><div><small>الهدف</small><b>'+F(G.g,1)+'</b></div><div class="rem"><small>المتبقي</small><b>'+F(G.rem,1)+'</b></div></div><div class="bar"><i style="width:'+G.p+'%"></i></div>'+(done?'<div class="mu" style="margin-top:6px">وصلت إلى وزنك المستهدف.</div>':(G.wks?'<div class="mu" style="margin-top:6px">نحو '+G.wks+' أسبوعًا بمعدل '+S.prof.rate+' كغ أسبوعيًا</div>':''))+'</div>'}
  return '<div class="card"><div class="emp"><span class="fi" style="--c:#8b5cf6">'+ic('target')+'</span><span class="t">لم تحدّد هدف وزن بعد</span><button class="chip" data-a="sub" data-v="set">تحديد الهدف</button></div></div>'}
@@ -1219,7 +1219,7 @@ function vToday(){
  const td=TD(),ti=TI(),T=tasks(),dn=T.filter(t=>t.r).length,c=cdv(td),P=S.prof,wd=weekDates(),wt=wd.map(cdv),cmWk=wt.reduce((a,x)=>a+x.min,0),G=goalInfo(),fd=foodSum(td),actMin=Math.ceil((+P.cardio||0)/7),pts=dn*5+cmWk,sc=sleepScore(td);
  const kc=wt.map(x=>Math.round(x.kcal)),kd=kc.filter(x=>x>0),avg=kd.length?Math.round(kd.reduce((a,b)=>a+b,0)/kd.length):0;
  let h='<div class="hello"><h1>أهلًا'+(P.name?' '+esc(P.name):'')+'</h1><div class="mu">'+DAYS[ti]+' · '+td+'</div></div>';
- h+=x2Hero(c,P,td,actMin)+x2Week(wd,ti)+remCard()+todayCard()+svcRow()+'<i data-cta></i>'+x2Bento(c,P,td)+nutCard(fd)+waterCard(td,1)+weekCard(T,dn,cmWk,pts)+burnCard(kc,avg,ti)+logToday(td,P,sc)+goalCard(G);
+ h+=x2Hero(c,P,td,actMin)+x2Week(wd,ti)+remCard()+todayCard()+svcRow()+'<i data-cta></i>'+x2Bento(c,P,td)+nutCard(fd)+waterCard(td,1)+weekCard(T,dn,cmWk,pts)+burnCard(kc,avg,ti)+wgtForm(true)+logToday(td,P,sc)+goalCard(G);
  h+='<div class="sechead"><h2>اختصاراتي</h2><button class="chip" data-a="drop" data-v="edit">تخصيص</button></div>'+rail(scList().map(i=>chipF(FD[i])));
  h+=gyHome()+homeCar()+bkCard();
  return h}
@@ -2201,12 +2201,12 @@ function applyRes(){
   if(d.weight)S.bw[td]=d.weight;if(d.sleep)S.sleep[td]=d.sleep;
   if(d.steps||d.kburn||d.km){const o=S.cd[td]=S.cd[td]||{};if(d.steps)o.steps=d.steps;if(d.kburn)o.kcal=d.kburn;if(d.km)o.km=d.km}
   d.cardio.forEach(x=>(S.cs[td]=S.cs[td]||[]).push(x));
-  d.meals.forEach(x=>(S.meals[td]=S.meals[td]||[]).push(Object.assign({id:uid()},x)));
+  d.meals.forEach(x=>mealSave(td,x));
   let n=0;d.ex.forEach(x=>{const t=matchTask(x.n);if(t){mark(t.k,x.w||S.base[t.e.n]||lastW(t.e.n)||t.e.w,x.r||t.e.r);n++}});
   if(d.ex.length&&n<d.ex.length)msg='تمت الإضافة، وتعذّر ربط '+(d.ex.length-n)+' تمرين بخطتك'}
  else if(R.k==='machine'){S.plan[TI()].ex.push(E(d.name,d.sets,d.reps,0));msg='أُضيف «'+d.name+'» إلى خطة اليوم'}
  else if(R.k==='display'){(S.cs[td]=S.cs[td]||[]).push({m:d.m,min:d.min,km:d.km,kcal:d.kcal,j:0});if(d.hr){const o=S.cd[td]=S.cd[td]||{};o.hr=d.hr}msg='سُجّلت الجلسة'}
- else{(S.meals[td]=S.meals[td]||[]).push({id:uid(),n:d.n,kcal:d.kcal,p:d.p,c:d.c,f:d.f,fi:d.fi,su:d.su,na:d.na,slot:guessSlot()});msg='سُجّلت الوجبة'}
+ else{mealSave(td,{n:d.n,kcal:d.kcal,p:d.p,c:d.c,f:d.f,fi:d.fi,su:d.su,na:d.na});msg='سُجّلت الوجبة'}
  UI.res=null;UI.sheet='';save();render();toast(msg)}
 function resHtml(){
  const R=UI.res;if(!R)return '';const d=R.d;let h='<div class="res">';
@@ -2700,10 +2700,21 @@ function wChart(big){
  const L=list[list.length-1];s+='<circle cx="'+sx(t1).toFixed(1)+'" cy="'+sy(L[1]).toFixed(1)+'" r="5" class="pl"/>';
  s+='<text x="'+pl+'" y="'+(H-6)+'" class="ax" text-anchor="start">'+list[0][0].slice(5)+'</text><text x="'+(W-pr)+'" y="'+(H-6)+'" class="ax" text-anchor="end">'+L[0].slice(5)+'</text></svg>';
  return s+'<div class="mu lgd"><span><i class="k1"></i>وزنك</span>'+(g?'<span><i class="k2"></i>الهدف</span>':'')+(plan?'<span><i class="k3"></i>المسار المخطط</span>':'')+'</div>'}
+/* ---- الوزن: نموذج واحد وحفظ واحد (اليوم، التقدّم، مراقبة الوزن). الوحدة المختارة تنطبق دائمًا؛ التخزين بالكغ في S.bw ---- */
+function wgtSave(d,val,bf,n,unitIsKg){
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(d||'')||d>TD()){toast('اختر تاريخًا صحيحًا لا يتجاوز اليوم');return false}
+ if(!(+val>0)){toast('أدخل الوزن');return false}
+ const kg=+(unitIsKg?+val:fromU(+val)).toFixed(2);if(kg<20||kg>400){toast('القيمة غير معقولة، تحقق من الوحدة');return false}
+ S.bw[d]=kg;if(bf>0&&bf<80)S.bf[d]=bf;if(n)S.wn[d]=String(n).slice(0,80);toast('حُفظ الوزن');return true}
+function wgtForm(compact){
+ const td=TD(),o=wStats(),cur=S.bw[td]!=null?S.bw[td]:(o?o.cw:''),val=cur===''?'':F(toU(cur),1).replace(/,/g,'');
+ const dF='<label class="f">التاريخ<input id="we-d" type="date" max="'+td+'" value="'+td+'"></label>',bF='<label class="f">نسبة الدهون % (اختياري)<input id="we-b" type="number" inputmode="decimal" step="0.1" value="'+(S.bf[td]||'')+'"></label>',nF='<label class="f">ملاحظة (اختياري)<input id="we-n" type="text" maxlength="80" value="'+esc(S.wn[td]||'')+'"></label>';
+ const wF='<label class="f">الوزن ('+uL()+')<input id="we-w" type="number" inputmode="decimal" step="0.1" value="'+val+'"></label>';
+ return '<div class="card hl" id="wform"><h2>'+ic('scale')+'تسجيل وزن</h2>'+(compact?'<div class="g2">'+wF+'<button class="btn" style="align-self:end" data-a="wadd">'+ic('plus')+'حفظ</button></div><details style="margin-top:8px"><summary class="mu">التاريخ، الدهون، ملاحظة</summary><div class="g2" style="margin-top:8px">'+dF+bF+nF+'</div></details>':'<div class="g2">'+dF+wF+bF+nF+'</div><div class="row" style="margin-top:10px"><button class="btn" data-a="wadd">'+ic('plus')+'حفظ</button></div>')+'</div>'}
 function vWgt(){
  const P=S.prof,o=wStats(),td=TD(),q=wQual(o),ide=idealW(),G=+P.goal||0;
  let h=back()+'<h1>مراقبة الوزن</h1><div class="mu" style="margin-bottom:10px">سجّل أي يوم، وتابع المسار نحو هدفك بتاريخ محدد. الوحدة المختارة ('+uL()+') تنطبق على هذه الصفحة.</div>';
- h+='<div class="card hl"><h2>'+ic('scale')+'تسجيل وزن</h2><div class="g2"><label class="f">التاريخ<input id="we-d" type="date" max="'+td+'" value="'+td+'"></label><label class="f">الوزن ('+uL()+')<input id="we-w" type="number" inputmode="decimal" step="0.1" value="'+(o?F(toU(o.cw),1).replace(/,/g,''):'')+'"></label><label class="f">نسبة الدهون % (اختياري)<input id="we-b" type="number" inputmode="decimal" step="0.1"></label><label class="f">ملاحظة (اختياري)<input id="we-n" type="text" maxlength="80"></label></div><div class="row" style="margin-top:10px"><button class="btn" data-a="wadd">'+ic('plus')+'حفظ</button></div></div>';
+ h+=wgtForm(false);
  if(!o)return h+'<div class="card mu">سجّل أول وزن ليبدأ التتبّع.</div>'+wSettings();
  h+='<div class="tiles"><div class="tile"><b>'+F(toU(o.cw),1)+'</b><small>الحالي ('+uL()+')</small></div><div class="tile"><b style="color:'+((G&&o.dir?(o.chg*o.dir>0):o.chg<0)?'var(--ac)':'var(--tx)')+'">'+(o.chg>0?'+':'')+F(toU(o.chg),1)+'</b><small>التغيّر الكلي</small></div><div class="tile"><b>'+(G?F(toU(o.rem||0),1):'—')+'</b><small>المتبقي للهدف</small></div></div>';
  h+='<div class="card"><h2>'+ic('target')+'الهدف</h2><div class="g2"><label class="f">الوزن المستهدف (كغ)<input type="number" inputmode="decimal" step="0.1" data-c="pf:goal" value="'+(G||'')+'"></label><label class="f">تاريخ تحقيقه<input type="date" data-c="pt:gdate" min="'+td+'" value="'+esc(P.gdate||'')+'"></label></div>';
@@ -3197,6 +3208,13 @@ function vExd(){
 Object.assign(UI,{off:{q:'',res:[],busy:0,msg:''},scan:0,rcp:{n:'',sv:1,it:[]}});
 const SCAN={stream:null,timer:0};
 const guessSlot=()=>{const h=new Date().getHours();return h<11?'b':(h<16?'l':(h<19?'s':'d'))};
+/* ---- مسار حفظ وجبة واحد: كل المداخل (اليوم، التغذية، الخطط، المكتبة، البحث، النسخ) تمرّ من هنا ----
+   الاسم والكمية والنوع (slot) يأتون من المدخل الأصلي؛ القيم تُقرَّب بالقاعدة نفسها (سعرات وصوديوم صحيحة، والباقي منزلة واحدة). */
+const mr1=v=>+(+v||0).toFixed(1);
+function mealScale(m,k){const o={kcal:Math.round((+m.kcal||0)*k),p:mr1((+m.p||0)*k),c:mr1((+m.c||0)*k),f:mr1((+m.f||0)*k)};if(m.fi!=null)o.fi=mr1(m.fi*k);if(m.su!=null)o.su=mr1(m.su*k);if(m.na!=null)o.na=Math.round((+m.na||0)*k);return o}
+function mealSave(d,m){const r=Object.assign({},m,{id:uid(),n:String(m.n!=null?m.n:(m.name||'')).slice(0,120),kcal:Math.round(+m.kcal||0),p:mr1(m.p),c:mr1(m.c),f:mr1(m.f),slot:m.slot||guessSlot()});
+ ['fi','su'].forEach(k=>{if(m[k]!=null)r[k]=mr1(m[k])});if(m.na!=null)r.na=Math.round(+m.na||0);
+ (S.meals[d]=S.meals[d]||[]).push(r);return r}
 const slotOpts=()=>{const g=guessSlot();return SLOTS.map(s=>'<option value="'+s[0]+'"'+(s[0]===g?' selected':'')+'>'+s[1]+'</option>').join('')};
 const waterGoal=()=>{const g=+S.prof.water;if(g>0)return g;const w=curW()||70;return Math.max(1500,Math.round(35*w/250)*250)};
 function waterCard(d,compact){
@@ -3987,6 +4005,7 @@ function vPg(){
  else h+='<button class="goalcard" data-a="sub" data-v="set"><div class="t"><b>حدّد وزنك المستهدف</b><div class="mu">أدخل وزنك الحالي والمستهدف لتظهر رحلتك</div></div>'+ic('next')+'</button>';
  h+='<div class="sechead"><h2>الأوسمة</h2><button class="chip" data-a="sub" data-v="ach">الكل</button></div><div class="medrow">'+medals().join('')+'</div>';
  h+=weekSummary();
+ h+=wgtForm(true);
  h+='<div class="quick"><button data-a="sub" data-v="wgt">'+ic('scale')+'مراقبة الوزن</button><button data-a="sub" data-v="rpt">'+ic('chart')+'تقاريري</button><button data-a="sub" data-v="prog">'+ic('pulse')+'الإحصاءات</button></div><div class="quick" id="pg-more"><button data-a="sub" data-v="arch">'+ic('box')+'الأرشيف</button><button data-a="sub" data-v="ach">'+ic('trophy')+'الأوسمة</button><button data-a="sub" data-v="wgt">'+ic('target')+'قياسات الجسم</button><button data-a="sub" data-v="prog">'+ic('moon')+'النوم</button></div>';
  return h}
 function vDash(){
@@ -4627,10 +4646,8 @@ const ACT={
  tmt:()=>{if(TM.run){TM.acc+=(Date.now()-TM.t0)/1000;TM.run=false}else{TM.t0=Date.now();TM.run=true;try{if(!TM.ac)TM.ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){lg(e)}try{if(navigator.wakeLock)navigator.wakeLock.request('screen').catch(()=>{})}catch(e){lg(e)}}},
  tmstop:()=>{const s=tmEl();if(s>=30){const td=TD();S.wt[td]=(+S.wt[td]||0)+s;toast('حُفظ وقت التمرين: '+Math.round(s/60)+' دقيقة')}TM.run=false;TM.acc=0;TM.t0=0},
  rest:b=>{try{if(!TM.ac)TM.ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){lg(e)}TM.rest=Date.now()+(+b.dataset.v)*1000},
- eat:b=>{const d=b.dataset.d,s=b.dataset.s,id=b.dataset.id,a=S.meals[d]=S.meals[d]||[],i=a.findIndex(x=>x.lid===id&&x.slot===s);if(i>=0)a.splice(i,1);else{const m=libGet(id);if(m)a.push({id:uid(),n:m.n,kcal:m.kcal,p:m.p,c:m.c,f:m.f,lid:id,slot:s})}},
+ eat:b=>{const d=b.dataset.d,s=b.dataset.s,id=b.dataset.id,a=S.meals[d]=S.meals[d]||[],i=a.findIndex(x=>x.lid===id&&x.slot===s);if(i>=0)a.splice(i,1);else{const m=libGet(id);if(m)mealSave(d,{n:m.n,kcal:m.kcal,p:m.p,c:m.c,f:m.f,lid:id,slot:s})}},
  mdel:b=>{S.meals[b.dataset.d].splice(+b.dataset.i,1)},
- madd:b=>{const m=libGet($('#mlib').value),q=+$('#mq').value||1;if(!m)return false;(S.meals[b.dataset.d]=S.meals[b.dataset.d]||[]).push({id:uid(),n:m.n+(q!==1?' ×'+q:''),kcal:Math.round(m.kcal*q),p:+(m.p*q).toFixed(1),c:+(m.c*q).toFixed(1),f:+(m.f*q).toFixed(1)})},
- mcustom:b=>{const c=b.closest('.card'),g=k=>c.querySelector('[data-c="m:'+k+'"]').value,n=$('#cn').value.trim();if(!n)return false;(S.meals[b.dataset.d]=S.meals[b.dataset.d]||[]).push({id:uid(),n,kcal:+g('kcal')||0,p:+g('p')||0,c:+g('c')||0,f:+g('f')||0})},
  ladd:b=>{const c=b.closest('.card'),g=k=>c.querySelector('[data-c="l:'+k+'"]').value,n=$('#ln').value.trim();if(!n)return false;S.lib.push({id:'u'+uid(),n,kcal:+g('kcal')||0,p:+g('p')||0,c:+g('c')||0,f:+g('f')||0})},
  ldel:b=>{const id=b.dataset.id;S.lib=S.lib.filter(x=>x.id!==id);Object.keys(S.mp).forEach(w=>SLOTS.forEach(s=>{if(S.mp[w]&&S.mp[w][s[0]])S.mp[w][s[0]]=S.mp[w][s[0]].filter(x=>x!==id)}))},
  pickday:b=>{UI.fd=b.dataset.d===TD()?'':b.dataset.d;UI.fm='today';window.scrollTo(0,0)},
@@ -4676,11 +4693,7 @@ Object.assign(ACT,{
 })}
 Object.assign(ACT,{
  bz:b=>{UI.ag=b.dataset.g||''},
- wadd:()=>{const d=($('#we-d').value||'').trim(),w=+$('#we-w').value,bf=+$('#we-b').value,n=($('#we-n').value||'').trim();
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||d>TD()){toast('اختر تاريخًا صحيحًا لا يتجاوز اليوم');return false}
-  if(!(w>0)){toast('أدخل الوزن');return false}
-  const kg=+fromU(w).toFixed(2);if(kg<20||kg>400){toast('القيمة غير معقولة، تحقق من الوحدة');return false}
-  S.bw[d]=kg;if(bf>0&&bf<80)S.bf[d]=bf;if(n)S.wn[d]=n.slice(0,80);toast('حُفظ الوزن')},
+ wadd:()=>{const g=i=>($(i)||{}).value||'';if(!wgtSave(g('#we-d').trim()||TD(),+g('#we-w'),+g('#we-b'),g('#we-n').trim()))return false},
  wdel:b=>{const d=b.dataset.d;delete S.bw[d];delete S.bf[d];delete S.wn[d]},
  wfs:()=>{UI.wfs=UI.wfs?0:1},
  wunit:b=>{S.prof.unit=b.dataset.v},
@@ -4744,12 +4757,12 @@ Object.assign(ACT,{
  fcancel:()=>{S.fast.on=0},
  offgo:()=>{const q=($('#off-q').value||'').trim();if(q.length<2){toast('اكتب كلمتين على الأقل');return false}UI.off.q=q;offSearch(q);return false},
  offcode:()=>{offCode($('#off-c').value);return false},
- offadd:b=>{const m=UI.off.res[+b.dataset.i],gi=document.querySelector('[data-gi="'+b.dataset.i+'"]'),g=+(gi&&gi.value)||100;if(!m)return false;const k=g/100,d=UI.fd||TD();(S.meals[d]=S.meals[d]||[]).push({id:uid(),n:m.n+' ('+g+' غ)',kcal:Math.round(m.kcal*k),p:+(m.p*k).toFixed(1),c:+(m.c*k).toFixed(1),f:+(m.f*k).toFixed(1),fi:+(m.fi*k).toFixed(1),su:+(m.su*k).toFixed(1),na:Math.round(m.na*k),slot:guessSlot()});toast('أُضيفت الوجبة')},
+ offadd:b=>{const m=UI.off.res[+b.dataset.i],gi=document.querySelector('[data-gi="'+b.dataset.i+'"]'),g=+(gi&&gi.value)||100;if(!m)return false;const k=g/100,d=UI.fd||TD();mealSave(d,Object.assign(mealScale(m,k),{n:m.n+' ('+g+' غ)'}));toast('أُضيفت الوجبة')},
  scan:()=>{UI.scan=1;render();scanStart();return false},
  scanstop:()=>{scanStop();return false},
- mcopy:()=>{const y=addDays(TD(),-1),L=S.meals[y]||[];if(!L.length){toast('لا وجبات مسجلة أمس');return false}const d=UI.fd||TD();(S.meals[d]=S.meals[d]||[]);L.forEach(m=>S.meals[d].push(Object.assign({},m,{id:uid()})));toast('نُسخت '+L.length+' وجبات')},
- madd:b=>{const m=libGet($('#mlib').value),q=+$('#mq').value||1;if(!m)return false;const sl=$('#msl');(S.meals[b.dataset.d]=S.meals[b.dataset.d]||[]).push({id:uid(),n:m.n+(q!==1?' ×'+q:''),kcal:Math.round(m.kcal*q),p:+(m.p*q).toFixed(1),c:+(m.c*q).toFixed(1),f:+(m.f*q).toFixed(1),slot:sl?sl.value:guessSlot()})},
- mcustom:b=>{const c=b.closest('.card'),g=k=>+((c.querySelector('[data-c="m:'+k+'"]')||{}).value)||0,n=$('#cn').value.trim();if(!n)return false;const sl=$('#msl');(S.meals[b.dataset.d]=S.meals[b.dataset.d]||[]).push({id:uid(),n:n,kcal:g('kcal'),p:g('p'),c:g('c'),f:g('f'),fi:g('fi'),su:g('su'),na:g('na'),slot:sl?sl.value:guessSlot()})},
+ mcopy:()=>{const y=addDays(TD(),-1),L=S.meals[y]||[];if(!L.length){toast('لا وجبات مسجلة أمس');return false}const d=UI.fd||TD();(S.meals[d]=S.meals[d]||[]);L.forEach(m=>mealSave(d,m));toast('نُسخت '+L.length+' وجبات')},
+ madd:b=>{const m=libGet($('#mlib').value),q=+$('#mq').value||1;if(!m)return false;const sl=$('#msl');mealSave(b.dataset.d,Object.assign(mealScale(m,q),{n:m.n+(q!==1?' ×'+q:''),slot:sl?sl.value:guessSlot()}))},
+ mcustom:b=>{const c=b.closest('.card'),g=k=>+((c.querySelector('[data-c="m:'+k+'"]')||{}).value)||0,n=$('#cn').value.trim();if(!n)return false;const sl=$('#msl');mealSave(b.dataset.d,{n:n,kcal:g('kcal'),p:g('p'),c:g('c'),f:g('f'),fi:g('fi'),su:g('su'),na:g('na'),slot:sl?sl.value:guessSlot()})},
  rcadd:()=>{readRc();UI.rcp.it.push({id:$('#rc-i').value,q:+$('#rc-q').value||1})},
  rcdel:b=>{readRc();UI.rcp.it.splice(+b.dataset.i,1)},
  rcsave:()=>{readRc();const r=UI.rcp,n=(r.n||'').trim();if(!n){toast('اكتب اسم الوصفة');return false}let k=0,p=0,c=0,f=0;r.it.forEach(i=>{const m=libGet(i.id);if(m){k+=m.kcal*i.q;p+=m.p*i.q;c+=m.c*i.q;f+=m.f*i.q}});const sv=Math.max(1,+r.sv||1);S.lib.push({id:'r'+uid(),n:n.slice(0,40)+' (حصة)',kcal:Math.round(k/sv),p:+(p/sv).toFixed(1),c:+(c/sv).toFixed(1),f:+(f/sv).toFixed(1)});UI.rcp={n:'',sv:1,it:[]};toast('حُفظت الوصفة في قائمة وجباتك')}
@@ -4828,9 +4841,9 @@ Object.assign(ACT,{
  dlset:b=>{S.dl=b.dataset.v==='1'?W():''},
  gs:()=>{const e=$('#gq');UI.gq=e?e.value:''},
  srch:()=>{S.sub='srch';window.scrollTo(0,0)},
- mrep:b=>{const d=b.dataset.d,y=b.dataset.y;S.meals[d]=(S.meals[d]||[]).concat((S.meals[y]||[]).map(m=>Object.assign({},m,{id:uid()})))},
- mfav:b=>{const m=freqMeals()[+b.dataset.i];if(!m)return;const d=b.dataset.d;(S.meals[d]=S.meals[d]||[]).push(Object.assign({},m,{id:uid()}))},
- mgo:b=>{const m=libGet(b.dataset.id);if(!m)return;const d=TD();(S.meals[d]=S.meals[d]||[]).push({id:uid(),n:m.n,kcal:m.kcal,p:m.p,c:m.c,f:m.f,lid:m.id,slot:guessSlot()});S.tab='food';S.sub=null;UI.fm='today';UI.fd='';toast('أُضيفت: '+m.n)},
+ mrep:b=>{const d=b.dataset.d,y=b.dataset.y;(S.meals[y]||[]).slice().forEach(m=>mealSave(d,m))},
+ mfav:b=>{const m=freqMeals()[+b.dataset.i];if(!m)return;const d=b.dataset.d;mealSave(d,m)},
+ mgo:b=>{const m=libGet(b.dataset.id);if(!m)return;const d=TD();mealSave(d,{n:m.n,kcal:m.kcal,p:m.p,c:m.c,f:m.f,lid:m.id});S.tab='food';S.sub=null;UI.fm='today';UI.fd='';toast('أُضيفت: '+m.n)},
  dnon:()=>{S.prof.dnon=S.prof.dnon?0:1;if(S.prof.dnon)try{if(typeof Notification!=='undefined'&&Notification.permission==='default')Notification.requestPermission().then(()=>render())}catch(e){lg(e)}},
  ohset:b=>{S.prof.oh=b.dataset.v}
 });
@@ -4904,7 +4917,7 @@ Object.assign(ACT,{
  fpadd:()=>{const f=UI.fp,it=f&&f.list[f.sel];if(!it)return false;const v=+($('#fp-g')||{}).value||(it.my?1:it.g),mac=fpMac(it,v);let id=it.my,nm=it.n;
   if(!it.my){nm=it.n+' ('+v+' غ)';let ex=S.lib.find(x=>x.n===nm);if(!ex){ex={id:uid(),n:nm,kcal:mac.k,p:mac.p,c:mac.c,f:mac.f};S.lib.push(ex)}id=ex.id}
   if(f.m==='mp'){S.mp[f.w]=S.mp[f.w]||{};(S.mp[f.w][f.s]=S.mp[f.w][f.s]||[]).push(id);toast('أُضيف للخطة: '+it.n)}
-  else if(f.m==='log'){(S.meals[f.d]=S.meals[f.d]||[]).push({id:uid(),n:it.my&&v!==1?nm+' ×'+v:nm,kcal:mac.k,p:mac.p,c:mac.c,f:mac.f,lid:id,slot:guessSlot()});toast('سُجّلت: '+it.n)}
+  else if(f.m==='log'){mealSave(f.d,{n:it.my&&v!==1?nm+' ×'+v:nm,kcal:mac.k,p:mac.p,c:mac.c,f:mac.f,lid:id});toast('سُجّلت: '+it.n)}
   else toast('أُضيف لوجباتي: '+it.n);
   UI.fp=null}});
 document.addEventListener('input',ev=>{const t=ev.target;if(!UI.fp)return;
@@ -5001,7 +5014,7 @@ document.addEventListener('change',ev=>{
  if(t.id==='av-in'){const f=t.files[0];if(!f)return;const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const c=document.createElement('canvas');const sq=Math.min(im.width,im.height),sx0=(im.width-sq)/2,sy0=(im.height-sq)/2;c.width=c.height=112;c.getContext('2d').drawImage(im,sx0,sy0,sq,sq,0,0,112,112);try{S.prof.av=c.toDataURL('image/jpeg',.82)}catch(e){lg(e)}const c2=document.createElement('canvas'),tw=Math.min(720,im.width),th=Math.round(tw*1.25);c2.width=tw;c2.height=th;let cw=im.width,ch=im.width*1.25;if(ch>im.height){ch=im.height;cw=ch/1.25}c2.getContext('2d').drawImage(im,(im.width-cw)/2,(im.height-ch)/2,cw,ch,0,0,tw,th);try{S.prof.ph=c2.toDataURL('image/jpeg',.8)}catch(e){lg(e)}URL.revokeObjectURL(u);save();render()};im.src=u;return}
  const c=t.dataset.c;if(!c)return;const v=t.value,td=TD(),P=S.prof;
  const set=o=>{if(v==='')delete o[td];else o[td]=+v};
- if(c==='bw')set(S.bw);else if(c==='sleep')set(S.sleep);
+ if(c==='bw'){if(v==='')delete S.bw[td];else wgtSave(td,v,0,'',1)}else if(c==='sleep')set(S.sleep);
  else if(c==='deep'){const o=S.sd[td]=S.sd[td]||{};if(v==='')delete o.deep;else o.deep=+v}
  else if(c==='eb'){const e=S.plan[+t.dataset.d].ex[+t.dataset.i];S.base[e.n]=+v||0;if((e.w||0)<S.base[e.n])e.w=S.base[e.n]}
  else if(c==='ew'){const e=S.plan[+t.dataset.d].ex[+t.dataset.i];e.w=Math.max(+v||0,S.base[e.n]||0)}
@@ -5010,7 +5023,7 @@ document.addEventListener('change',ev=>{
  else if(c.startsWith('pf:')){const f=c.slice(3);P[f]=+v||0;if(f==='startW'&&!P.ob&&+v)S.bw[td]=+v}
  else if(c.startsWith('pt:'))P[c.slice(3)]=v;
  else if(c.startsWith('nt:'))S.nt[c.slice(3)]=+v||0;
- else if(c.startsWith('tl:')){const f=c.slice(3);if(f==='w'){if(+v)S.bw[td]=+v}else S.tl[f]=+v||0}
+ else if(c.startsWith('tl:')){const f=c.slice(3);if(f==='w'){if(+v>=20&&+v<=400)S.bw[td]=+v}else S.tl[f]=+v||0}
  else if(c.startsWith('lb:')){const p=c.split(':'),m=libGet(p[2]);if(m)m[p[1]]=p[1]==='n'?v:(+v||0)}
  else if(c.startsWith('ac:')){const f=c.slice(3),a=acSt();a[f]=v===''?'':+v}
  else if(!XCHG(c,v,t))return;
