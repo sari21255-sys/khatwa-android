@@ -1448,27 +1448,18 @@ function taskRow(t,late){
  else h+='<div class="wrow"><div class="cur"><small>الحالي</small><b>'+F(bs,1)+'</b></div><label><small>وزن هذا الأسبوع</small><input type="number" inputmode="decimal" min="'+bs+'" data-wk="'+t.k+'" value="'+w+'" aria-label="وزن هذا الأسبوع"></label><label><small>التكرار</small><input type="number" inputmode="numeric" data-rk="'+t.k+'" value="'+rp+'" aria-label="التكرار"></label><button class="btn sm" data-a="done" data-k="'+t.k+'">تم</button></div>'+suggLine(t);
  return h+'</div>'}
 function vTrain(){
+ if(UI.tw==='week'||UI.tw==='cum')UI.tw='today';
  if(UI.trk==='hub'||!UI.trk)return trkHub();
  if(UI.trk==='cardio')return trkBack()+'<h1>الكارديو</h1><div class="mu" style="margin-bottom:10px">'+DAYS[TI()]+' · '+TD()+'</div>'+vCardio(1);
  if(UI.trk!=='iron')return trkEmpty(UI.trk);
  const T=tasks(),ti=TI(),dn=T.filter(t=>t.r).length,late=T.filter(t=>t.d<ti&&!t.r),now=T.filter(t=>t.d===ti),pw=S.plan[ti],td=TD(),rs=restLeft();
- let h=trkBack()+'<h1>الحديد</h1><div class="mu" style="margin-bottom:10px">'+DAYS[ti]+' · '+(pw.ex.length?esc(pw.t):'يوم راحة')+'</div>'+seg([['today','اليوم'],['week','الأسبوع'],['plan','الخطة'],['cum','لم تتحقق'],['disc','اكتشف']],'tw',UI.tw);
+ let h=trkBack()+'<h1>الحديد</h1><div class="mu" style="margin-bottom:10px">'+DAYS[ti]+' · '+(pw.ex.length?esc(pw.t):'يوم راحة')+'</div>'+seg([['today','اليوم'],['plan','الخطة'],['disc','اكتشف']],'tw',UI.tw);
  if(UI.tw==='plan')return h+vPlan().replace(/^<button class="back"[^>]*>.*?<\/button>/,'').replace(/<h1>.*?<\/h1>/,'');
  if(UI.tw==='disc')return h+vDisc();
- if(UI.tw==='cum')return h+vCum();
  if(UI.tw==='today')h+=planHead()+sxHero(0,0).note+'<div class="row" style="margin:10px 0 12px">'+sxHero(0,0).btn+'</div>'+sxHero(0,0).mk+(isDl()?deloadCard():'');
- if(UI.tw==='week'){
-  h+='<div class="card hl"><div class="num" style="font-size:44px;line-height:1;color:var(--ac);font-weight:700">'+pct(dn,T.length)+'%</div><div class="bar" style="margin:8px 0"><i style="width:'+pct(dn,T.length)+'%"></i></div><div class="mu">أنجزت '+dn+' وتبقى '+(T.length-dn)+'. اضغط على الدائرة لتعليم أي تمرين منجزًا بقيمه المخططة.</div></div>';
-  S.plan.forEach((p,d)=>{if(!p.ex.length)return;const ts=T.filter(t=>t.d===d),n=ts.filter(t=>t.r).length,st=n===ts.length?'<span class="tag">مكتمل</span>':(d<ti?'<span class="tag bad">ناقص '+(ts.length-n)+' · مرحّل</span>':(d===ti?'<span class="tag">اليوم</span>':'<span class="mu">قادم</span>'));
-   h+='<div class="card"><div class="row" style="margin-bottom:6px"><b>'+DAYS[d]+' · '+esc(p.t)+'</b><span class="sp"></span>'+st+'</div>'+ts.map(t=>'<div class="mealrow"><button class="eat'+(t.r?' on':'')+'" data-a="qd" data-k="'+t.k+'" aria-label="'+(t.r?'إلغاء الإنجاز':'تعليم كمنجز')+'">'+(t.r?ic('check'):'')+'</button><div class="t"><b'+(t.r?' class="mu"':'')+'>'+esc(t.e.n)+'</b></div><span class="mu num" style="font-size:16px">'+t.e.s+'×'+t.e.r+'</span></div>').join('')+'</div>'});
-  return h}
- const el=tmEl();
- h+='<div class="card tm"><div class="mu">وقت التمرين</div><div class="tmv num" id="tmv">'+fmtT(el)+'</div><div class="row c" style="gap:16px"><button class="pp" data-a="tmt" aria-label="'+(TM.run?'إيقاف مؤقت':'تشغيل')+'">'+ic(TM.run?'pause':'play','f')+'</button></div><div class="row c" style="margin-top:14px"><button class="chip" data-a="tmstop">'+ic('check')+'إنهاء وحفظ</button><span class="chip">'+ic('timer')+'اليوم <b class="num" style="font-size:16px">'+Math.round(((+S.wt[td]||0)+el)/60)+'</b> د</span></div>'+
- '<div class="mu" style="margin:14px 0 8px">مؤقت الراحة بين المجموعات</div><div class="chips" style="justify-content:center">'+[45,60,90,120].map(s=>'<button class="chip" data-a="rest" data-v="'+s+'">'+s+' ث</button>').join('')+'</div><div class="rs num" id="rsv" style="margin-top:8px">'+(rs?fmtT(rs).slice(3):'')+'</div></div>';
  if(late.length)h+='<div class="card"><h2>'+ic('flame')+'مرحّل من الأيام السابقة ('+late.length+')</h2>'+late.map(t=>taskRow(t,1)).join('')+'</div>';
  h+='<div class="card"><h2>'+ic('dumbbell')+'تمارين اليوم'+(now.length?' ('+now.filter(t=>t.r).length+'/'+now.length+')':'')+'</h2>'+(now.length?now.map(t=>taskRow(t)).join(''):'<div class="mu">يوم راحة. التمارين المرحّلة، إن وُجدت، في البطاقة أعلاه.</div>')+'</div>';
- h+='<div class="row"><button class="btn ghost" data-a="ai" data-t="photo" data-k="machine">'+ic('camera')+'صوّر جهازًا للتعرف عليه</button><button class="btn ghost" data-a="sub" data-v="plan">'+ic('gear')+'الخطة</button></div>';
- return h}
+  return h}
 
 /* ---------- views: cardio ---------- */
 function vCardio(noH){
@@ -3357,16 +3348,13 @@ function sessCard(se){
  const g=sessGroups(se).slice(0,3).map(k=>GNAME(k,'ar')).join(' · ');
  return '<button class="sc" data-a="ssd" data-id="'+se.id+'"><div class="sci">'+ic(se.cat==='stretch'?'moon':(se.cat==='burn'?'flame':'dumbbell'))+'</div><b>'+esc(se.n)+'</b><div class="mu">'+se.min+' دقيقة · '+sxp(se.x).length+' تمارين</div><div class="mu" style="font-size:12px">'+esc(g)+'</div><span class="tag" style="margin-top:6px">'+LVN[se.lv]+'</span></button>'}
 function vDisc(){
- let h=recoCard();
+ let h='';
  h+='<button class="lnk" style="border:1px solid var(--bd);border-radius:18px;padding:14px;margin-bottom:12px;background:var(--card)" data-a="sub" data-v="exl">'+ic('book')+'<span class="t"><b>مكتبة التمارين</b><br><span class="mu">'+XL.length+' تمرينًا بشرح وعضلات مستهدفة، مع بحث وتصفية</span></span>'+ic('next')+'</button>';
- h+='<button class="lnk" style="border:1px solid var(--bd);border-radius:18px;padding:14px;margin-bottom:12px;background:var(--card)" data-a="sub" data-v="aip">'+ic('spark')+'<span class="t"><b>خطة بالذكاء الاصطناعي</b><br><span class="mu">خطة أسبوعية من مكتبة التمارين حسب مستواك</span></span>'+ic('next')+'</button>';
-h+='<button class="lnk" style="border:1px solid var(--bd);border-radius:18px;padding:14px;margin-bottom:12px;background:var(--card)" data-a="sub" data-v="nau">'+ic('dumbbell')+'<span class="t"><b>الأجهزة الرياضية</b><br><span class="mu">دليل أجهزة النادي وطريقة استخدامها</span></span>'+ic('next')+'</button>';
+ h+='<button class="lnk" style="border:1px solid var(--bd);border-radius:18px;padding:14px;margin-bottom:12px;background:var(--card)" data-a="sub" data-v="nau">'+ic('dumbbell')+'<span class="t"><b>الأجهزة الرياضية</b><br><span class="mu">دليل أجهزة النادي وطريقة استخدامها</span></span>'+ic('next')+'</button>';
 h+='<button class="lnk" style="border:1px solid var(--bd);border-radius:18px;padding:14px;margin-bottom:12px;background:var(--card)" data-a="sub" data-v="prg">'+ic('book')+'<span class="t"><b>البرامج الجاهزة</b><br><span class="mu">برامج حديد جاهزة تضيفها إلى خطتك</span></span>'+ic('next')+'</button>';
  const mine=S.my||[];
  if(mine.length)h+='<h2 style="margin:14px 0 8px">'+ic('user')+'جلساتي</h2><div class="car">'+mine.map(sessCard).join('')+'</div>';
  CAT.forEach(c=>{const L=SESS.filter(s=>s.cat===c[0]);if(L.length)h+='<h2 style="margin:14px 0 8px">'+c[1]+'</h2><div class="car">'+L.map(sessCard).join('')+'</div>'});
- const b=UI.bld;
- h+='<div class="card"><h2>'+ic('plus')+'ابنِ جلستك</h2>'+(b.x.length?'<label class="f">اسم الجلسة<input id="bld-n" type="text" maxlength="40" value="'+esc(b.n)+'"></label><div style="margin:8px 0">'+b.x.map((n,i)=>'<div class="mealrow"><div class="t"><b>'+esc(n)+'</b></div><button class="x" data-a="bldx" data-i="'+i+'">إزالة</button></div>').join('')+'</div><div class="row"><button class="btn sm" data-a="bldsave">حفظ الجلسة</button><button class="btn sm ghost" data-a="bldclr">مسح</button></div>':'<div class="mu">افتح أي تمرين من المكتبة واضغط «أضف لجلسة جديدة»، ثم احفظ الجلسة هنا لتشغيلها لاحقًا.</div>')+'</div>';
  return h}
 /* session detail */
 function vSsd(){
@@ -5301,6 +5289,7 @@ function vPg(){
  let h='<div class="sjttl"><div><h1>التقدّم</h1><div class="mu">تابع أهدافك وصحتك</div></div></div>';
  h+='<button class="sjrow" data-a="sub" data-v="wgt" style="display:block">'+'<span class="row" style="gap:10px;margin-bottom:6px">'+sjI('wm','pulse')+'<b class="t" style="font-size:18px">مراقبة الوزن</b><span class="num" style="font-size:22px">'+(cw?F(toU(cw),1)+' '+uL():'—')+'</span></span>'+(bv.length>1?xspark(bv,'#858CFF'):'<span class="mu">سجّل وزنك لتظهر رحلتك</span>')+'</button>';
  h+='<button class="statcard" data-a="sub" data-v="prog"><div class="srings">'+ring([[c.steps,P.steps,'#e08aa0'],[c.kcal,P.kcal,'#9a2444'],[c.min,Math.ceil((+P.cardio||0)/7),'#f0f0f2']])+'</div><div class="t"><b>الإحصاءات</b><div class="mu">تابع نشاطك وتقدّمك</div></div>'+ic('next')+'</button>';
+ h+=recoCard();
  h+='<div class="sechead"><h2>رحلتي</h2><button class="chip" data-a="report">'+ic('share')+'مشاركة</button></div>';
  h+='<div class="jt"><div class="jtile">'+'<b class="num">'+x.cur+'</b><span>'+ic('flame')+'<small>أيام متتالية</small></span></div><div class="jtile"><b class="num">'+F(wk)+'</b><span>'+ic('dumbbell')+'<small>تمارين</small></span></div><div class="jtile"><b class="num">'+F(totalHours(),1)+'</b><span>'+ic('timer')+'<small>ساعات</small></span></div></div>';
  if(G){const done=G.rem<=0;h+='<button class="goalcard" data-a="sub" data-v="wgt">'+medal('SIJIL · GOAL',G.p+'%','TARGET','target',1).replace('class="medal','class="medal big')+'<div class="t"><b>'+F(G.cw,1)+' → '+F(G.g,1)+' كغ</b><div class="mu">'+(done?'وصلت إلى هدفك':'المتبقي '+F(G.rem,1)+' كغ'+(G.wks?' · نحو '+G.wks+' أسبوعًا':''))+'</div><div class="bar" style="margin-top:8px"><i style="width:'+G.p+'%"></i></div></div>'+ic('next')+'</button>'}

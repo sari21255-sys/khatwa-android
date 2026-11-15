@@ -84,9 +84,11 @@ const IND=/[٠-٩]/;
  {const {ctx,p}=await mk(390);await p.evaluate(seed);await p.click('#nav button[data-v=train]');await p.waitForTimeout(200);
   const ks=await p.$$eval('.sjtk',a=>a.map(x=>x.dataset.v));ok(JSON.stringify(ks)===JSON.stringify(['iron','cardio','cali','lift','swim','run']),'ستة مسارات: الحديد، الكارديو، الكاليسثنكس، رفع الأوزان، السباحة، الركض',ks.join());
   await p.click('.sjtk[data-v=iron]');await p.waitForTimeout(150);
-  const segs=await p.$$eval('.seg [data-a=seg]',a=>a.map(x=>x.dataset.v));ok(segs.join()==='today,week,plan,cum,disc','مسار الحديد: اليوم، الأسبوع، الخطة، لم تتحقق، اكتشف (دون الكارديو)',segs.join());
+  const segs=await p.$$eval('.seg [data-a=seg]',a=>a.map(x=>x.dataset.v));ok(segs.join()==='today,plan,disc','مسار الحديد: اليوم، الخطة، اكتشف فقط (بلا الأسبوع ولا لم تتحقق ولا الكارديو)',segs.join());
+  ok(!await p.$('.tm')&&!await p.$('[data-k=machine]'),'لا بطاقة مؤقت منفصلة ولا زر تصوير الجهاز');
   ok(!!await p.$('#sx-go,[data-a=wkstart],[data-a=sxgo]')||/ابدأ|أكمل/.test(await p.evaluate(()=>document.body.innerText)),'مسار الحديد يعرض بدء التمرين');
-  await p.click('[data-a=seg][data-v=disc]');await p.waitForTimeout(150);const dv=await p.$$eval('[data-a=sub]',a=>a.map(x=>x.dataset.v));ok(['exl','aip','nau','prg'].every(x=>dv.includes(x)),'«اكتشف» في الحديد يضم المكتبة والذكاء الاصطناعي والأجهزة والبرامج',dv.join());
+  await p.click('[data-a=seg][data-v=disc]');await p.waitForTimeout(150);const dv=await p.$$eval('[data-a=sub]',a=>a.map(x=>x.dataset.v));ok(['exl','nau','prg'].every(x=>dv.includes(x))&&!dv.includes('aip')&&!await p.$('#bld-n,[data-a=bldsave]'),'«اكتشف» في الحديد يضم المكتبة والأجهزة والبرامج دون الذكاء الاصطناعي ومولّد الجلسات',dv.join());
+  await p.click('[data-a=trkhub]');await p.click('#nav button[data-v=pg]');ok(/جاهزية العضلات/.test(await p.evaluate(()=>document.body.innerText)),'جاهزية العضلات انتقلت إلى «التقدّم»');await p.click('#nav button[data-v=train]');await p.click('.sjtk[data-v=iron]');
   await p.click('[data-a=trkhub]');await p.click('.sjtk[data-v=cardio]');await p.waitForTimeout(150);ok(/الكارديو/.test(await p.evaluate(()=>document.querySelector('h1').innerText))&&!!await p.$('[data-a=ss]'),'مسار الكارديو يضم تسجيل الجلسات والبيانات');
   for(const k of ['cali','lift','swim','run']){await p.click('[data-a=trkhub]');await p.click('.sjtk[data-v='+k+']');await p.waitForTimeout(100);ok(!!await p.$('.sjemp')&&(await p.$$('.card')).length===1,'مسار '+k+' فارغ بانتظار التكوين')}
   await p.click('#nav button[data-v=train]');ok(!!await p.$('.sjtk'),'زر التمرين في الشريط يعيد إلى قائمة المسارات');
