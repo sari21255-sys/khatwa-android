@@ -1066,6 +1066,26 @@ html[data-sj] body .x2n .big{font-size:40px}
 @media (prefers-reduced-motion:reduce){.sjsr.sv,.sjck.on{animation:none}}
 html[data-sj] body{--fe:var(--sj-fa);--fa:var(--sj-fa)}
 html[data-sj] body .num,html[data-sj] body .big,html[data-sj] body b.num,html[data-sj] body input[type=number],html[data-sj] body .tm,html[data-sj] body .sjsr *{font-family:var(--sj-fa)!important}
+/* خطة التمارين */
+html[data-sj] body .sjday{background:color-mix(in srgb,var(--dc) 9%,var(--sj-s1))!important;border-color:color-mix(in srgb,var(--dc) 26%,var(--sj-ln))!important}
+html[data-sj="white"] body .sjday{background:color-mix(in srgb,var(--dc) 7%,#fff)!important}
+.sjdt2{width:auto;max-width:62%;min-width:0;font-weight:700;padding:8px 10px}
+.sjxp{border:1px solid var(--sj-ln);border-radius:14px;background:var(--sj-s2)}
+.sjxp>summary{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;list-style:none;min-height:48px}
+.sjxp>summary::-webkit-details-marker{display:none}
+.sjxp>summary::after{content:"▾";margin-inline-start:auto;color:var(--sj-mu)}
+.sjxp[open]>summary::after{content:"▴"}
+.sjxp .t small,.sjxo small{color:var(--sj-mu);display:block;font-size:13px;direction:ltr;text-align:start}
+.sjxp>summary .t small{display:inline;margin-inline-start:6px}
+.sjxl{max-height:340px;overflow:auto;border-top:1px solid var(--sj-ln);padding:4px 6px 8px}
+.sjxg{font-weight:700;font-size:14px;color:var(--sj-mu);padding:10px 8px 4px}
+.sjxg small{font-weight:400;direction:ltr}
+.sjxo{display:flex;align-items:center;gap:10px;width:100%;text-align:start;background:transparent;border:0;border-radius:12px;padding:8px;color:var(--sj-tx);min-height:48px}
+.sjxo:active,.sjxo:hover{background:color-mix(in srgb,var(--sj-tx) 8%,transparent)}
+.sjxo .t{display:block;min-width:0}
+.sjxo .sico,.sjxp .sico{flex:0 0 40px;width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:color-mix(in srgb,var(--sj-tx) 7%,transparent)}
+.sjxo .sico svg,.sjxp .sico svg{width:30px;height:30px}
+.sjadd input[data-f="n"]{margin-top:8px}
 </style>
 <script src="config.js"></script>
 
@@ -5291,6 +5311,31 @@ function vEx(){
  [['التدريب',['wk','plan','prog','ach','arch','rpt']],['الصحة والتغذية',['meal','wgt','tools','link','rem']],['النادي والمعرفة',['gyms','nau','vis','cul','coach']],['المجتمع والحساب',['comm','nc','set','me']]].forEach(g=>{h+='<div class="sechead"><h2>'+g[0]+'</h2></div>'+rail(g[1].map(i=>chipF(FD[i])))});
  return h}
 Object.assign(ENT,{'اليوم':'Today','التمرين':'Workout','التقدّم':'Progress','المزيد':'More','المظهر':'Appearance','تسجيل سريع':'Quick log','تسجيل الماء':'Log water','تسجيل الوزن':'Log weight','تسجيل وجبة':'Log meal','تسجيل تمرين':'Log workout','أهلًا بك':'Welcome','ابدأ الآن':'Start now','تسجيل الدخول':'Sign in','تمرين اليوم':'Today\'s workout','يوم راحة':'Rest day','سجلاتي':'My records','الصحة والجسم':'Health & body','النادي':'Gym','تعلّم':'Learn','التطبيق وحسابي':'App & account','الأسود':'Black','الأبيض':'White','الأزرق':'Blue','الزمردي':'Emerald','الزيتوني':'Olive','البنفسجي':'Purple','الملف الشخصي':'Profile','النبض':'Pulse','الماء':'Water','التغذية':'Nutrition','التقارير':'Reports','الأرشيف':'Archive','الأوسمة':'Medals','مراقبة الوزن':'Weight tracking','النوم':'Sleep','الإعدادات':'Settings'});
+/* ===== خطة التمارين: نوع اليوم قائمة منسدلة، لون خفيف لكل يوم، وقائمة تمارين تناسب اليوم بالعربية والإنجليزية مع أيقونة الشكل ===== */
+const DAYT=[['صدر','Chest','chest'],['ظهر','Back','back'],['أكتاف','Shoulders','sho'],['باي','Biceps','bic'],['تراي','Triceps','tri'],['صدر وترايسبس','Chest & Triceps','chest,tri'],['ظهر وبايسبس','Back & Biceps','back,bic'],['أكتاف وبطن','Shoulders & Abs','sho,core'],['أرجل','Legs','quad,ham,glu,calf,add,hip'],['جسم علوي','Upper body','chest,back,sho,bic,tri,fore'],['جسم سفلي','Lower body','quad,ham,glu,calf,add,hip'],['جسم كامل','Full body','full'],['تكميلي','Accessory',''],['راحة','Rest','']];
+const DAYHUE=['#e5484d','#f5a524','#c9b80f','#3fb950','#16b3b3','#4c7dff','#a35ee8'];
+const daySel=t=>{const x=DAYT.find(a=>a[0]===t);return x?x[0]:'__o'};
+function dayGroups(t){const x=DAYT.find(a=>a[0]===t);if(x)return x[2]?x[2].split(','):[];const s=String(t||''),g=[];[[/صدر/,'chest'],[/ظهر/,'back'],[/كتف|كتاف/,'sho'],[/باي/,'bic'],[/تراي/,'tri'],[/بطن/,'core'],[/رجل|ارجل|سفلي/,'quad,ham,glu,calf,add,hip'],[/علوي/,'chest,back,sho,bic,tri,fore'],[/كامل/,'full']].forEach(r=>{if(r[0].test(s))g.push.apply(g,r[1].split(','))});return g}
+function xPickList(d){const t=S.plan[d].t,gs=dayGroups(t),all=!gs.length;let h='',n=0;
+ AGRP.forEach(a=>{const L=XL.filter(x=>x.g===a[0]&&(all||gs.indexOf(a[0])>=0));if(!L.length)return;n+=L.length;h+='<div class="sjxg">'+a[1]+' <small>'+a[2]+'</small></div>'+L.map(x=>'<button type="button" class="sjxo" data-a="xpick" data-n="'+esc(x.n)+'"><span class="sico">'+exIco(x.n)+'</span><span class="t"><b>'+esc(x.n)+'</b><small>'+esc(x.e)+'</small></span></button>').join('')});
+ return h+'<button type="button" class="sjxo oth" data-a="xpick" data-n="__o"><span class="sico">'+ic('plus')+'</span><span class="t"><b>أخرى</b><small>اكتب اسم التمرين بنفسك</small></span></button>'}
+function vPlan(){
+ let h=back()+'<h1>خطة التمارين</h1><div class="mu" style="margin-bottom:12px">الخانة البرتقالية الثابتة هي قدرتك الحالية. لا يقبل البرنامج وزنًا أقل منها.</div>';
+ S.plan.forEach((p,d)=>{const sel=daySel(p.t);
+ h+='<div class="card sjday" data-d="'+d+'" style="--dc:'+DAYHUE[d]+'"><div class="row" style="margin-bottom:8px;gap:8px"><b>'+DAYS[d]+'</b><span class="sp"></span><select class="sjdt2" data-dt="'+d+'" aria-label="نوع التمرين في هذا اليوم">'+DAYT.map(a=>'<option value="'+a[0]+'"'+(sel===a[0]?' selected':'')+'>'+a[0]+' ('+a[1]+')</option>').join('')+'<option value="__o"'+(sel==='__o'?' selected':'')+'>أخرى (Other)</option></select></div>'+
+ (sel==='__o'?'<label class="f" style="margin-bottom:8px">اسم اليوم<input class="sp" data-c="title" data-d="'+d+'" value="'+esc(p.t)+'" aria-label="اسم اليوم"></label>':'')+
+ p.ex.map((e,i)=>'<div class="ex"><div class="row"><span class="sico">'+exIco(e.n)+'</span><b class="nm">'+esc(e.n)+'</b><span class="sp"></span><span class="mu num" style="font-size:16px">'+e.s+'×'+e.r+'</span><button class="x" data-a="del" data-d="'+d+'" data-i="'+i+'">حذف</button></div><div class="wrow" style="grid-template-columns:auto minmax(0,1fr)"><label class="cur" style="width:96px"><small>الحالي</small><input type="number" inputmode="decimal" style="border:0;background:transparent;text-align:center;color:var(--ac);padding:0;font-size:22px" data-c="eb" data-d="'+d+'" data-i="'+i+'" value="'+(S.base[e.n]||0)+'"></label><label><small>وزن هذا الأسبوع</small><input type="number" inputmode="decimal" data-c="ew" data-d="'+d+'" data-i="'+i+'" value="'+(e.w||0)+'"></label></div>'+(e.mid?(()=>{const x=(S.mx&&S.mx[e.mid])||{};return '<div class="exm"><label class="lc inl"><small>الوزن الأقصى (كغ)</small><input type="number" inputmode="decimal" data-emx="w" data-d="'+d+'" data-i="'+i+'" value="'+(x.w||'')+'" placeholder="0"></label><label class="lc inl"><small>تاريخ الوزن الأقصى</small><input type="date" data-emx="d" data-d="'+d+'" data-i="'+i+'" value="'+(x.d||'')+'"></label></div>'})():'')+'</div>').join('')+
+ '<div class="sjadd"><div class="mu" style="margin:10px 0 6px">إضافة تمرين'+(dayGroups(p.t).length?' (يناسب «'+esc(p.t)+'»)':'')+'</div><details class="sjxp"><summary><span class="sico" data-xs>'+exIco('')+'</span><span class="t" data-xt>اختر التمرين</span></summary><div class="sjxl">'+xPickList(d)+'</div></details><input type="text" data-f="n" placeholder="اكتب اسم التمرين" hidden aria-label="اسم التمرين"></div>'+
+ '<div class="g3" style="margin-top:10px"><label class="f">مجموعات<input type="number" inputmode="numeric" data-f="s" placeholder="3"></label><label class="f">تكرار<input type="number" inputmode="numeric" data-f="r" placeholder="10"></label><label class="f">الحالي كغ<input type="number" inputmode="decimal" data-f="w" placeholder="0"></label></div><div style="margin-top:10px"><button class="btn sm" data-a="add" data-d="'+d+'">'+ic('plus')+'إضافة</button></div></div>'});
+ return h+'<datalist id="xlnames">'+XL.map(x=>'<option value="'+esc(x.n)+'">').join('')+'</datalist>'}
+Object.assign(ACT,{xpick:b=>{const c=b.closest('.sjday'),inp=c.querySelector('[data-f="n"]'),n=b.dataset.n,dt=c.querySelector('details');
+ if(n==='__o'){inp.hidden=false;inp.value='';c.querySelector('[data-xt]').textContent='أخرى: اكتب الاسم';c.querySelector('[data-xs]').innerHTML=exIco('');dt.open=false;inp.focus()}
+ else{inp.hidden=true;inp.value=n;const x=XL.find(a=>a.n===n);c.querySelector('[data-xt]').innerHTML=esc(n)+(x?' <small>'+esc(x.e)+'</small>':'');c.querySelector('[data-xs]').innerHTML=exIco(n);dt.open=false}
+ return false}});
+document.addEventListener('change',ev=>{const t=ev.target;if(!t||!t.dataset||t.dataset.dt===undefined)return;const d=+t.dataset.dt,y=window.scrollY;
+ if(t.value==='__o'){if(daySel(S.plan[d].t)!=='__o')S.plan[d].t='يوم '+DAYS[d]}else S.plan[d].t=t.value;
+ save();render();window.scrollTo(0,y)});
+Object.assign(ENT,{"اختر التمرين":"Choose exercise","أخرى":"Other","اكتب اسم التمرين بنفسك":"Type your own exercise name","اكتب اسم التمرين":"Exercise name","نوع التمرين في هذا اليوم":"Workout type for this day","اسم اليوم":"Day name","أخرى: اكتب الاسم":"Other: type the name"});
 Object.assign(ACT,{
  ql:()=>{UI.fab=0;UI.qa='';UI.ql=UI.ql?'':'menu'},
  qlm:b=>{const v=b.dataset.v;UI.fab=0;UI.qa='';if(v==='wo'){UI.ql='';_sjWo();return false}UI.ql=v},

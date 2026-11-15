@@ -67,4 +67,17 @@ const IND=/[٠-٩]/;
   ok(r.th==='white','الترقية: السمة الفاتحة القديمة تُحوَّل إلى الأبيض',r.th);
   for(const t of ['dash','train','pg','ex']){await q.click('#nav button[data-v='+t+']');await q.waitForTimeout(100)}
   ok(errs.length===0,'الترقية: التنقل بين التبويبات بلا أخطاء',errs.join('|'));await ctx2.close()}
+ /* 5) خطة التمارين: نوع اليوم منسدل، تمارين تناسب اليوم بلغتين وأيقونة، وخيار «أخرى» */
+ {const {ctx,p}=await mk(390);await p.evaluate(seed);await p.evaluate(()=>{S.tab='ex';S.sub='plan';render()});await p.waitForTimeout(200);
+  const opts=await p.$$eval('[data-dt="0"] option',a=>a.map(x=>x.value));ok(['ظهر','باي','تراي','أكتاف','جسم علوي','جسم سفلي','ظهر وبايسبس'].every(x=>opts.includes(x)),'قائمة نوع اليوم تضم الظهر والباي والتراي والأكتاف والجسم العلوي والسفلي',opts.join());
+  const hues=await p.$$eval('.sjday',a=>new Set(a.map(x=>x.style.getPropertyValue('--dc'))).size);ok(hues===7,'لكل يوم لون خاص (7)',String(hues));
+  await p.selectOption('[data-dt="1"]','ظهر وبايسبس');await p.waitForTimeout(150);
+  const L=await p.$$eval('.sjday[data-d="1"] .sjxo:not(.oth)',a=>a.map(x=>({n:x.dataset.n,en:x.querySelector('small').textContent,ico:!!x.querySelector('svg')})));
+  const grp=await p.evaluate(n=>n.map(x=>XL.find(a=>a.n===x).g),L.map(x=>x.n));
+  ok(L.length>5&&grp.every(g=>g==='back'||g==='bic')&&L.every(x=>x.en&&x.ico),'«ظهر وبايسبس» يعرض تمارين الظهر والباي فقط بالعربية والإنجليزية وأيقونة',L.length+' '+[...new Set(grp)].join());
+  await p.click('.sjday[data-d="1"] summary');await p.click('.sjday[data-d="1"] .sjxo >> nth=0');await p.click('.sjday[data-d="1"] [data-a=add]');await p.waitForTimeout(200);
+  ok(await p.evaluate(n=>S.plan[1].ex.some(e=>e.n===n),L[0].n),'اختيار تمرين من القائمة وإضافته إلى اليوم');
+  await p.click('.sjday[data-d="1"] summary');await p.click('.sjday[data-d="1"] .sjxo.oth');await p.fill('.sjday[data-d="1"] [data-f=n]','تمرين كتبته');await p.click('.sjday[data-d="1"] [data-a=add]');await p.waitForTimeout(200);
+  ok(await p.evaluate(()=>S.plan[1].ex.some(e=>e.n==='تمرين كتبته')),'خيار «أخرى» يقبل اسمًا يكتبه المستخدم');
+  ok(p.errs.length===0,'لا أخطاء سكربت',p.errs.join('|'));await ctx.close()}
  await b.close();console.log('\n'+pass+' ناجح، '+fail+' فاشل');process.exit(fail?1:0)})();
