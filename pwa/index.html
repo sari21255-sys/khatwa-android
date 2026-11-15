@@ -979,7 +979,7 @@ plan:[
 {t:'أكتاف وبطن',ex:[E('ضغط أكتاف دمبل',4,10),E('رفع جانبي',3,15),E('رفع خلفي',3,15),E('كرنش',3,20)]},
 {t:'تكميلي',ex:[E('ضغط صدر آلة',3,12),E('سحب كابل',3,12),E('ضغط أكتاف آلة',3,12)]},
 {t:'راحة',ex:[]}],
-done:{},cardio:{},sleep:{},bw:{}});
+done:{},cardio:{},sleep:{},bw:{},sx:{}});
 let S=def();
 let db=null,ref=null,saveT=null,renderT=null,dirty=false,SM=null,SMI=false,REC=null,toastT=null;
 const UI={fm:'today',tw:'today',tool:'',sheet:'',at:'text',ak:'machine',txt:'',busy:0,res:null,msg:'',listen:0,fd:'',mpd:-1,my:null,mm:null};
@@ -992,7 +992,7 @@ const TM={run:false,t0:0,acc:0,rest:0,ac:null};
 function norm(){
  if(!Array.isArray(S.ch))S.ch=[];
  {const D0=def();Object.keys(D0).forEach(k=>{if(S[k]===undefined||(Array.isArray(D0[k])&&!Array.isArray(S[k])))S[k]=D0[k]})}
- ['base','cd','cs','tot','cardio','bw','sleep','done','meals','mp','wt','sd','tl','bf','ms','wn','ses','sw','fav','wtr','mx','cq'].forEach(k=>{if(!S[k]||typeof S[k]!=='object')S[k]={}});
+ ['base','cd','cs','tot','cardio','bw','sleep','done','meals','mp','wt','sd','tl','bf','ms','wn','ses','sw','fav','wtr','mx','cq','sx'].forEach(k=>{if(!S[k]||typeof S[k]!=='object')S[k]={}});
  if(!Array.isArray(S.plan)||S.plan.length!==7)S.plan=def().plan;
  if(!S.prof.ps)S.prof.ps=TD();
  if(!Array.isArray(S.lib)||!S.lib.length)S.lib=LIB0();
@@ -1178,7 +1178,8 @@ function vOnb(){const P=S.prof,w=curW();
 /* ---------- views: home ---------- */
 function todayCard(){
  const ti=TI(),T=tasks(),now=T.filter(t=>t.d===ti),dn=now.filter(t=>t.r).length,late=T.filter(t=>t.d<ti&&!t.r).length,pw=S.plan[ti],rest=!pw.ex.length;
- return '<div class="card tdc"><div class="row" style="flex-wrap:nowrap;gap:12px"><span class="fi" style="--c:'+(rest?'#6366f1':'#f97316')+'">'+ic(rest?'moon':'dumbbell')+'</span><div class="t" style="flex:1;min-width:0"><small class="mu">خطة اليوم</small><b class="tdt">'+(rest?'يوم راحة':esc(pw.t))+'</b></div>'+(rest?'':'<div class="tdp"><small>منجز</small><b class="num">'+dn+'/'+now.length+'</b></div>')+(late?'<div class="tdp late"><small>مرحّل</small><b class="num">'+late+'</b></div>':'')+'</div>'+(rest?'':'<div class="bar" style="margin:12px 0"><i style="width:'+pct(dn,now.length)+'%"></i></div>')+'<div class="row" style="gap:8px;margin-top:'+(rest?'12':'0')+'px;flex-wrap:nowrap"><button class="btn big" style="flex:1" data-a="wkstart">'+ic('play','f')+(rest&&!late?'جلسة خفيفة':'ابدأ التمرين')+'</button><button class="btn ghost big" style="flex:0 0 auto" data-a="go" data-v="train">'+ic('dumbbell')+'التمارين</button></div></div>'}
+ return '<div class="card tdc"><div class="row" style="flex-wrap:nowrap;gap:12px"><span class="fi" style="--c:'+(rest?'#6366f1':'#f97316')+'">'+ic(rest?'moon':'dumbbell')+'</span><div class="t" style="flex:1;min-width:0"><small class="mu">خطة اليوم</small><b class="tdt">'+(rest?'يوم راحة':esc(pw.t))+'</b></div>'+(rest?'':'<div class="tdp"><small>منجز</small><b class="num">'+dn+'/'+now.length+'</b></div>')+(late?'<div class="tdp late"><small>مرحّل</small><b class="num">'+late+'</b></div>':'')+'</div>'+(rest?'':'<div class="bar" style="margin:12px 0"><i style="width:'+pct(dn,now.length)+'%"></i></div>')+''+sxHero(rest,late).note+'<div class="row" style="gap:8px;margin-top:'+(rest?'12':'10')+'px;flex-wrap:nowrap">'+sxHero(rest,late).btn+'<button class="btn ghost big" style="flex:0 0 auto" data-a="go" data-v="train">'+ic('dumbbell')+'التمارين</button></div><div class="mu" id="wk-goal" style="margin-top:10px">هدف الأسبوع: <b class="num">'+wkDays().n+' من '+wkDays().t+'</b> جلسات مكتملة</div></div>'}
+function svcRow(){return '<div class="sechead"><h2>خدماتك</h2></div>'+rail(['arch','rpt','cul','tools'].map(i=>chipF(FD[i])))}
 function nutCard(fd){const N=S.nt,m=[['سعرات',fd.kcal,N.kcal,'#f97316',''],['بروتين',fd.p,N.p,'#ef4444','غ'],['كربوهيدرات',fd.c,N.c,'#3b82f6','غ'],['دهون',fd.f,N.f,'#eab308','غ']];
  return '<div class="card"><div class="row" style="margin-bottom:10px"><h2 style="margin:0">'+ic('fork')+'التغذية اليوم</h2><span class="sp"></span><span class="mu">المتبقي <b class="num" style="font-size:16px;color:'+(N.kcal-fd.kcal<0?'var(--bad)':'var(--tx)')+'">'+F(Math.abs(Math.round(N.kcal-fd.kcal)))+'</b> سعرة'+(N.kcal-fd.kcal<0?' زائدة':'')+'</span></div><div class="nm4">'+m.map(x=>'<div class="nmt"><small style="--c:'+x[3]+'">'+x[0]+'</small><b class="num"'+(x[1]>x[2]*1.05?' style="color:var(--bad)"':'')+'>'+F(Math.round(x[1]))+'</b><span class="mu">من '+F(x[2])+(x[4]?' '+x[4]:'')+'</span><div class="trk"><i style="width:'+pct(x[1],x[2])+'%;background:'+x[3]+'"></i></div></div>').join('')+'</div><div class="row" style="gap:8px;margin-top:12px;flex-wrap:nowrap"><button class="btn" style="flex:1" data-a="fgo" data-v="food">'+ic('plus')+'تسجيل وجبة</button><button class="btn ghost" data-a="go" data-v="food">فتح التغذية</button></div></div>'}
 function weekCard(T,dn,cmWk,pts){const x=stats(),wd=weekDates(),P=S.prof;
@@ -1193,7 +1194,7 @@ function vToday(){
  const td=TD(),ti=TI(),T=tasks(),dn=T.filter(t=>t.r).length,c=cdv(td),P=S.prof,wd=weekDates(),wt=wd.map(cdv),cmWk=wt.reduce((a,x)=>a+x.min,0),G=goalInfo(),fd=foodSum(td),actMin=Math.ceil((+P.cardio||0)/7),pts=dn*5+cmWk,sc=sleepScore(td);
  const kc=wt.map(x=>Math.round(x.kcal)),kd=kc.filter(x=>x>0),avg=kd.length?Math.round(kd.reduce((a,b)=>a+b,0)/kd.length):0;
  let h='<div class="hello"><h1>أهلًا'+(P.name?' '+esc(P.name):'')+'</h1><div class="mu">'+DAYS[ti]+' · '+td+'</div></div>';
- h+=x2Hero(c,P,td,actMin)+x2Week(wd,ti)+remCard()+todayCard()+'<i data-cta></i>'+x2Bento(c,P,td)+nutCard(fd)+waterCard(td,1)+weekCard(T,dn,cmWk,pts)+burnCard(kc,avg,ti)+logToday(td,P,sc)+goalCard(G);
+ h+=x2Hero(c,P,td,actMin)+x2Week(wd,ti)+remCard()+todayCard()+svcRow()+'<i data-cta></i>'+x2Bento(c,P,td)+nutCard(fd)+waterCard(td,1)+weekCard(T,dn,cmWk,pts)+burnCard(kc,avg,ti)+logToday(td,P,sc)+goalCard(G);
  h+='<div class="sechead"><h2>اختصاراتي</h2><button class="chip" data-a="drop" data-v="edit">تخصيص</button></div>'+rail(scList().map(i=>chipF(FD[i])));
  h+=gyHome()+homeCar()+bkCard();
  return h}
@@ -1215,7 +1216,7 @@ function vTrain(){
  if(UI.tw==='cardio')return h+vCardio(1);
  if(UI.tw==='disc')return h+vDisc();
  if(UI.tw==='cum')return h+vCum();
- if(UI.tw==='today')h+=planHead()+'<button class="btn big" style="width:100%;margin:0 0 12px" data-a="wkstart">'+ic('play')+'ابدأ جلسة متتابعة</button>'+(isDl()?deloadCard():'');
+ if(UI.tw==='today')h+=planHead()+sxHero(0,0).note+'<div class="row" style="margin:10px 0 12px">'+sxHero(0,0).btn.replace('ابدأ التمرين','ابدأ جلسة متتابعة')+'</div>'+(isDl()?deloadCard():'');
  if(UI.tw==='week'){
   h+='<div class="card hl"><div class="num" style="font-size:44px;line-height:1;color:var(--ac);font-weight:700">'+pct(dn,T.length)+'%</div><div class="bar" style="margin:8px 0"><i style="width:'+pct(dn,T.length)+'%"></i></div><div class="mu">أنجزت '+dn+' وتبقى '+(T.length-dn)+'. اضغط على الدائرة لتعليم أي تمرين منجزًا بقيمه المخططة.</div></div>';
   S.plan.forEach((p,d)=>{if(!p.ex.length)return;const ts=T.filter(t=>t.d===d),n=ts.filter(t=>t.r).length,st=n===ts.length?'<span class="tag">مكتمل</span>':(d<ti?'<span class="tag bad">ناقص '+(ts.length-n)+' · مرحّل</span>':(d===ti?'<span class="tag">اليوم</span>':'<span class="mu">قادم</span>'));
@@ -2084,15 +2085,24 @@ function vProg(){
  h+=ppCard();
  h+='<div class="card"><h2>'+ic('dumbbell')+'تطور الأوزان</h2>'+(names.length?names.map(n=>{const a=L[n],f=a[0].w,l=a[a.length-1].w,b=Math.max.apply(null,a.map(x=>x.w)),d=+(l-f).toFixed(1);return '<div class="mealrow"><div class="t"><b>'+esc(n)+'</b><span class="mu">أول مرة '+F(f,1)+' · آخر مرة '+F(l,1)+' · أفضل '+F(b,1)+' · '+a.length+' جلسة</span></div><span class="tag'+(d<0?' bad':'')+'">'+(d>0?'+':'')+d+' كغ</span></div>'}).join(''):'<div class="mu">ستظهر هنا بعد أن تعلّم تمارين كمنجزة.</div>')+'</div>';
  return h}
-function vArch(){
+function vArchW(){
  const G={},g=w=>G[w]=G[w]||{n:0,min:0,steps:0,kcal:0,km:0,sl:[],bw:0,eat:0,ed:0};
  for(const k in S.done)g(k.split('|')[0]).n++;
  const ds=new Set([].concat(Object.keys(S.cardio),Object.keys(S.cd),Object.keys(S.cs),Object.keys(S.sleep),Object.keys(S.bw),Object.keys(S.meals)));
  Array.from(ds).sort().forEach(d=>{const o=g(wkey(d)),c=cdv(d),f=foodSum(d);o.min+=c.min;o.steps+=c.steps;o.kcal+=c.kcal;o.km+=c.km;if(S.sleep[d])o.sl.push(S.sleep[d]);if(S.bw[d])o.bw=S.bw[d];if(f.n){o.eat+=f.kcal;o.ed++}});
- let h=back()+'<h1>الأرشيف</h1><div class="card"><div class="row"><span class="mu sp">كل أسابيعك المسجلة.</span><button class="btn sm ghost" data-a="exp">'+ic('download')+'تصدير</button></div></div>';
+ let h='<div class="mu" style="margin:6px 0 10px">كل أسابيعك المسجلة.</div>';
  const ks=Object.keys(G).sort().reverse();
  h+=ks.length?ks.map(w=>{const o=G[w],tt=S.tot[w]||0;return '<div class="card"><div class="row" style="margin-bottom:8px"><b>أسبوع '+w+'</b><span class="sp"></span>'+(w===W()?'<span class="tag">الحالي</span>':'')+'</div>'+(tt?bl(o.n,tt,'التمارين','تمرين'):'<div class="mu">التمارين المنجزة: '+o.n+'</div>')+'<div class="mu" style="margin-top:8px">كارديو '+o.min+' د · '+(+o.km.toFixed(1))+' كم · '+F(o.steps)+' خطوة · '+F(o.kcal)+' سعرة محروقة'+(o.sl.length?' · نوم '+(o.sl.reduce((a,x)=>a+x,0)/o.sl.length).toFixed(1)+' س':'')+(o.bw?' · الوزن '+o.bw+' كغ':'')+(o.ed?' · متوسط الأكل '+F(o.eat/o.ed)+' سعرة':'')+'</div></div>'}).join(''):'<div class="card mu">لا بيانات بعد.</div>';
  return h}
+function vArch(){
+ if(UI.ad)return vArDet();
+ const t=UI.ar||'ses',lb=(S.prof&&S.prof.lastBk)?'آخر نسخة: '+esc(S.prof.lastBk):'لم تُنزَّل نسخة بعد';
+ let h=back()+'<h1>الأرشيف</h1><div class="card" id="bk-card"><div class="row" style="flex-wrap:nowrap;gap:10px;align-items:flex-start"><div style="flex:1;min-width:0"><b>نسخة احتياطية</b><div class="mu" style="font-size:13px;margin-top:2px">ملف JSON يشمل التمارين والوزن والوجبات والإعدادات. لا يشمل مفاتيح الخدمات ولا رموز الجلسة والمزامنة.</div><div class="mu" style="font-size:12px;margin-top:4px">'+lb+'</div></div></div><div class="row" style="margin-top:10px"><button class="btn sm" data-a="bkdl" id="bk-dl">'+ic('download')+'تنزيل نسخة احتياطية</button><button class="btn sm ghost" data-a="sub" data-v="set">استرجاع نسخة</button></div></div>';
+ h+=seg([['ses','الجلسات'],['wk','ملخص الأسابيع']],'ar',t);
+ if(t==='wk')return h+vArchW();
+ h+='<div class="srch" style="margin:10px 0"><input id="aq" type="search" data-live="arl" data-q="aq" value="'+esc(UI.aq||'')+'" placeholder="ابحث باسم تمرين أو يوم أو تاريخ" aria-label="بحث في الجلسات"></div>';
+ h+='<div class="chips" style="margin-bottom:10px">'+[['all','الكل'],['c','مكتملة'],['p','جزئية'],['o','سجلات سابقة']].map(x=>'<button class="chip'+((UI.arf||'all')===x[0]?' on':'')+'" data-a="arf" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>';
+ return h+'<div id="arl">'+arList()+'</div>'}
 function arc(b0,b1){const a=b=>180-(Math.max(10,Math.min(40,b))-10)/30*180,p=d=>[100+80*Math.cos(d*Math.PI/180),100-80*Math.sin(d*Math.PI/180)],s=p(a(b0)),e=p(a(b1));return 'M'+s[0].toFixed(1)+' '+s[1].toFixed(1)+' A80 80 0 0 1 '+e[0].toFixed(1)+' '+e[1].toFixed(1)}
 function gauge(b){const a=180-(Math.max(10,Math.min(40,b))-10)/30*180,nx=100+60*Math.cos(a*Math.PI/180),ny=100-60*Math.sin(a*Math.PI/180);
  return '<svg class="ch" viewBox="0 0 200 116" style="max-width:260px;margin:0 auto" role="img" aria-label="مقياس كتلة الجسم"><path d="'+arc(10,18.5)+'" stroke="#6b6b73" stroke-width="14" fill="none"/><path d="'+arc(18.5,25)+'" stroke="#555555" stroke-width="14" fill="none"/><path d="'+arc(25,30)+'" stroke="#ffb347" stroke-width="14" fill="none"/><path d="'+arc(30,40)+'" stroke="#ff5a4d" stroke-width="14" fill="none"/><line x1="100" y1="100" x2="'+nx.toFixed(1)+'" y2="'+ny.toFixed(1)+'" stroke="#f7f5f6" stroke-width="3" stroke-linecap="round"/><circle cx="100" cy="100" r="6" fill="#f7f5f6"/></svg>'}
@@ -3985,12 +3995,70 @@ function importLifts(t){const R=parseCsv(t);if(R.length<2)return 0;const H=R[0].
 const isDl=()=>S.dl===W();
 function pfW(e){const sg=sugg(e);let w=sg?sg.w:(S.base[e.n]||lastW(e.n)||e.w||0);if(isDl())w=Math.round(w*.85*2)/2;return w}
 function wkKeys(){const ti=TI();return tasks().filter(t=>t.d<=ti&&!t.r).sort((a,b)=>a.d-b.d).map(t=>t.k)}
+/* ---------- سجل الجلسات (S.sx): معرّف ثابت، يُحفظ بعد كل مجموعة، ويُستأنف من أول مجموعة غير مكتملة ----------
+   المفتاح: S.sx[id] = {id,wk,date,ts,t,st:'p'|'c',sec,vol,ex:[{k,id,n,d,tg,tr,sets:[{w,r,ty,rp,at}],dn,sk}]}
+   لا يُحتسب الإنجاز من هنا: التمرين المكتمل يُكتب في S.done كما كان، فيبقى كل قارئ قديم (التقارير، الأوسمة، الأرشيف الأسبوعي)
+   على حاله، ولا تُحتسب الجلسة مرتين لأن العدّاد الأسبوعي يُشتق من S.done وحده. */
+const sxCnt=x=>x?x.sets.filter(q=>q.ty!=='w').length:0;
+const sxList=()=>Object.keys(S.sx||{}).map(k=>S.sx[k]).filter(x=>x&&x.id&&Array.isArray(x.ex)).sort((a,b)=>(b.ts||0)-(a.ts||0));
+const sxOpen=()=>sxList().find(x=>x.st==='p'&&x.wk===W());
+const sxToday=()=>sxList().find(x=>x.date===TD());
+function sxProg(s){let d=0,t=0;s.ex.forEach(x=>{t+=x.tg;d+=Math.min(sxCnt(x),x.tg)});return{d:d,t:t}}
+function sxNew(ks){const T=tasks(),id='sx'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+ const ex=ks.map(k=>T.find(t=>t.k===k)).filter(Boolean).map(t=>({k:t.k,id:t.e.id,n:t.e.n,d:t.d,tg:t.e.s,tr:t.e.r,sets:[],dn:0,sk:0}));
+ return S.sx[id]={id:id,wk:W(),date:TD(),ts:Date.now(),t:(S.plan[TI()]||{}).t||'',st:'p',sec:0,vol:0,ex:ex}}
+function sxRec(t,w,r,ty,rp){const U=UI.wk;let s=U.sid&&S.sx[U.sid];if(!s){s=sxNew(U.ks);U.sid=s.id}
+ const x=s.ex.find(q=>q.k===t.k);if(x)x.sets.push({w:w,r:r,ty:ty,rp:rp||0,at:Date.now()});return{s:s,x:x}}
+function sxAfter(s){const U=UI.wk,T=tasks();if(U){s.vol=U.vol;s.sec=Math.round(tmEl())}
+ if(s.ex.every(x=>x.dn||(T.find(q=>q.k===x.k)||{}).r)){s.st='c';s.fin=Date.now()}}
+function sxBoot(s,ks){TM.acc=s?(+s.sec||0):0;TM.t0=Date.now();TM.run=true;TM.rest=0;
+ const U={ks:ks,i:0,s:0,w:null,r:null,vol:s?(+s.vol||0):0,sid:s?s.id:null,ty:'n',rp:0};
+ if(s){const T=tasks();let i=0;while(i<ks.length){const x=s.ex.find(q=>q.k===ks[i]),t=T.find(q=>q.k===ks[i]);if(x&&!x.dn&&!x.sk&&t&&!t.r)break;i++}U.i=i;if(i<ks.length)U.s=sxCnt(s.ex.find(q=>q.k===ks[i]))}
+ UI.wk=U}
+function sxGo(s){const ks=s?s.ex.map(x=>x.k):wkKeys();
+ if(!s&&!ks.length){const f=sxToday();toast(f&&f.st==='c'?'أنجزت تمرين اليوم. تجده في الأرشيف':'لا تمارين متبقية اليوم');S.tab='train';S.sub=null;UI.tw='today';return}
+ try{if(!TM.ac)TM.ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){lg(e)}
+ try{if(navigator.wakeLock)navigator.wakeLock.request('screen').catch(()=>{})}catch(e){lg(e)}
+ sxBoot(s,ks);S.sub='wk';UI.ad=null;window.scrollTo(0,0)}
+function wkDays(){const T=tasks();let n=0,t=0;S.plan.forEach((p,d)=>{if(!p.ex.length)return;t++;const ts=T.filter(x=>x.d===d);if(ts.length&&ts.every(x=>x.r))n++});return{n:n,t:t}}
+function sxHero(rest,late){const s=sxOpen(),f=sxToday();
+ if(s){const a=sxProg(s);return{note:'<div class="tag" style="margin:10px 0 0" id="sx-partial">'+ic('timer')+' تمرين جزئي محفوظ · '+a.d+' من '+a.t+' مجموعة</div>',btn:'<button class="btn big" style="flex:1" data-a="wkstart" id="sx-go">'+ic('play','f')+'أكمل التمرين</button>'}}
+ if(f&&f.st==='c'&&!wkKeys().length)return{note:'',btn:'<button class="btn big" style="flex:1" data-a="sxview" data-v="'+f.id+'" id="sx-go">'+ic('check','f')+'اعرض تمرينك المحفوظ</button>'}
+ return{note:'',btn:'<button class="btn big" style="flex:1" data-a="wkstart" id="sx-go">'+ic('play','f')+(rest&&!late?'جلسة خفيفة':'ابدأ التمرين')+'</button>'}}
+function backupData(){const sk=/token|secret|passw|jwt|api[_-]?key|bearer|authorization|refresh|credential|accemail/i;
+ const cp=(x,d)=>{if(x==null||typeof x!=='object'||d>14)return x;if(Array.isArray(x))return x.map(v=>cp(v,d+1));const o={};Object.keys(x).forEach(k=>{if(sk.test(k)||k==='__proto__')return;o[k]=cp(x[k],d+1)});return o};
+ const o=cp(S,0);delete o.sub;return o}
+function sxLegacy(){const inS=new Set();Object.keys(S.sx||{}).forEach(i=>(S.sx[i].ex||[]).forEach(x=>inS.add(x.k)));const g={};
+ Object.keys(S.done).forEach(k=>{if(inS.has(k))return;const r=S.done[k];if(!r||!r.date)return;(g[r.date]=g[r.date]||[]).push({k:k,n:r.n,w:r.w,r:r.r,rpe:r.rpe})});
+ return Object.keys(g).sort().reverse().map(d=>({id:'old|'+d,old:1,date:d,st:'o',t:'',ex:g[d].map(x=>({k:x.k,n:x.n,tg:0,dn:1,sets:[{w:x.w,r:x.r,ty:'n',rp:x.rpe||0}]}))}))}
+const sxDay=d=>{const x=new Date(d+'T12:00:00');return isNaN(x)?d:DAYS[(x.getDay()+1)%7]+' '+d};
+const sxTitle=s=>s.old?'تمارين مسجّلة':(s.t||'جلسة تمرين');
+function sxAll(){return sxList().concat(sxLegacy())}
+function arList(){const q=(UI.aq||'').trim().toLowerCase(),f=UI.arf||'all';
+ const l=sxAll().filter(s=>(f==='all'||s.st===f)&&(!q||(sxTitle(s)+' '+s.date+' '+s.ex.map(x=>x.n).join(' ')).toLowerCase().indexOf(q)>=0));
+ if(!sxAll().length)return '<div class="card"><div class="emp"><span class="fi" style="--c:#64748b">'+ic('box')+'</span><span class="t">لا جلسات بعد. أول تمرين تحفظ فيه مجموعة واحدة يظهر هنا.</span><button class="btn" data-a="wkstart">ابدأ أول تمرين</button></div></div>';
+ if(!l.length)return '<div class="card mu">لا نتائج. جرّب كلمة أخرى أو اختر «الكل».</div>';
+ return l.map(s=>{const a=s.old?null:sxProg(s),tg=s.st==='c'?'<span class="tag">مكتملة</span>':s.st==='p'?'<span class="tag bad">جزئية</span>':'<span class="tag">سجل سابق</span>';
+  return '<button class="mealrow sxr" data-a="sxopen" data-v="'+esc(s.id)+'"><span class="t" style="flex:1;text-align:start"><b>'+esc(sxTitle(s))+'</b><br><span class="mu">'+esc(sxDay(s.date))+' · '+(a?a.d+' من '+a.t+' مجموعة':s.ex.length+' تمرين')+'</span></span>'+tg+'</button>'}).join('')}
+LIVE['arl']=()=>arList();
+function vArDet(){const id=UI.ad,s=id.indexOf('old|')===0?sxLegacy().find(x=>x.id===id):S.sx[id];
+ const bk='<button class="back" data-a="adback">'+ic('back')+'رجوع إلى الجلسات</button>';
+ if(!s)return bk+'<div class="card mu">لم أجد هذه الجلسة.</div>';
+ const a=s.old?null:sxProg(s),cur=s.st==='p'&&s.wk===W();
+ let h=bk+'<h1>'+esc(sxTitle(s))+'</h1><div class="mu" style="margin-bottom:10px">'+esc(sxDay(s.date))+(s.sec?' · '+Math.max(1,Math.round(s.sec/60))+' دقيقة':'')+(s.vol?' · حجم '+F(Math.round(s.vol))+' كغ':'')+'</div>';
+ h+='<div class="row" style="gap:8px;margin-bottom:12px">'+(s.st==='c'?'<span class="tag">مكتملة</span>':s.st==='p'?'<span class="tag bad">جزئية · '+a.d+' من '+a.t+' مجموعة</span>':'<span class="tag">سجل سابق</span>')+'</div>';
+ if(cur)h+='<button class="btn big" style="width:100%;margin-bottom:12px" data-a="sxres" data-v="'+esc(s.id)+'" id="ar-resume">'+ic('play','f')+'أكمل التمرين</button>';
+ else if(s.st==='p')h+='<div class="note" style="margin-bottom:12px">هذه جلسة من أسبوع سابق، ولا يمكن استكمالها لأن تمارين الأسبوع تبدأ من جديد. سجلّها محفوظ هنا.</div>';
+ h+=s.ex.map(x=>{const L=x.sets.length?x.sets.map((q,i)=>'<div class="mealrow"><span class="t" style="flex:1"><b>المجموعة '+(i+1)+'</b></span><span class="mu num">'+(q.w?F(q.w,1)+' كغ × ':'')+q.r+(q.ty&&q.ty!=='n'?' · '+TY[q.ty]:'')+(q.rp?' · RPE '+q.rp:'')+'</span></div>').join(''):'<div class="mu">لم تُسجَّل مجموعات'+(x.sk?' (تخطيته)':'')+'.</div>';
+  return '<div class="card"><h2 style="margin-bottom:6px">'+esc(x.n)+(x.dn?' <span class="tag">تم</span>':'')+'</h2>'+L+'</div>'}).join('');
+ return h}
 function wkSteps(n){return '<div class="wksets">'+Array.from({length:n.tot},(_,i)=>'<i class="'+(i<n.done?'dn':i===n.done?'cu':'')+'"></i>').join('')+'</div>'}
 function vWk(){
+ if(!UI.wk){const o=sxOpen();if(o){sxBoot(o,o.ex.map(x=>x.k))}}
  const U=UI.wk;if(!U)return back()+'<div class="card mu">لا توجد جلسة جارية.</div>';
  const T=tasks(),n=U.ks.length;
  if(U.i>=n)return wkDone();
- const t=T.find(x=>x.k===U.ks[U.i]);if(!t){U.i++;return vWk()}
+ const t=T.find(x=>x.k===U.ks[U.i]);if(!t||(t.r&&!U.s)){U.i++;U.s=0;return vWk()}
  const e=t.e,sg=sugg(e),w=U.w!=null?U.w:pfW(e),r=U.r!=null?U.r:e.r,g=exGroup(e.n),lastSet=U.s+1>=e.s;
  let h='<div class="wkt"><button class="chip" data-a="wkend">'+ic('x')+'إنهاء</button><span class="sp"></span><span class="num wkclock" id="tmv">'+fmtT(tmEl())+'</span></div>';
  h+='<div class="bar" style="margin:8px 0 14px"><i style="width:'+Math.round((U.i+U.s/e.s)/n*100)+'%"></i></div>';
@@ -4000,6 +4068,8 @@ function vWk(){
  h+='<div class="mu" style="text-align:center;margin:6px 0 12px">الهدف <b class="num">'+e.r+'</b> تكرارًا في المجموعة</div>';
  if(restLeft()>0)h+='<div class="card hl wkrest" style="text-align:center"><div class="mu">راحة</div><div class="num" id="rsv" style="font-size:44px;font-weight:800">'+fmtT(restLeft()).slice(3)+'</div><button class="chip" data-a="wkskip">تخطي الراحة</button></div>';
  h+='<div class="chips" style="justify-content:center;margin-bottom:8px">'+Object.keys(TY).map(k=>'<button class="chip'+((U.ty||'n')===k?' on':'')+'" data-a="wkty" data-v="'+k+'">'+TY[k]+'</button>').join('')+'</div>';
+ h+='<div class="chips" style="justify-content:center;margin-bottom:8px;align-items:center"><span class="mu" style="font-size:13px">الجهد RPE (اختياري)</span>'+[7,8,9,10].map(v=>'<button class="chip'+(U.rp===v?' on':'')+'" data-a="wkrp" data-v="'+v+'" aria-label="RPE '+v+'">'+v+'</button>').join('')+'</div>';
+ {const sx=U.sid&&S.sx[U.sid],xx=sx&&sx.ex.find(q=>q.k===t.k);if(xx&&xx.sets.length)h+='<div class="mu" id="wk-logged" style="text-align:center;margin:4px 0 8px">المسجّل: '+xx.sets.map(q=>(q.w?F(q.w,1)+'×':'')+q.r+(q.ty!=='n'?' ('+TY[q.ty]+')':'')+(q.rp?' RPE'+q.rp:'')).join(' · ')+'</div>'}
  h+='<div class="wkin"><div class="wkf"><small>الوزن (كغ)</small><div class="wkst"><button class="pbtn2" data-a="wkadj" data-f="w" data-v="-2.5" aria-label="أنقص">−</button><input id="wk-w" type="number" inputmode="decimal" step="0.5" value="'+w+'"><button class="pbtn2" data-a="wkadj" data-f="w" data-v="2.5" aria-label="زِد">+</button></div></div><div class="wkf"><small>التكرار</small><div class="wkst"><button class="pbtn2" data-a="wkadj" data-f="r" data-v="-1" aria-label="أنقص">−</button><input id="wk-r" type="number" inputmode="numeric" value="'+r+'"><button class="pbtn2" data-a="wkadj" data-f="r" data-v="1" aria-label="زِد">+</button></div></div></div>';
  if(sg)h+='<div class="mu" style="text-align:center;margin:8px 0">'+ic('spark')+' '+esc(sg.t)+'</div>';
  if(w>20)h+='<div class="mu" style="text-align:center;margin:4px 0" dir="auto">1RM مقدّر: <b class="num">'+F(e1rm(w,r),1)+'</b> كغ · الأقراص لكل جانب: <b class="num" dir="ltr">'+(plates(w,20)||'—')+'</b></div>';
@@ -4007,7 +4077,7 @@ function vWk(){
  h+='<div class="row c" style="margin-top:8px;justify-content:center"><button class="mu" data-a="wknext">تخطي هذا التمرين</button></div>';
  return h}
 function wkDone(){const U=UI.wk,mins=Math.round(tmEl()/60),prs=(S.prs||[]).filter(x=>x.date===TD()).slice(-4);
- return '<div class="card hl" style="text-align:center;margin-top:20px"><div class="num" style="font-size:56px;color:var(--ac)">'+U.ks.length+'</div><div class="mu">'+ic('trophy')+' تمارين في هذه الجلسة</div><div class="row" style="justify-content:center;gap:24px;margin:14px 0"><div><b class="num" style="font-size:26px">'+mins+'</b><div class="mu">دقيقة</div></div><div><b class="num" style="font-size:26px">'+F(Math.round(U.vol))+'</b><div class="mu">كغ حجم</div></div></div>'+(prs.length?'<div class="note" style="margin-bottom:12px">'+ic('trophy')+' أرقام شخصية جديدة: '+prs.map(x=>esc(x.n)+' '+F(x.w,1)+' كغ').join('، ')+'</div>':'<div class="mu" style="margin-bottom:12px">أحسنت. الاستمرار هو ما يبني الجسم.</div>')+'<button class="btn big" style="width:100%" data-a="wkfin">حفظ والعودة</button></div>'}
+ return '<div class="card hl" style="text-align:center;margin-top:20px"><div class="num" style="font-size:56px;color:var(--ac)">'+U.ks.length+'</div><div class="mu">'+ic('trophy')+' تمارين في هذه الجلسة</div><div class="row" style="justify-content:center;gap:24px;margin:14px 0"><div><b class="num" style="font-size:26px">'+mins+'</b><div class="mu">دقيقة</div></div><div><b class="num" style="font-size:26px">'+F(Math.round(U.vol))+'</b><div class="mu">كغ حجم</div></div></div>'+(prs.length?'<div class="note" style="margin-bottom:12px">'+ic('trophy')+' أرقام شخصية جديدة: '+prs.map(x=>esc(x.n)+' '+F(x.w,1)+' كغ').join('، ')+'</div>':'<div class="mu" style="margin-bottom:12px">أحسنت. الاستمرار هو ما يبني الجسم.</div>')+(U.sid&&S.sx[U.sid]&&S.sx[U.sid].st==='p'?'<div class="note" style="margin-bottom:12px">تخطيت بعض التمارين، فالجلسة محفوظة كجزئية. تكملها من «اليوم» أو من الأرشيف.</div>':'')+'<button class="btn big" style="width:100%" data-a="wkfin">حفظ والعودة</button></div>'}
 
 /* quick log card for dashboard */
 function quickLog(){const td=TD(),ml=+S.wtr[td]||0,g=waterGoal();
@@ -4458,7 +4528,7 @@ const ACT={
  go2:b=>{S.tab=b.dataset.v;S.sub=null;UI.tw='today';window.scrollTo(0,0)},
  go:b=>{S.tab=b.dataset.v;S.sub=null;UI.sheet='';window.scrollTo(0,0)},
  sub:b=>{S.sub=b.dataset.v;window.scrollTo(0,0)},
- back:()=>{S.sub=null;window.scrollTo(0,0)},
+ back:()=>{UI.ad=null;S.sub=null;window.scrollTo(0,0)},
  seg:b=>{UI[b.dataset.k]=b.dataset.v;UI.res=null;UI.msg=''},
  tool:b=>{UI.tool=b.dataset.v},
  sex:b=>{S.prof.sex=b.dataset.v},
@@ -4473,7 +4543,7 @@ const ACT={
  ss:b=>{const c=b.closest('.card'),g=f=>{const e=c.querySelector('[data-s="'+f+'"]')||c.querySelector('[data-c="s:'+f+'"]');return e?e.value:''},td=TD(),s={m:g('m'),min:+g('min')||0,km:+g('km')||0,kcal:+g('kcal')||0,j:+g('j')||0};if(!s.min&&!s.km&&!s.j)return false;(S.cs[td]=S.cs[td]||[]).push(s)},
  ds:b=>{S.cs[TD()].splice(+b.dataset.i,1)},
  imp:()=>{const n=importWatch($('#imp').value.trim());UI.msg='تم استيراد '+n+' يوم'},
- exp:()=>{doExport('khatwa-'+TD()+'.json',JSON.stringify(S,null,1));return false},
+ exp:()=>{doExport('khatwa-'+TD()+'.json',JSON.stringify(backupData(),null,1));return false},
  impall:()=>{try{const x=JSON.parse($('#impall').value);if(x&&x.plan&&load(x)){UI.msg='تم استرجاع البيانات'}else UI.msg='الملف لا يحتوي على بيانات صالحة للتطبيق، ولم يتغير شيء'}catch(e){UI.msg='تعذّرت قراءة الملف'}},
  fontreset:()=>{try{['fit_font','fit_fontB','fit_fontL'].forEach(k=>localStorage.removeItem(k))}catch(e){lg(e)}const s=$('#qf');if(s)s.textContent='';UI.msg='أُزيل الخط المرفوع';fitLogos()},
  tmt:()=>{if(TM.run){TM.acc+=(Date.now()-TM.t0)/1000;TM.run=false}else{TM.t0=Date.now();TM.run=true;try{if(!TM.ac)TM.ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){lg(e)}try{if(navigator.wakeLock)navigator.wakeLock.request('screen').catch(()=>{})}catch(e){lg(e)}}},
@@ -4643,20 +4713,31 @@ Object.assign(ACT,{
 document.addEventListener('change',ev=>{const t=ev.target;if(t&&t.dataset&&t.dataset.s==='m'){const e=document.getElementById('mico');if(e)e.innerHTML=machIco(t.value)}});
 document.addEventListener('input',ev=>{const t=ev.target;if(t&&t.dataset&&t.dataset.f==='n'){const e=document.getElementById('xico');if(e)e.innerHTML=exIco(t.value)}});
 Object.assign(ACT,{
- wkstart:()=>{const ks=wkKeys();if(!ks.length){toast('لا تمارين متبقية اليوم');S.tab='train';S.sub=null;UI.tw='today';return}try{if(!TM.ac)TM.ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){lg(e)}TM.acc=0;TM.t0=Date.now();TM.run=true;try{if(navigator.wakeLock)navigator.wakeLock.request('screen').catch(()=>{})}catch(e){lg(e)}UI.wk={ks,i:0,s:0,w:null,r:null,vol:0};S.sub='wk';window.scrollTo(0,0)},
+ wkstart:()=>{sxGo(sxOpen())},
+ sxres:b=>{const o=S.sx[b.dataset.v];if(!o||o.st!=='p'||o.wk!==W()){toast('تعذّر استكمال هذه الجلسة');return false}sxGo(o)},
+ sxview:b=>{S.sub='arch';UI.ar='ses';UI.ad=b.dataset.v;window.scrollTo(0,0)},
+ sxopen:b=>{UI.ad=b.dataset.v;window.scrollTo(0,0)},
+ adback:()=>{UI.ad=null;window.scrollTo(0,0)},
+ arf:b=>{UI.arf=b.dataset.v},
+ wkrp:b=>{const U=UI.wk,wi=$('#wk-w'),ri=$('#wk-r');if(wi){U.w=+wi.value||0;U.r=+ri.value||0}const v=+b.dataset.v;U.rp=U.rp===v?0:v},
+ bkdl:()=>{doExport('khatwa-backup-'+TD()+'.json',JSON.stringify(backupData(),null,1));S.prof.lastBk=TD();toast('نُزّلت النسخة الاحتياطية')},
  wkadj:b=>{const f=b.dataset.f,wi=$('#wk-w'),ri=$('#wk-r');UI.wk.w=+(wi?wi.value:0)||0;UI.wk.r=+(ri?ri.value:0)||0;const k=f==='w'?'w':'r';UI.wk[k]=Math.max(0,+(UI.wk[k]+(+b.dataset.v)).toFixed(1))},
- wkty:b=>{UI.wk.ty=b.dataset.v},
+ wkty:b=>{const U=UI.wk,wi=$('#wk-w'),ri=$('#wk-r');if(wi){U.w=+wi.value||0;U.r=+ri.value||0}U.ty=b.dataset.v},
  frz:b=>{S.fz=(S.fz||[]).concat([b.dataset.d]);toast('جُمّدت السلسلة')},
  msx:b=>{S.ms=S.ms||{};S.ms[b.dataset.v]=1},
  hvimp:()=>false,
- wkset:()=>{const U=UI.wk,t=tasks().find(x=>x.k===U.ks[U.i]);if(!t)return;const e=t.e,w=+($('#wk-w')||{}).value||0,r=+($('#wk-r')||{}).value||e.r,ty=U.ty||'n';U.ty='n';
-  if(ty==='w'){U.w=w;U.r=r;TM.rest=Date.now()+45000;return}
+ wkset:()=>{const U=UI.wk,t=tasks().find(x=>x.k===U.ks[U.i]);if(!t)return;const e=t.e,w=+($('#wk-w')||{}).value||0,r=+($('#wk-r')||{}).value||e.r,ty=U.ty||'n',rp=U.rp||0;U.ty='n';U.rp=0;
+  const q=sxRec(t,w,r,ty,rp),x=q.x;
+  if(ty==='w'){U.w=w;U.r=r;TM.rest=Date.now()+45000;sxAfter(q.s);return}
   U.vol+=w*r;U.s++;U.w=w;U.r=r;
-  if(U.s>=e.s){mark(t.k,w,r);if(ty==='f'&&S.done[t.k])S.done[t.k].rpe=10;U.i++;U.s=0;U.w=null;U.r=null;if(U.i<U.ks.length)TM.rest=Date.now()+90000;else TM.rest=0}else TM.rest=Date.now()+(ty==='d'?15000:90000);window.scrollTo(0,0)},
- wknext:()=>{const U=UI.wk;U.i++;U.s=0;U.w=null;U.r=null;TM.rest=0},
+  if(U.s>=e.s){mark(t.k,w,r);const rr=ty==='f'?10:rp;if(rr&&S.done[t.k])S.done[t.k].rpe=rr;if(x)x.dn=1;U.i++;U.s=0;U.w=null;U.r=null;if(U.i<U.ks.length)TM.rest=Date.now()+90000;else TM.rest=0}else TM.rest=Date.now()+(ty==='d'?15000:90000);
+  sxAfter(q.s);window.scrollTo(0,0)},
+ wknext:()=>{const U=UI.wk,sx=U.sid&&S.sx[U.sid];if(sx){const x=sx.ex.find(q=>q.k===U.ks[U.i]);if(x&&!x.dn)x.sk=1}U.i++;U.s=0;U.w=null;U.r=null;TM.rest=0;if(sx)sxAfter(sx)},
  wkskip:()=>{TM.rest=0},
- wkend:()=>{if(UI.wk&&UI.wk.i>0){UI.wk.i=UI.wk.ks.length}else{UI.wk=null;TM.run=false;TM.acc=0;TM.t0=0;TM.rest=0;S.sub=null}},
- wkfin:()=>{const s=tmEl();if(s>=30){const td=TD();S.wt[td]=(+S.wt[td]||0)+s;toast('حُفظت الجلسة: '+Math.round(s/60)+' دقيقة')}TM.run=false;TM.acc=0;TM.t0=0;TM.rest=0;UI.wk=null;S.sub=null;S.tab='dash'},
+ wkend:()=>{const U=UI.wk;if(!U){S.sub=null;return}const sx=U.sid&&S.sx[U.sid];
+  if(sx){sxAfter(sx);if(sx.st!=='c'){const a=sxProg(sx);UI.wk=null;TM.run=false;TM.rest=0;S.sub=null;S.tab='dash';toast('حُفظ تمرين جزئي: '+a.d+' من '+a.t+' مجموعة');return}U.i=U.ks.length;return}
+  UI.wk=null;TM.run=false;TM.acc=0;TM.t0=0;TM.rest=0;S.sub=null},
+ wkfin:()=>{const s=tmEl();{const sx=UI.wk&&UI.wk.sid&&S.sx[UI.wk.sid];if(sx)sx.sec=Math.round(s)}if(s>=30){const td=TD();S.wt[td]=(+S.wt[td]||0)+s;toast('حُفظت الجلسة: '+Math.round(s/60)+' دقيقة')}TM.run=false;TM.acc=0;TM.t0=0;TM.rest=0;UI.wk=null;S.sub=null;S.tab='dash'},
  dlset:b=>{S.dl=b.dataset.v==='1'?W():''},
  gs:()=>{const e=$('#gq');UI.gq=e?e.value:''},
  srch:()=>{S.sub='srch';window.scrollTo(0,0)},
@@ -4724,7 +4805,7 @@ Object.assign(ACT,{
 ACT.ddt=()=>{UI.ddo=!UI.ddo};
 ACT.cdo=b=>{const o=UI.cdo||(UI.cdo={}),k=b.dataset.i;o[k]=!o[k]};
 (()=>{const w=ACT.seg;ACT.seg=b=>{UI.ddo=0;if(b.dataset.k==='ct')UI.cd='';w(b);if(b.dataset.k==='cmt'){CM.tab=b.dataset.v;cmLoad()}if(b.dataset.k==='au')UI.aerr=''}})();
-['sub','go','fgo','wkstart','tplan','srch'].forEach(k=>{const f=ACT[k];if(f)ACT[k]=(b,e)=>{UI.dr='';const r=f(b,e);if(k==='sub'&&b.dataset.v==='comm')cmLoad();if(k==='sub'&&b.dataset.v==='nc')cmNotes().then(cmR);return r}});
+['sub','go','fgo','wkstart','tplan','srch'].forEach(k=>{const f=ACT[k];if(f)ACT[k]=(b,e)=>{UI.dr='';UI.ad=null;const r=f(b,e);if(k==='sub'&&b.dataset.v==='comm')cmLoad();if(k==='sub'&&b.dataset.v==='nc')cmNotes().then(cmR);return r}});
 setInterval(()=>{if(SB.ses&&!(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName))){cmNotes().then(()=>{if(S.sub!=='comm')render()})}},9e4);
 if(SB.ses){cmNotes();cmPull();cmLoad()}
 
