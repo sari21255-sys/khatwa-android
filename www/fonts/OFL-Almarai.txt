@@ -1,11 +1,6 @@
-Copyright (c) 2010, 2012, Khaled Hosny <khaledhosny@eglug.org>.
-Portions copyright (c) 2010, Sebastian Kosch <sebastian@aldusleaf.org>
-Font Software: Amiri-Regular.ttf, Reserved Font Name "Amiri" (https://github.com/aliftype/amiri).
+Copyright (c) 2019 by Almarai. All rights reserved.
 
-This Font Software is licensed under the SIL Open Font License, Version 1.1.
-This license is copied below, and is also available with a FAQ at:
-https://openfontlicense.org
-
+Font Software: Almarai-Regular.ttf — licensed under the SIL Open Font License, Version 1.1 (https://openfontlicense.org).
 
 -----------------------------------------------------------
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007

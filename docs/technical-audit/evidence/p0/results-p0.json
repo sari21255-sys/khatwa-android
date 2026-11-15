@@ -10,7 +10,7 @@
   "id": "T22b-csp",
   "name": "CSP: لا unsafe-eval ولا unsafe-inline في script-src، frame-ancestors/object-src none، سكربتات مضمّنة بالتجزئة",
   "result": "PASS",
-  "evidence": "script-src: 'self' 'sha256-oiV+nmJGnAcNbT/zSjT05r2LkJyLUtHj8n55OunhYWc=' 'sha256-7K5ZAeaKu9qOSZ1TDIeUj… | style-src: 'self' 'unsafe-inline'",
+  "evidence": "script-src: 'self' 'sha256-3R6Sj8Dhos/50nEbU4kgD5KDbOknfyLDRcCDtzapk7k=' 'sha256-7K5ZAeaKu9qOSZ1TDIeUj… | style-src: 'self' 'unsafe-inline'",
   "severity": ""
  },
  {
@@ -38,7 +38,7 @@
   "id": "T10c-1",
   "name": "بعد التثبيت: eq-db.js وindex.html في الكاش، والكاش القديم حُذف (المفتاح الوحيد هو إصدار sw.js الحالي)",
   "result": "PASS",
-  "evidence": "{\"keys\":[\"sijil-v69\"],\"eq\":true,\"idx\":true}",
+  "evidence": "{\"keys\":[\"sijil-v70\"],\"eq\":true,\"idx\":true}",
   "severity": ""
  },
  {
@@ -52,7 +52,7 @@
   "id": "T10c-2",
   "name": "عودة الاتصال: لا تعارض كاش (مفتاح واحد هو إصدار sw.js الحالي) والتطبيق يعمل",
   "result": "PASS",
-  "evidence": "{\"keys\":[\"sijil-v69\"],\"status\":200,\"ok\":true} | js_errors=[]",
+  "evidence": "{\"keys\":[\"sijil-v70\"],\"status\":200,\"ok\":true} | js_errors=[]",
   "severity": ""
  },
  {

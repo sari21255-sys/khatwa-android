@@ -12,7 +12,7 @@ const PLAN=`(()=>{const rest={t:'راحة',ex:[]};return[rest,rest,rest,rest,{t:
  {const c=await b.newContext({viewport:{width:390,height:844}});await blockG(c);const p=await c.newPage();const reqs=[];p.on('response',r=>reqs.push({u:r.url(),sw:r.fromServiceWorker()}));
   await p.goto(U);await p.waitForTimeout(800);
   await p.evaluate(async()=>{await navigator.serviceWorker.ready;await document.fonts.load('400 16px Cairo','بنش');await document.fonts.load('700 16px Cairo','بنش');await document.fonts.load('800 16px Cairo','بنش');await document.fonts.load('400 16px Cairo','RPE 9')});
-  const fam=await p.evaluate(()=>getComputedStyle(document.body).fontFamily);ok(/QamraUser.*Amiri.*Cairo/.test(fam),'الخط الافتراضي في body أميري ثم Cairo احتياطًا بعد خط المستخدم المرفوع',fam);
+  const fam=await p.evaluate(()=>getComputedStyle(document.body).fontFamily);ok(/QamraUser.*Almarai.*Cairo/.test(fam),'الخط الافتراضي في body المراعي ثم Cairo احتياطًا بعد خط المستخدم المرفوع',fam);
   const loaded=await p.evaluate(()=>[...document.fonts].filter(f=>f.family.replace(/"/g,'')==='Cairo'&&f.status==='loaded').map(f=>f.weight+(/6{1}00|0600/i.test(f.unicodeRange)?'ar':'lat')));
   ok(loaded.includes('400lat')&&loaded.includes('400ar')&&loaded.filter(x=>x.startsWith('700')).length&&loaded.filter(x=>x.startsWith('800')).length,'أوجه Cairo المحمّلة: '+loaded.join(','));
   ok(reqs.some(r=>/fonts\/Cairo-Regular\.ttf/.test(r.u))&&reqs.some(r=>/fonts\/Cairo-700-arabic\.woff/.test(r.u)),'الطلبات تذهب إلى fonts/ المحلية');
@@ -20,12 +20,12 @@ const PLAN=`(()=>{const rest={t:'راحة',ex:[]};return[rest,rest,rest,rest,{t:
   const cached=await p.evaluate(async()=>{const k=await caches.keys();const out=[];for(const n of k){const c=await caches.open(n);for(const r of await c.keys())if(/\/fonts\//.test(r.url))out.push(r.url.split('/').pop())}return out});
   ok(cached.length>=5,'التخزين المسبق يضم ملفات الخط: '+cached.join(','));
   await c.setOffline(true);const p2=await c.newPage();await p2.goto(U);await p2.waitForTimeout(800);
-  const off=await p2.evaluate(async()=>{await document.fonts.load('700 16px Cairo','بنش');await document.fonts.load('400 16px Cairo','RPE');await document.fonts.load('400 16px Amiri','بنش');return[...document.fonts].filter(f=>/^"?(Cairo|Amiri)"?$/.test(f.family)&&f.status==='loaded').length});
-  ok(off>=3,'دون اتصال: أوجه Amiri وCairo تُحمَّل من الذاكرة ('+off+')');
+  const off=await p2.evaluate(async()=>{await document.fonts.load('700 16px Cairo','بنش');await document.fonts.load('400 16px Cairo','RPE');await document.fonts.load('400 16px Almarai','بنش');return[...document.fonts].filter(f=>/^"?(Cairo|Almarai)"?$/.test(f.family)&&f.status==='loaded').length});
+  ok(off>=3,'دون اتصال: أوجه Almarai وCairo تُحمَّل من الذاكرة ('+off+')');
   const cdp=await c.newCDPSession(p2);await cdp.send('DOM.enable');await cdp.send('CSS.enable');
   await p2.evaluate(()=>{const s=document.createElement('p');s.id='fx';s.textContent='ضغط الصدر 35 كغ × 12 RPE 9';s.style.cssText='font:700 20px var(--fa);position:fixed;top:0';document.body.appendChild(s)});await p2.waitForTimeout(500);
   const doc=await cdp.send('DOM.getDocument');const n=await cdp.send('DOM.querySelector',{nodeId:doc.root.nodeId,selector:'#fx'});const pf=await cdp.send('CSS.getPlatformFontsForNode',{nodeId:n.nodeId});
-  ok(pf.fonts.some(f=>/^(Amiri|Cairo)/.test(f.familyName)&&f.isCustomFont&&f.glyphCount>=8)&&pf.fonts.every(f=>f.isCustomFont),'الحروف العربية تُعرض بأميري (أو Cairo احتياطًا) من الملف المحلي، واللاتينية بخط الواجهة المضمّن (Inter)، بلا رجوع إلى خط النظام (CDP): '+pf.fonts.map(f=>f.familyName+':'+f.glyphCount).join(','));
+  ok(pf.fonts.some(f=>/^(Almarai|Cairo)/.test(f.familyName)&&f.isCustomFont&&f.glyphCount>=8)&&pf.fonts.every(f=>f.isCustomFont),'الحروف العربية تُعرض بالمراعي (أو Cairo احتياطًا) من الملف المحلي، واللاتينية بخط الواجهة المضمّن (Inter)، بلا رجوع إلى خط النظام (CDP): '+pf.fonts.map(f=>f.familyName+':'+f.glyphCount).join(','));
   await c.close()}
  console.log('2) خيار تغيير الخط');
  {const c=await b.newContext({viewport:{width:390,height:844}});await blockG(c);const p=await c.newPage();await p.goto(U);await p.waitForTimeout(500);
