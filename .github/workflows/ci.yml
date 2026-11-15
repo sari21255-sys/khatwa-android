@@ -2,7 +2,7 @@ name: Tests
 on:
   pull_request:
   push:
-    branches: [main, master, 'p0/**', 'p1/**']
+    branches: [main, master, 'p0/**', 'p1/**', 'ux/**']
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -29,6 +29,11 @@ jobs:
           npm i -g playwright
           npx playwright install --with-deps chromium
           NODE_PATH="$(npm root -g)" node tests/app.e2e.js
+      - name: UX acceptance (today/train/archive, makeup sessions, local Cairo font)
+        run: |
+          NODE_PATH="$(npm root -g)" node tests/ux.e2e.js
+          NODE_PATH="$(npm root -g)" node tests/ux2.e2e.js
+          NODE_PATH="$(npm root -g)" node tests/font.e2e.js
       - name: P0 acceptance (security headers + CSP, offline eq-db, 320px, worker failure)
         run: NODE_PATH="$(npm root -g)" node docs/technical-audit/evidence/p0-acceptance.mjs
       - name: Supabase schema + RLS tests
@@ -49,6 +54,7 @@ jobs:
           PSQL="psql -h localhost -U postgres -d postgres -q -At" bash supabase/tests/03_concurrency.sh
           node tests/worker.p1.test.mjs
           PSQL="psql -h localhost -U postgres -d postgres -q -At" NODE_PATH="$(npm root -g)" node tests/sync.e2e.mjs
+          PSQL="psql -h localhost -U postgres -d postgres -q -At" NODE_PATH="$(npm root -g)" node tests/sync-sx.e2e.mjs
   build-reproducible:
     name: build --check (${{ matrix.os }}) from a clean clone, no manual file setup
     strategy:

@@ -2,7 +2,7 @@ name: Build Android
 on:
   workflow_dispatch:
   push:
-    branches: [main, master, 'p0/**', 'p1/**']
+    branches: [main, master, 'p0/**', 'p1/**', 'ux/**']
 permissions:
   contents: read
 jobs:
