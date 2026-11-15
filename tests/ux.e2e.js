@@ -26,7 +26,7 @@ const ovf=p=>p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
   ok(await p.evaluate(()=>S.plan.some(d=>d.ex.length)),'اختيار الخطة من الترحيب يبني خطة بتمارين');
   await setup(p);
   let t=await txt(p);
-  ok(/ابدأ التمرين/.test(t)&&/هدف الأسبوع: 0 من 3/.test(t),'اليوم: «ابدأ التمرين» وهدف الأسبوع 0 من 3');
+  ok(/ابدأ تمرين اليوم/.test(t)&&/هدف الأسبوع: 0 من 3/.test(t),'اليوم: «ابدأ تمرين اليوم» وهدف الأسبوع 0 من 3');
   await click(p,'#sx-go');ok(await p.evaluate(()=>S.sub==='wk'&&!!UI.wk),'ضغط «ابدأ» يفتح الجلسة');
   ok((await sx(p))&&Object.keys(await sx(p)).length===0,'لا يُنشأ سجل جلسة قبل أول مجموعة');
   await click(p,'[data-a="wkty"][data-v="d"]');await click(p,'[data-a="wkrp"][data-v="9"]');await click(p,'[data-a="wkset"]');

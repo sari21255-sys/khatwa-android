@@ -7,4 +7,5 @@ echo "== قبول P0 =="; NODE_PATH="$(npm root -g)" node docs/technical-audit/e
 echo "== هوية الوسيط (P1) =="; node tests/worker.p1.test.mjs
 echo "== اليوم/التمرين/الأرشيف (UX) =="; NODE_PATH="$(npm root -g)" node tests/ux.e2e.js
 echo "== الخط المحلي =="; NODE_PATH="$(npm root -g)" node tests/font.e2e.js
+echo "== حصة اليوم والتعويض (UX2) =="; NODE_PATH="$(npm root -g)" node tests/ux2.e2e.js
 if [ -n "${PSQL:-}" ]; then echo "== مزامنة السجلات (جهازان + Postgres) =="; NODE_PATH="$(npm root -g)" node tests/sync.e2e.mjs; else echo "(تخطي sync.e2e: عيّن PSQL)"; fi

@@ -1183,7 +1183,7 @@ function vOnb(){const P=S.prof,w=curW();
 /* ---------- views: home ---------- */
 function todayCard(){
  const ti=TI(),T=tasks(),now=T.filter(t=>t.d===ti),dn=now.filter(t=>t.r).length,late=T.filter(t=>t.d<ti&&!t.r).length,pw=S.plan[ti],rest=!pw.ex.length;
- return '<div class="card tdc"><div class="row" style="flex-wrap:nowrap;gap:12px"><span class="fi" style="--c:'+(rest?'#6366f1':'#f97316')+'">'+ic(rest?'moon':'dumbbell')+'</span><div class="t" style="flex:1;min-width:0"><small class="mu">خطة اليوم</small><b class="tdt">'+(rest?'يوم راحة':esc(pw.t))+'</b></div>'+(rest?'':'<div class="tdp"><small>منجز</small><b class="num">'+dn+'/'+now.length+'</b></div>')+(late?'<div class="tdp late"><small>مرحّل</small><b class="num">'+late+'</b></div>':'')+'</div>'+(rest?'':'<div class="bar" style="margin:12px 0"><i style="width:'+pct(dn,now.length)+'%"></i></div>')+''+sxHero(rest,late).note+'<div class="row" style="gap:8px;margin-top:'+(rest?'12':'10')+'px;flex-wrap:nowrap">'+sxHero(rest,late).btn+'<button class="btn ghost big" style="flex:0 0 auto" data-a="go" data-v="train">'+ic('dumbbell')+'التمارين</button></div><div class="mu" id="wk-goal" style="margin-top:10px">هدف الأسبوع: <b class="num">'+wkDays().n+' من '+wkDays().t+'</b> جلسات مكتملة</div></div>'}
+ return '<div class="card tdc"><div class="row" style="flex-wrap:nowrap;gap:12px"><span class="fi" style="--c:'+(rest?'#6366f1':'#f97316')+'">'+ic(rest?'moon':'dumbbell')+'</span><div class="t" style="flex:1;min-width:0"><small class="mu">خطة اليوم</small><b class="tdt">'+(rest?'يوم راحة':esc(pw.t))+'</b></div>'+(rest?'':'<div class="tdp"><small>منجز</small><b class="num">'+dn+'/'+now.length+'</b></div>')+(late?'<div class="tdp late"><small>مرحّل</small><b class="num">'+late+'</b></div>':'')+'</div>'+(rest?'':'<div class="bar" style="margin:12px 0"><i style="width:'+pct(dn,now.length)+'%"></i></div>')+''+sxHero(rest,late).note+'<div class="row" style="gap:8px;margin-top:'+(rest?'12':'10')+'px;flex-wrap:nowrap">'+sxHero(rest,late).btn+'<button class="btn ghost big" style="flex:0 0 auto" data-a="go" data-v="train">'+ic('dumbbell')+'التمارين</button></div>'+sxHero(rest,late).mk+'<div class="mu" id="wk-goal" style="margin-top:10px">هدف الأسبوع: <b class="num">'+wkDays().n+' من '+wkDays().t+'</b> جلسات مكتملة</div></div>'}
 function svcRow(){return '<div class="sechead"><h2>خدماتك</h2></div>'+rail(['arch','rpt','cul','tools'].map(i=>chipF(FD[i])))}
 function nutCard(fd){const N=S.nt,m=[['سعرات',fd.kcal,N.kcal,'#f97316',''],['بروتين',fd.p,N.p,'#ef4444','غ'],['كربوهيدرات',fd.c,N.c,'#3b82f6','غ'],['دهون',fd.f,N.f,'#eab308','غ']];
  return '<div class="card"><div class="row" style="margin-bottom:10px"><h2 style="margin:0">'+ic('fork')+'التغذية اليوم</h2><span class="sp"></span><span class="mu">المتبقي <b class="num" style="font-size:16px;color:'+(N.kcal-fd.kcal<0?'var(--bad)':'var(--tx)')+'">'+F(Math.abs(Math.round(N.kcal-fd.kcal)))+'</b> سعرة'+(N.kcal-fd.kcal<0?' زائدة':'')+'</span></div><div class="nm4">'+m.map(x=>'<div class="nmt"><small style="--c:'+x[3]+'">'+x[0]+'</small><b class="num"'+(x[1]>x[2]*1.05?' style="color:var(--bad)"':'')+'>'+F(Math.round(x[1]))+'</b><span class="mu">من '+F(x[2])+(x[4]?' '+x[4]:'')+'</span><div class="trk"><i style="width:'+pct(x[1],x[2])+'%;background:'+x[3]+'"></i></div></div>').join('')+'</div><div class="row" style="gap:8px;margin-top:12px;flex-wrap:nowrap"><button class="btn" style="flex:1" data-a="fgo" data-v="food">'+ic('plus')+'تسجيل وجبة</button><button class="btn ghost" data-a="go" data-v="food">فتح التغذية</button></div></div>'}
@@ -1221,7 +1221,7 @@ function vTrain(){
  if(UI.tw==='cardio')return h+vCardio(1);
  if(UI.tw==='disc')return h+vDisc();
  if(UI.tw==='cum')return h+vCum();
- if(UI.tw==='today')h+=planHead()+sxHero(0,0).note+'<div class="row" style="margin:10px 0 12px">'+sxHero(0,0).btn.replace('ابدأ التمرين','ابدأ جلسة متتابعة')+'</div>'+(isDl()?deloadCard():'');
+ if(UI.tw==='today')h+=planHead()+sxHero(0,0).note+'<div class="row" style="margin:10px 0 12px">'+sxHero(0,0).btn+'</div>'+sxHero(0,0).mk+(isDl()?deloadCard():'');
  if(UI.tw==='week'){
   h+='<div class="card hl"><div class="num" style="font-size:44px;line-height:1;color:var(--ac);font-weight:700">'+pct(dn,T.length)+'%</div><div class="bar" style="margin:8px 0"><i style="width:'+pct(dn,T.length)+'%"></i></div><div class="mu">أنجزت '+dn+' وتبقى '+(T.length-dn)+'. اضغط على الدائرة لتعليم أي تمرين منجزًا بقيمه المخططة.</div></div>';
   S.plan.forEach((p,d)=>{if(!p.ex.length)return;const ts=T.filter(t=>t.d===d),n=ts.filter(t=>t.r).length,st=n===ts.length?'<span class="tag">مكتمل</span>':(d<ti?'<span class="tag bad">ناقص '+(ts.length-n)+' · مرحّل</span>':(d===ti?'<span class="tag">اليوم</span>':'<span class="mu">قادم</span>'));
@@ -4006,30 +4006,47 @@ function wkKeys(){const ti=TI();return tasks().filter(t=>t.d<=ti&&!t.r).sort((a,
    على حاله، ولا تُحتسب الجلسة مرتين لأن العدّاد الأسبوعي يُشتق من S.done وحده. */
 const sxCnt=x=>x?x.sets.filter(q=>q.ty!=='w').length:0;
 const sxList=()=>Object.keys(S.sx||{}).map(k=>S.sx[k]).filter(x=>x&&x.id&&Array.isArray(x.ex)).sort((a,b)=>(b.ts||0)-(a.ts||0));
-const sxOpen=()=>sxList().find(x=>x.st==='p'&&x.wk===W());
-const sxToday=()=>sxList().find(x=>x.date===TD());
+const sxOpen=()=>sxList().filter(x=>x.st==='p'&&x.wk===W()).sort((a,b)=>(b.up||b.ts||0)-(a.up||a.ts||0))[0];
+/* كل جلسة تخص يوم خطة واحدًا: حصة اليوم (dy===TI()) أو تعويض لحصة فائتة (dy<TI()). الجلسات القديمة بلا dy تأخذ أكبر يوم فيها */
+const sxDy=s=>s.dy!=null?s.dy:(s.ex.length?Math.max.apply(null,s.ex.map(x=>x.d)):-1);
+const sxPart=dy=>sxList().find(x=>x.st==='p'&&x.wk===W()&&sxDy(x)===dy);
+const sxToday=()=>sxList().find(x=>x.date===TD()&&x.st==='c'&&sxDy(x)===TI());
+const sxPrev=()=>sxList().filter(x=>x.st==='p'&&x.wk!==W());
+function dayKeys(d){return tasks().filter(t=>t.d===d&&!t.r).map(t=>t.k)}
+function sxMissed(){const ti=TI(),T=tasks(),o=[];S.plan.forEach((p,d)=>{if(d>=ti||!p.ex.length)return;const ts=T.filter(x=>x.d===d),left=ts.filter(x=>!x.r);if(!left.length)return;const q=sxPart(d);o.push({d:d,t:p.t,n:left.length,tot:ts.length,s:q,pr:q?sxProg(q):null})});return o}
 function sxProg(s){let d=0,t=0;s.ex.forEach(x=>{t+=x.tg;d+=Math.min(sxCnt(x),x.tg)});return{d:d,t:t}}
 function sxNew(ks){const T=tasks(),id='sx'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
  const ex=ks.map(k=>T.find(t=>t.k===k)).filter(Boolean).map(t=>({k:t.k,id:t.e.id,n:t.e.n,d:t.d,tg:t.e.s,tr:t.e.r,sets:[],dn:0,sk:0}));
- return S.sx[id]={id:id,wk:W(),date:TD(),ts:Date.now(),t:(S.plan[TI()]||{}).t||'',st:'p',sec:0,vol:0,ex:ex}}
+ const dy=ex.length?ex[0].d:TI();return S.sx[id]={id:id,wk:W(),date:TD(),ts:Date.now(),up:Date.now(),dy:dy,kd:dy===TI()?'t':'m',t:(S.plan[dy]||{}).t||'',st:'p',sec:0,vol:0,ex:ex}}
 function sxRec(t,w,r,ty,rp){const U=UI.wk;let s=U.sid&&S.sx[U.sid];if(!s){s=sxNew(U.ks);U.sid=s.id}
- const x=s.ex.find(q=>q.k===t.k);if(x)x.sets.push({w:w,r:r,ty:ty,rp:rp||0,at:Date.now()});return{s:s,x:x}}
+ const x=s.ex.find(q=>q.k===t.k);if(x)x.sets.push({w:w,r:r,ty:ty,rp:rp||0,at:Date.now()});s.up=Date.now();return{s:s,x:x}}
 function sxAfter(s){const U=UI.wk,T=tasks();if(U){s.vol=U.vol;s.sec=Math.round(tmEl())}
  if(s.ex.every(x=>x.dn||(T.find(q=>q.k===x.k)||{}).r)){s.st='c';s.fin=Date.now()}}
 function sxBoot(s,ks){TM.acc=s?(+s.sec||0):0;TM.t0=Date.now();TM.run=true;TM.rest=0;
  const U={ks:ks,i:0,s:0,w:null,r:null,vol:s?(+s.vol||0):0,sid:s?s.id:null,ty:'n',rp:0};
- if(s){const T=tasks();let i=0;while(i<ks.length){const x=s.ex.find(q=>q.k===ks[i]),t=T.find(q=>q.k===ks[i]);if(x&&!x.dn&&!x.sk&&t&&!t.r)break;i++}U.i=i;if(i<ks.length)U.s=sxCnt(s.ex.find(q=>q.k===ks[i]))}
+ if(s){const T=tasks();let i=0;while(i<ks.length){const x=s.ex.find(q=>q.k===ks[i]),t=T.find(q=>q.k===ks[i]);if(x&&!x.dn&&!x.sk&&t&&!t.r)break;i++}
+  if(i>=ks.length){i=0;while(i<ks.length){const x=s.ex.find(q=>q.k===ks[i]),t=T.find(q=>q.k===ks[i]);if(x&&!x.dn&&t&&!t.r){x.sk=0;break}i++}}U.i=i;if(i<ks.length)U.s=sxCnt(s.ex.find(q=>q.k===ks[i]))}
  UI.wk=U}
-function sxGo(s){const ks=s?s.ex.map(x=>x.k):wkKeys();
- if(!s&&!ks.length){const f=sxToday();toast(f&&f.st==='c'?'أنجزت تمرين اليوم. تجده في الأرشيف':'لا تمارين متبقية اليوم');S.tab='train';S.sub=null;UI.tw='today';return}
+function sxGo(s,d){const dd=d==null?TI():d,ks=s?s.ex.map(x=>x.k):dayKeys(dd);
+ if(!s&&!ks.length){const f=sxToday();toast(dd===TI()?(f?'أنجزت تمرين اليوم. تجده في الأرشيف':'لا تمارين لهذا اليوم'):'هذه الحصة مكتملة');S.tab='train';S.sub=null;UI.tw='today';return}
  try{if(!TM.ac)TM.ac=new (window.AudioContext||window.webkitAudioContext)()}catch(e){lg(e)}
  try{if(navigator.wakeLock)navigator.wakeLock.request('screen').catch(()=>{})}catch(e){lg(e)}
  sxBoot(s,ks);S.sub='wk';UI.ad=null;window.scrollTo(0,0)}
 function wkDays(){const T=tasks();let n=0,t=0;S.plan.forEach((p,d)=>{if(!p.ex.length)return;t++;const ts=T.filter(x=>x.d===d);if(ts.length&&ts.every(x=>x.r))n++});return{n:n,t:t}}
-function sxHero(rest,late){const s=sxOpen(),f=sxToday();
- if(s){const a=sxProg(s);return{note:'<div class="tag" style="margin:10px 0 0" id="sx-partial">'+ic('timer')+' تمرين جزئي محفوظ · '+a.d+' من '+a.t+' مجموعة</div>',btn:'<button class="btn big" style="flex:1" data-a="wkstart" id="sx-go">'+ic('play','f')+'أكمل التمرين</button>'}}
- if(f&&f.st==='c'&&!wkKeys().length)return{note:'',btn:'<button class="btn big" style="flex:1" data-a="sxview" data-v="'+f.id+'" id="sx-go">'+ic('check','f')+'اعرض تمرينك المحفوظ</button>'}
- return{note:'',btn:'<button class="btn big" style="flex:1" data-a="wkstart" id="sx-go">'+ic('play','f')+(rest&&!late?'جلسة خفيفة':'ابدأ التمرين')+'</button>'}}
+function sxHero(rest,late){const s=sxPart(TI()),f=sxToday(),ti=TI(),td=tasks().filter(t=>t.d===ti),left=td.filter(t=>!t.r).length,ms=sxMissed(),pv=sxPrev();
+ let mk='';
+ if(ms.length)mk+='<button class="btn ghost" style="width:100%;margin-top:8px" data-a="mkpick" id="mk-go">'+ic('timer')+'عوّض تمرينًا فائتًا <b class="num">'+ms.length+'</b></button>';
+ if(pv.length)mk+='<div class="mu" id="mk-prev" style="margin-top:8px;font-size:13px">'+pv.length+' '+(pv.length>1?'جلسات جزئية':'جلسة جزئية')+' من أسبوع سابق محفوظة في الأرشيف للقراءة فقط</div>';
+ if(s){const a=sxProg(s);return{mk:mk,note:'<div class="tag" style="margin:10px 0 0" id="sx-partial">'+ic('timer')+' تمرين جزئي محفوظ · '+a.d+' من '+a.t+' مجموعة</div>',btn:'<button class="btn big" style="flex:1" data-a="wkstart" id="sx-go">'+ic('play','f')+'أكمل التمرين</button>'}}
+ if(td.length&&!left)return{mk:mk,note:'',btn:'<button class="btn big" style="flex:1" data-a="sxview" data-v="'+(f?f.id:'old|'+TD())+'" id="sx-go">'+ic('check','f')+'اعرض تمرينك المحفوظ</button>'}
+ return{mk:mk,note:'',btn:'<button class="btn big" style="flex:1" data-a="wkstart" id="sx-go">'+ic('play','f')+(rest?'جلسة خفيفة':'ابدأ تمرين اليوم')+'</button>'}}
+function vMk(){const ms=sxMissed(),pv=sxPrev();
+ let h=back()+'<div class="card"><h2>'+ic('timer')+'عوّض تمرينًا فائتًا</h2><div class="mu">حصص من هذا الأسبوع لم تكتمل. التعويض جلسة مستقلة تُحتسب مرة واحدة، ولا تغيّر حصة اليوم.</div></div>';
+ if(!ms.length)h+='<div class="card mu" id="mk-empty">لا توجد حصص فائتة هذا الأسبوع.</div>';
+ ms.forEach(m=>{h+='<div class="card mkc" data-day="'+m.d+'"><div class="row" style="flex-wrap:nowrap;gap:10px"><div class="t" style="flex:1;min-width:0"><b>'+esc(m.t)+'</b><div class="mu">'+DAYS[m.d]+' · المتبقي '+m.n+' من '+m.tot+' تمرين'+(m.pr?' · جزئي '+m.pr.d+' من '+m.pr.t+' مجموعة':'')+'</div></div><button class="btn" data-a="wkmk" data-v="'+m.d+'">'+ic('play','f')+(m.s?'أكمل التعويض':'ابدأ التعويض')+'</button></div></div>'});
+ if(pv.length){h+='<div class="sechead"><h2>من أسابيع سابقة</h2></div><div class="card mu" style="font-size:13px">تبقى هذه الجلسات في الأرشيف للقراءة. لا تُستكمل لأن الإنجاز مرتبط بأسبوعها.</div>';
+  pv.forEach(x=>{const a=sxProg(x);h+='<button class="lnk" data-a="sxview" data-v="'+x.id+'"><span class="t">'+esc(sxTitle(x))+'<small class="mu"> · '+esc(sxDay(x.date))+' · '+a.d+' من '+a.t+' مجموعة</small></span>'+ic('next')+'</button>'})}
+ return h}
 function backupData(){const sk=/token|secret|passw|jwt|api[_-]?key|bearer|authorization|refresh|credential|accemail/i;
  const cp=(x,d)=>{if(x==null||typeof x!=='object'||d>14)return x;if(Array.isArray(x))return x.map(v=>cp(v,d+1));const o={};Object.keys(x).forEach(k=>{if(sk.test(k)||k==='__proto__')return;o[k]=cp(x[k],d+1)});return o};
  const o=cp(S,0);delete o.sub;return o}
@@ -4065,7 +4082,8 @@ function vWk(){
  if(U.i>=n)return wkDone();
  const t=T.find(x=>x.k===U.ks[U.i]);if(!t||(t.r&&!U.s)){U.i++;U.s=0;return vWk()}
  const e=t.e,sg=sugg(e),w=U.w!=null?U.w:pfW(e),r=U.r!=null?U.r:e.r,g=exGroup(e.n),lastSet=U.s+1>=e.s;
- let h='<div class="wkt"><button class="chip" data-a="wkend">'+ic('x')+'إنهاء</button><span class="sp"></span><span class="num wkclock" id="tmv">'+fmtT(tmEl())+'</span></div>';
+ const d0=t.d,ttl=(d0===TI()?'حصة اليوم':'تعويض · '+DAYS[d0])+' · '+((S.plan[d0]||{}).t||'');
+ let h='<div class="wkt"><button class="chip" data-a="wkend">'+ic('x')+'إنهاء</button><span class="sp"></span><span class="num wkclock" id="tmv">'+fmtT(tmEl())+'</span></div><div class="mu" id="wk-title" style="text-align:center;font-weight:700">'+esc(ttl)+'</div>';
  h+='<div class="bar" style="margin:8px 0 14px"><i style="width:'+Math.round((U.i+U.s/e.s)/n*100)+'%"></i></div>';
  h+='<div class="mu" style="text-align:center">تمرين '+(U.i+1)+' من '+n+(t.d<TI()?' · متأخر من '+DAYS[t.d]:'')+(isDl()?' · أسبوع تخفيف':'')+'</div>';
  h+=x2Cur(t,e,g,U,w,r);
@@ -4075,6 +4093,7 @@ function vWk(){
  h+='<div class="chips" style="justify-content:center;margin-bottom:8px">'+Object.keys(TY).map(k=>'<button class="chip'+((U.ty||'n')===k?' on':'')+'" data-a="wkty" data-v="'+k+'">'+TY[k]+'</button>').join('')+'</div>';
  h+='<div class="chips" style="justify-content:center;margin-bottom:8px;align-items:center"><span class="mu" style="font-size:13px">الجهد RPE (اختياري)</span>'+[7,8,9,10].map(v=>'<button class="chip'+(U.rp===v?' on':'')+'" data-a="wkrp" data-v="'+v+'" aria-label="RPE '+v+'">'+v+'</button>').join('')+'</div>';
  {const sx=U.sid&&S.sx[U.sid],xx=sx&&sx.ex.find(q=>q.k===t.k);if(xx&&xx.sets.length)h+='<div class="mu" id="wk-logged" style="text-align:center;margin:4px 0 8px">المسجّل: '+xx.sets.map(q=>(q.w?F(q.w,1)+'×':'')+q.r+(q.ty!=='n'?' ('+TY[q.ty]+')':'')+(q.rp?' RPE'+q.rp:'')).join(' · ')+'</div>'}
+ {const sx0=U.sid&&S.sx[U.sid];if(sx0&&sx0.ex.some(q=>q.sets.length))h+='<div class="row c" style="justify-content:center;margin:0 0 8px"><button class="chip" id="wk-undo" data-a="wkundo">تراجع عن آخر مجموعة</button></div>'}
  h+='<div class="wkin"><div class="wkf"><small>الوزن (كغ)</small><div class="wkst"><button class="pbtn2" data-a="wkadj" data-f="w" data-v="-2.5" aria-label="أنقص">−</button><input id="wk-w" type="number" inputmode="decimal" step="0.5" value="'+w+'"><button class="pbtn2" data-a="wkadj" data-f="w" data-v="2.5" aria-label="زِد">+</button></div></div><div class="wkf"><small>التكرار</small><div class="wkst"><button class="pbtn2" data-a="wkadj" data-f="r" data-v="-1" aria-label="أنقص">−</button><input id="wk-r" type="number" inputmode="numeric" value="'+r+'"><button class="pbtn2" data-a="wkadj" data-f="r" data-v="1" aria-label="زِد">+</button></div></div></div>';
  if(sg)h+='<div class="mu" style="text-align:center;margin:8px 0">'+ic('spark')+' '+esc(sg.t)+'</div>';
  if(w>20)h+='<div class="mu" style="text-align:center;margin:4px 0" dir="auto">1RM مقدّر: <b class="num">'+F(e1rm(w,r),1)+'</b> كغ · الأقراص لكل جانب: <b class="num" dir="ltr">'+(plates(w,20)||'—')+'</b></div>';
@@ -4469,7 +4488,7 @@ function planHead(){const T=tasks(),ti=TI(),w=Math.max(1,Math.min(12,Math.floor(
 /* ---------- render ---------- */
 function view(){
  if(!S.prof.ob)return vOnb();
- if(S.sub){const f={plan:vPlan,prog:vProg,arch:vArch,tools:vTools,watch:vWatch,prg:vPrg,mpg:vMpg,ach:vAch,cul:vCul,wgt:vWgt,exl:vExl,nau:vNau,nad:vNad,exd:vExd,ssd:vSsd,ply:vPly,fin:vFin,set:vSet,coach:vCoach,aip:vAip,gyms:vGyms,gye:vGye,vis:vVis,rem:vRem,rpt:vRpt,link:vLink,wk:vWk,srch:vSrch,comm:vComm,nc:vNc}[S.sub];if(f)return f()}
+ if(S.sub){const f={plan:vPlan,prog:vProg,arch:vArch,tools:vTools,watch:vWatch,prg:vPrg,mpg:vMpg,ach:vAch,cul:vCul,wgt:vWgt,exl:vExl,nau:vNau,nad:vNad,exd:vExd,ssd:vSsd,ply:vPly,fin:vFin,set:vSet,coach:vCoach,aip:vAip,gyms:vGyms,gye:vGye,vis:vVis,rem:vRem,rpt:vRpt,link:vLink,wk:vWk,mk:vMk,srch:vSrch,comm:vComm,nc:vNc}[S.sub];if(f)return f()}
  if(S.tab==='cardio'){S.tab='train';UI.tw='cardio'}
  return {home:vDash,dash:vDash,train:vTrain,food:vFood,pg:vPg,me:vMe,club:vClub,ex:vEx}[S.tab]()}
 function render(){
@@ -4718,7 +4737,9 @@ Object.assign(ACT,{
 document.addEventListener('change',ev=>{const t=ev.target;if(t&&t.dataset&&t.dataset.s==='m'){const e=document.getElementById('mico');if(e)e.innerHTML=machIco(t.value)}});
 document.addEventListener('input',ev=>{const t=ev.target;if(t&&t.dataset&&t.dataset.f==='n'){const e=document.getElementById('xico');if(e)e.innerHTML=exIco(t.value)}});
 Object.assign(ACT,{
- wkstart:()=>{sxGo(sxOpen())},
+ wkstart:()=>{sxGo(sxPart(TI()),TI())},
+ mkpick:()=>{S.sub='mk';window.scrollTo(0,0)},
+ wkmk:b=>{const d=+b.dataset.v;sxGo(sxPart(d),d)},
  sxres:b=>{const o=S.sx[b.dataset.v];if(!o||o.st!=='p'||o.wk!==W()){toast('تعذّر استكمال هذه الجلسة');return false}sxGo(o)},
  sxview:b=>{S.sub='arch';UI.ar='ses';UI.ad=b.dataset.v;window.scrollTo(0,0)},
  sxopen:b=>{UI.ad=b.dataset.v;window.scrollTo(0,0)},
@@ -4739,6 +4760,10 @@ Object.assign(ACT,{
   sxAfter(q.s);window.scrollTo(0,0)},
  wknext:()=>{const U=UI.wk,sx=U.sid&&S.sx[U.sid];if(sx){const x=sx.ex.find(q=>q.k===U.ks[U.i]);if(x&&!x.dn)x.sk=1}U.i++;U.s=0;U.w=null;U.r=null;TM.rest=0;if(sx)sxAfter(sx)},
  wkskip:()=>{TM.rest=0},
+ wkundo:()=>{const U=UI.wk,sx=U&&U.sid&&S.sx[U.sid];if(!sx)return false;let bx=null;sx.ex.forEach(x=>x.sets.forEach((q,i)=>{if(!bx||q.at>=bx.q.at)bx={x:x,q:q,i:i}}));if(!bx)return false;
+  const x=bx.x,q=bx.q;x.sets.splice(bx.i,1);if(x.dn){x.dn=0;delete S.done[x.k]}if(q.ty!=='w')U.vol=Math.max(0,U.vol-(q.w||0)*(q.r||0));
+  sx.vol=U.vol;sx.up=Date.now();if(sx.st==='c'){sx.st='p';delete sx.fin}x.sk=0;const i=U.ks.indexOf(x.k);if(i>=0){U.i=i;U.s=sxCnt(x)}U.w=q.w||null;U.r=q.r||null;U.ty='n';U.rp=0;TM.rest=0;
+  if(!sx.ex.some(y=>y.sets.length)){delete S.sx[sx.id];U.sid=null}toast('تراجعت عن آخر مجموعة')},
  wkend:()=>{const U=UI.wk;if(!U){S.sub=null;return}const sx=U.sid&&S.sx[U.sid];
   if(sx){sxAfter(sx);if(sx.st!=='c'){const a=sxProg(sx);UI.wk=null;TM.run=false;TM.rest=0;S.sub=null;S.tab='dash';toast('حُفظ تمرين جزئي: '+a.d+' من '+a.t+' مجموعة');return}U.i=U.ks.length;return}
   UI.wk=null;TM.run=false;TM.acc=0;TM.t0=0;TM.rest=0;S.sub=null},
