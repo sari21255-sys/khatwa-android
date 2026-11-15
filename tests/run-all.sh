@@ -8,6 +8,7 @@ echo "== هوية الوسيط (P1) =="; node tests/worker.p1.test.mjs
 echo "== اليوم/التمرين/الأرشيف (UX) =="; NODE_PATH="$(npm root -g)" node tests/ux.e2e.js
 echo "== الخط المحلي =="; NODE_PATH="$(npm root -g)" node tests/font.e2e.js
 echo "== دمج الجلسات (تعادل، حجم، تراجع) =="; NODE_PATH="$(npm root -g)" node tests/sxmerge.e2e.js
+echo "== التقارير (الفترة والعوامل) =="; NODE_PATH="$(npm root -g)" node tests/rpt.e2e.js
 echo "== الوزن والوجبات (مسار واحد) =="; NODE_PATH="$(npm root -g)" node tests/wm.e2e.js
 echo "== حصة اليوم والتعويض (UX2) =="; NODE_PATH="$(npm root -g)" node tests/ux2.e2e.js
 echo "== موافقة الذكاء الاصطناعي =="; NODE_PATH="$(npm root -g)" node tests/consent.e2e.js

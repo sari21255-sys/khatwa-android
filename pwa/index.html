@@ -3653,45 +3653,52 @@ function vVis(){
  h+='<button class="lnk" style="border:1px solid var(--bd);border-radius:18px;padding:14px;background:var(--card)" data-a="sub" data-v="rem">'+ic('bell')+'<span class="t"><b>منبه الذهاب والغياب</b><br><span class="mu">عدّل أوقات التذكير وتنبيه الغياب</span></span>'+ic('next')+'</button>';
  return h}
 /* reports */
+/* التقرير: الفترة = آخر wks أسابيع تنتهي بالأسبوع الحالي. الأسبوع الحالي يُحسب حتى اليوم فقط (لا يُحاسَب على أيام لم تأتِ).
+   المتوسطات تبدأ من أول أسبوع فيه بيانات، فلا تُحسب أسابيع ما قبل الاستخدام أصفارًا. المكوّن بلا بيانات (تغذية، نوم، وزن) يُستبعد من الدرجة ويظهر «—». */
 function rptData(wks){wks=+wks||8;
- const w0=W(),P=S.prof,nt=S.nt,out={weeks:[],plan:0};
- const planned=S.plan.reduce((a,p)=>a+p.ex.length,0);out.plan=planned;
+ const w0=W(),P=S.prof,nt=S.nt,ti=TI(),out={weeks:[],plan:0};
+ const exOf=n=>S.plan.slice(0,n).reduce((a,p)=>a+p.ex.length,0),planned=exOf(7);out.plan=planned;
  for(let i=wks-1;i>=0;i--){
-  const ws=addDays(w0,-7*i),dates=[0,1,2,3,4,5,6].map(k=>addDays(ws,k));
+  const ws=addDays(w0,-7*i),cur=i===0,nd=cur?ti+1:7,dates=[0,1,2,3,4,5,6].slice(0,nd).map(k=>addDays(ws,k)),pl=cur?exOf(nd):planned;
   let done=0;Object.keys(S.done).forEach(k=>{if(k.indexOf(ws+'|')===0)done++});
   let logged=0,kok=0,pok=0;dates.forEach(d=>{const f=foodSum(d);if(f.n){logged++;if(nt.kcal&&Math.abs(f.kcal-nt.kcal)<=nt.kcal*.1)kok++;if(nt.p&&f.p>=nt.p*.9)pok++}});
   const act={};dates.forEach(d=>{if(Object.keys(S.done).some(k=>S.done[k]&&S.done[k].date===d)||(S.ses[d]||[]).length||(gy().vis||[]).some(x=>x.d===d))act[d]=1});
   let vol=0;Object.keys(S.done).forEach(k=>{const r=S.done[k];if(r&&dates.indexOf(r.date)>=0)vol+=(r.w||0)*(r.r||0)});
   const sl=dates.map(d=>+S.sleep[d]||0).filter(x=>x>0),slav=sl.length?sl.reduce((a,b)=>a+b,0)/sl.length:0;
-  const tr=planned?Math.min(100,Math.round(done/planned*100)):(Object.keys(act).length?60:0);
-  const nu=logged?Math.round(logged/7*40+kok/logged*30+pok/logged*30):0;
+  const tr=planned?(pl?Math.min(100,Math.round(done/pl*100)):null):(Object.keys(act).length?60:0);
+  const nu=logged?Math.round(logged/nd*40+kok/logged*30+pok/logged*30):0;
   const co=Math.min(100,Math.round(Object.keys(act).length/Math.max(1,+P.dpw||3)*100));
-  out.weeks.push({ws:ws,done:done,tr:tr,nu:nu,co:co,logged:logged,kok:kok,pok:pok,days:Object.keys(act).length,vol:vol,sl:slav})}
- const av=k=>{const a=out.weeks.filter(x=>x[k]>0||k==='tr');return a.length?a.reduce((s,x)=>s+x[k],0)/out.weeks.length:0};
- out.tr=av('tr');out.nu=av('nu');out.co=av('co');
- const sls=out.weeks.filter(x=>x.sl>0);out.sl=sls.length?sls.reduce((a,x)=>a+x.sl,0)/sls.length:0;out.slp=out.sl?Math.min(100,Math.round(out.sl/(+P.sleep||7)*100)):0;
- const o=wStats();out.wt=o;let pr=0;if(o&&o.dir&&o.wk!=null)pr=Math.max(0,Math.min(100,Math.round(50+(o.wk*o.dir)/0.5*50)));else if(o&&o.dir===0)pr=70;out.pr=pr;
+  out.weeks.push({ws:ws,done:done,tr:tr,nu:nu,co:co,logged:logged,kok:kok,pok:pok,days:Object.keys(act).length,vol:vol,sl:slav,cur:cur,nd:nd,has:!!(done||logged||Object.keys(act).length||sl.length)})}
+ out.from=out.weeks[0].ws;out.to=TD();
+ const fi=out.weeks.findIndex(x=>x.has),act=fi<0?[]:out.weeks.slice(fi);out.nact=act.length;out.first=fi<0?null:out.weeks[fi].ws;
+ const mean=(a,k)=>{const v=a.map(x=>x[k]).filter(x=>x!=null);return v.length?v.reduce((s,x)=>s+x,0)/v.length:null};
+ out.tr=mean(act,'tr');out.co=mean(act,'co');out.hasNu=out.weeks.some(x=>x.logged>0);out.nu=out.hasNu?mean(act,'nu'):null;
+ const sls=out.weeks.filter(x=>x.sl>0);out.sl=sls.length?sls.reduce((a,x)=>a+x.sl,0)/sls.length:0;out.slp=out.sl?Math.min(100,Math.round(out.sl/(+P.sleep||7)*100)):null;
+ const o=wStats();out.wt=o;let pr=null;if(o&&o.dir&&o.wk!=null)pr=Math.max(0,Math.min(100,Math.round(50+(o.wk*o.dir)/0.5*50)));else if(o&&o.dir===0)pr=70;out.pr=pr;
  const half=Math.floor(wks/2),v1=out.weeks.slice(0,half).reduce((a,x)=>a+x.vol,0),v2=out.weeks.slice(half).reduce((a,x)=>a+x.vol,0);out.vch=v1>0?Math.round((v2-v1)/v1*100):null;
- out.prs=(S.prs||[]).filter(x=>x.date>=addDays(w0,-7*wks)).length;
- out.score=Math.round(out.tr*.35+out.nu*.25+out.co*.2+out.slp*.1+out.pr*.1);
- out.hasData=out.weeks.some(x=>x.done||x.logged||x.days);
+ out.prs=(S.prs||[]).filter(x=>x.date>=out.from).length;
+ const comp=[[out.tr,.35],[out.nu,.25],[out.co,.2],[out.slp,.1],[out.pr,.1]].filter(x=>x[0]!=null),wsum=comp.reduce((a,x)=>a+x[1],0);
+ out.score=out.nact&&wsum?Math.round(comp.reduce((a,x)=>a+x[0]*x[1],0)/wsum):0;
+ out.used=[['التمارين',out.tr!=null],['التغذية',out.nu!=null],['الانتظام',out.co!=null],['النوم',out.slp!=null],['التقدّم',out.pr!=null]].filter(x=>x[1]).map(x=>x[0]);
+ out.hasData=out.nact>0;
  return out}
 function rptLocal(d){
  const s=[],g=[],a=[];
- if(d.tr>=75)s.push('التزامك بخطة التمارين عالٍ ('+Math.round(d.tr)+'٪).');else g.push('أنجزت '+Math.round(d.tr)+'٪ فقط من تمارين الخطة.');
- if(d.nu>=70)s.push('تسجيل التغذية والالتزام بالسعرات والبروتين جيد.');else if(d.nu>0)g.push('الالتزام بالتغذية '+Math.round(d.nu)+'٪: سجّل أيامًا أكثر وقرّب سعراتك وبروتينك من الهدف.');else g.push('لا تغذية مسجّلة في الفترة، وتحليل الالتزام بها ناقص.');
- if(d.vch!=null){if(d.vch>3)s.push('حجم تدريبك ارتفع '+d.vch+'٪ في النصف الأخير من الفترة.');else if(d.vch<-10)g.push('حجم تدريبك انخفض '+Math.abs(d.vch)+'٪ في النصف الأخير.')}
+ if(d.tr==null){}else if(d.tr>=75)s.push('التزامك بخطة التمارين عالٍ ('+Math.round(d.tr)+'٪).');else g.push('أنجزت '+Math.round(d.tr)+'٪ فقط من تمارين الخطة.');
+ if(d.nu==null)g.push('لا تغذية مسجّلة في الفترة، لذلك لم تدخل التغذية في الدرجة.');else if(d.nu>=70)s.push('تسجيل التغذية والالتزام بالسعرات والبروتين جيد.');else g.push('الالتزام بالتغذية '+Math.round(d.nu)+'٪: سجّل أيامًا أكثر وقرّب سعراتك وبروتينك من الهدف.');
+ if(d.slp==null)g.push('لا نوم مسجّل في الفترة، لذلك لم يدخل النوم في الدرجة.');
+ if(d.vch!=null){if(d.vch>3)s.push('حجم تدريبك (مجموع الوزن×التكرار) ارتفع '+d.vch+'٪ في النصف الأخير من الفترة.');else if(d.vch<-10)g.push('حجم تدريبك انخفض '+Math.abs(d.vch)+'٪ في النصف الأخير.')}
  if(d.prs)s.push('حققت '+d.prs+' رقمًا شخصيًا جديدًا.');
- if(d.wt&&d.wt.wk!=null&&d.wt.dir){if(d.wt.wk*d.wt.dir>0)s.push('اتجاه وزنك يخدم هدفك ('+Math.abs(d.wt.wk).toFixed(2)+' كغ أسبوعيًا).');else g.push('اتجاه وزنك لا يخدم هدفك حاليًا.')}
+ if(d.wt&&d.wt.wk!=null&&d.wt.dir){if(d.wt.wk*d.wt.dir>0)s.push('اتجاه وزنك في آخر 4 أسابيع يخدم هدفك ('+Math.abs(d.wt.wk).toFixed(2)+' كغ أسبوعيًا).');else g.push('اتجاه وزنك في آخر 4 أسابيع لا يخدم هدفك.')}
  if(d.sl&&d.sl<(+S.prof.sleep||7)-.5)g.push('متوسط نومك '+d.sl.toFixed(1)+' ساعة وأقل من هدفك.');
- if(d.tr<75)a.push('ثبّت مواعيد ذهابك من صفحة جدول زيارتي وفعّل المنبه.');
- if(d.nu<70)a.push('سجّل وجباتك يوميًا لأسبوعين، وابدأ بالفطور والغداء.');
+ if(d.tr!=null&&d.tr<75)a.push('ثبّت مواعيد ذهابك من صفحة جدول زيارتي وفعّل المنبه.');
+ if(d.nu==null||d.nu<70)a.push('سجّل وجباتك يوميًا لأسبوعين، وابدأ بالفطور والغداء.');
  if(d.sl&&d.sl<(+S.prof.sleep||7)-.5)a.push('قدّم موعد نومك 30 دقيقة هذا الأسبوع.');
  if(!a.length)a.push('حافظ على نفس الوتيرة وارفع أوزان التمارين الأساسية تدريجيًا.');
- return{verdict:d.score>=80?'أداء ممتاز ومنتظم.':(d.score>=60?'أداء جيد وفيه مجال واضح للتحسن.':(d.hasData?'الالتزام الحالي أقل من المطلوب لبلوغ هدفك.':'البيانات قليلة، سجّل أكثر ليكتمل التحليل.')),strengths:s,gaps:g,actions:a}}
+ return{verdict:!d.hasData?'لا بيانات كافية في هذه الفترة.':(d.nact<2?'البيانات أقل من أسبوعين، فالدرجة أولية.':(d.score>=80?'أداء ممتاز ومنتظم.':(d.score>=60?'أداء جيد وفيه مجال واضح للتحسن.':'الالتزام الحالي أقل من المطلوب لبلوغ هدفك.'))),strengths:s,gaps:g,actions:a}}
 async function rptAi(){
  const d=rptData(UI.rpw);UI.rpb=1;UI.rpm='';render();
- try{const r=await aiJson('حلّل وضع المستخدم الرياضي بناء على الأرقام التالية لآخر '+UI.rpw+' أسابيع. التمارين المنجزة من الخطة: '+Math.round(d.tr)+'٪، الالتزام بالتغذية: '+Math.round(d.nu)+'٪، انتظام الأيام: '+Math.round(d.co)+'٪، النوم: '+(d.sl?d.sl.toFixed(1)+' ساعة':'غير مسجل')+'، تغير حجم التدريب بين نصفي الفترة: '+(d.vch==null?'غير متاح':d.vch+'٪')+'، أرقام شخصية جديدة: '+d.prs+'، الدرجة الكلية: '+d.score+'. أسبوعيًا (تمارين٪/تغذية٪/أيام نشاط): '+d.weeks.map(x=>x.tr+'/'+x.nu+'/'+x.days).join(' | ')+'. '+aiCtx()+' كن مباشرًا ودقيقًا، واذكر الأرقام، ولا تشخّص طبيًا. أرجع JSON فقط: {"verdict":"حكم عام في جملتين","strengths":["حتى 4"],"gaps":["حتى 4"],"actions":["3 إلى 5 خطوات عملية للأسبوع القادم"]}','default');
+ try{const r=await aiJson('حلّل وضع المستخدم الرياضي بناء على الأرقام التالية لآخر '+UI.rpw+' أسابيع. التمارين المنجزة من الخطة: '+(d.tr==null?'غير متاح':Math.round(d.tr)+'٪')+'، الالتزام بالتغذية: '+(d.nu==null?'غير مسجل':Math.round(d.nu)+'٪')+'، انتظام الأيام: '+Math.round(d.co||0)+'٪، النوم: '+(d.sl?d.sl.toFixed(1)+' ساعة':'غير مسجل')+'، تغير حجم التدريب بين نصفي الفترة: '+(d.vch==null?'غير متاح':d.vch+'٪')+'، أرقام شخصية جديدة: '+d.prs+'، الدرجة الكلية: '+d.score+'. أسبوعيًا (تمارين٪/تغذية٪/أيام نشاط): '+d.weeks.map(x=>x.tr+'/'+x.nu+'/'+x.days).join(' | ')+'. '+aiCtx()+' كن مباشرًا ودقيقًا، واذكر الأرقام، ولا تشخّص طبيًا. أرجع JSON فقط: {"verdict":"حكم عام في جملتين","strengths":["حتى 4"],"gaps":["حتى 4"],"actions":["3 إلى 5 خطوات عملية للأسبوع القادم"]}','default');
   const f=a=>(a||[]).map(String).filter(Boolean).slice(0,5);UI.rpr={verdict:String(r.verdict||''),strengths:f(r.strengths),gaps:f(r.gaps),actions:f(r.actions),ai:1};if(!UI.rpr.verdict)throw{code:'invalid_json'}}
  catch(e){UI.rpm=aiMsg(e);UI.rpr=null}
  UI.rpb=0;render()}
@@ -3699,7 +3706,8 @@ function vRpt(){
  const d=rptData(UI.rpw),L=UI.rpr||Object.assign(rptLocal(d),{ai:0}),lb=d.weeks.map(x=>x.ws.slice(5));
  let h=back()+'<h1>تقاريري وتحليل وضعي</h1><div class="mu" style="margin-bottom:10px">تحليل لمدى التزامك وتطورك في التمارين والتغذية.</div>';
  h+=seg([['4','4 أسابيع'],['8','8 أسابيع'],['12','12 أسبوعًا']],'rpw',String(UI.rpw));
- h+='<div class="card hl"><div class="row" style="flex-wrap:nowrap;gap:14px"><div style="text-align:center;flex:none"><div class="num" style="font-size:46px;font-weight:900;line-height:1">'+d.score+'</div><div class="mu" style="font-size:12px">الدرجة الكلية من 100</div></div><div style="flex:1">'+[['التمارين',d.tr],['التغذية',d.nu],['الانتظام',d.co],['النوم',d.slp],['التقدّم',d.pr]].map(x=>'<div class="row" style="flex-wrap:nowrap;gap:8px;margin:3px 0"><span style="width:62px;font-size:13px">'+x[0]+'</span><div class="bar" style="flex:1"><i style="width:'+Math.round(x[1])+'%"></i></div><span class="num" style="width:34px;font-size:13px">'+Math.round(x[1])+'</span></div>').join('')+'</div></div></div>';
+ h+='<div class="mu" id="rpt-per" style="margin:6px 0 10px;font-size:13px">الفترة من '+d.from+' إلى '+d.to+' (الأسبوع الحالي يُحسب حتى اليوم). '+(d.hasData?'المتوسطات من '+d.first+' أول أسبوع فيه بيانات. ':'')+'الدرجة تعتمد على: '+(d.used.length?d.used.join('، '):'لا شيء بعد')+'. التقدّم يقيس اتجاه وزنك في آخر 4 أسابيع بغضّ النظر عن الفترة.</div>';
+ h+='<div class="card hl"><div class="row" style="flex-wrap:nowrap;gap:14px"><div style="text-align:center;flex:none"><div class="num" style="font-size:46px;font-weight:900;line-height:1">'+d.score+'</div><div class="mu" style="font-size:12px">الدرجة الكلية من 100</div></div><div style="flex:1">'+[['التمارين',d.tr],['التغذية',d.nu],['الانتظام',d.co],['النوم',d.slp],['التقدّم',d.pr]].map(x=>'<div class="row" style="flex-wrap:nowrap;gap:8px;margin:3px 0"><span style="width:62px;font-size:13px">'+x[0]+'</span><div class="bar" style="flex:1"><i style="width:'+(x[1]==null?0:Math.round(x[1]))+'%"></i></div><span class="num" style="width:34px;font-size:13px">'+(x[1]==null?'—':Math.round(x[1]))+'</span></div>').join('')+'</div></div></div>';
  h+='<div class="card"><h2>'+ic('dumbbell')+'التمارين المنجزة أسبوعيًا (٪)</h2>'+bars(d.weeks.map(x=>x.tr),lb,d.weeks.length-1)+'</div>';
  h+='<div class="card"><h2>'+ic('fork')+'الالتزام بالتغذية أسبوعيًا (٪)</h2>'+bars(d.weeks.map(x=>x.nu),lb,d.weeks.length-1)+'<div class="mu" style="margin-top:8px;font-size:13px">يحسب أيام التسجيل، والأيام القريبة من هدف السعرات (±10٪)، وأيام بلوغ 90٪ من هدف البروتين.</div></div>';
  h+='<div class="card"><h2>'+ic('spark')+(L.ai?'تحليل الذكاء الاصطناعي':'تحليل آلي من أرقامك')+'</h2><div style="margin-bottom:8px">'+esc(L.verdict)+'</div>'+(L.strengths.length?'<b>نقاط القوة</b>'+lst(L.strengths.map(esc)):'')+(L.gaps.length?'<b>فجوات</b>'+lst(L.gaps.map(esc)):'')+(L.actions.length?'<b>خطة الأسبوع القادم</b>'+lst(L.actions.map(esc)):'')+'<div class="row" style="margin-top:10px"><button class="btn" data-a="rai"'+(UI.rpb?' disabled':'')+'>'+ic('spark')+(SM?'حلّل بالذكاء الاصطناعي':'أعد التحليل')+'</button><button class="btn ghost" data-a="report">'+ic('download')+'تقرير للطباعة</button></div>'+(UI.rpb?'<div class="note" style="margin-top:8px">جارٍ التحليل…</div>':'')+(UI.rpm?'<div class="note" style="margin-top:8px;color:var(--tx)">'+esc(UI.rpm)+'</div>':'')+'</div>';
