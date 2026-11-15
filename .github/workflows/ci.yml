@@ -36,6 +36,7 @@ jobs:
           NODE_PATH="$(npm root -g)" node tests/sxmerge.e2e.js
           NODE_PATH="$(npm root -g)" node tests/wm.e2e.js
           NODE_PATH="$(npm root -g)" node tests/theme.e2e.js
+          NODE_PATH="$(npm root -g)" node tests/wrap.e2e.js
           NODE_PATH="$(npm root -g)" node tests/rpt.e2e.js
           NODE_PATH="$(npm root -g)" node tests/font.e2e.js
           NODE_PATH="$(npm root -g)" node tests/consent.e2e.js
