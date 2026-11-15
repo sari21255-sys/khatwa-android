@@ -2,3 +2,14 @@
 *.png binary
 *.jpg binary
 *.jar binary
+
+# خطوط محلية: ثنائية، لا تحويل أسطر على أي نظام
+app/fonts/*.woff binary
+app/fonts/*.ttf binary
+pwa/fonts/*.woff binary
+pwa/fonts/*.ttf binary
+www/fonts/*.woff binary
+www/fonts/*.ttf binary
+app/fonts/OFL.txt text eol=lf
+pwa/fonts/OFL.txt text eol=lf
+www/fonts/OFL.txt text eol=lf

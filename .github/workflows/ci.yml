@@ -88,7 +88,8 @@ jobs:
           for line in open('tools/build.sha256',encoding='utf-8'):
               h,f=line.split()
               b=open(f,'rb').read()
-              ok=(b'\r' not in b) and hashlib.sha256(b).hexdigest()==h
-              print('OK  ' if ok else 'FAIL', f, hashlib.sha256(b).hexdigest(), 'CR' if b'\r' in b else 'LF')
+              binary=f.startswith('pwa/fonts/') and not f.endswith('.txt')   # الخطوط ثنائية: قد تحوي 0x0d، ويكفي تطابق SHA-256
+              ok=(binary or b'\r' not in b) and hashlib.sha256(b).hexdigest()==h
+              print('OK  ' if ok else 'FAIL', f, hashlib.sha256(b).hexdigest(), 'binary' if binary else ('CR' if b'\r' in b else 'LF'))
               bad+=0 if ok else 1
           sys.exit(1 if bad else 0)
