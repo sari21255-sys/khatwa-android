@@ -1071,15 +1071,21 @@ function rsPut(r){const k=r.k,v=r.v;
  if(v.m==='a'){if(!Array.isArray(S[k]))S[k]=[];const i=S[k].findIndex(x=>x&&String(x.id)===e);if(i>=0)S[k][i]=val;else S[k].push(val)}
  else{if(!S[k]||typeof S[k]!=='object'||Array.isArray(S[k]))S[k]={};S[k][e]=val}
  return val}
+function sxApplyRemote(r,key,rd){const id=String(r.v.e),loc=S.sx[id],inc=cleanData(r.v.v);if(!loc||!inc||!Array.isArray(inc.ex)||inc.id!==id)return false;
+ const m=sxMerge(loc,inc),mi=JSON.stringify(m),ii=JSON.stringify(sxCanon(inc));S.sx[id]=m;RS.sxm=(RS.sxm||[]).concat([id]);
+ if(mi===ii)RSM.rec[key]={h:rsH(mi),t:+r.ts,x:0,d:rd};              /* الوارد يحوي كل ما عندنا: متزامنون */
+ else{RSM.rec[key]={h:rsH(mi),t:rsTs(Math.max(Date.now(),+r.ts+1)),x:0,p:1,d:RSM.dev};RS.again=1}   /* عندنا ما ليس في الوارد: يُرفع مدموجًا بتوقيت أحدث من الوارد (لا من وقت آخر حفظ) */
+ return true}
 function rsApply(recs){let n=0;
  for(const r of recs){if(!r||typeof r.k!=='string'||typeof r.r!=='string')continue;const key=r.k+'\u0001'+r.r,e=RSM.rec[key],x=!!r.x;
   const rd=String(r.d);
   if(e){const ed=e.d||(e.p?RSM.dev:null);                                                      /* الجهاز الكاتب لما عندنا: معروف دائمًا لما كتبناه أو استلمناه بعد هذا التعديل */
    if(e.t===+r.ts&&!!e.x===x&&(ed===null||ed===rd)){delete e.p;if(!e.d)e.d=rd;continue}       /* السجل نفسه (صدى كتابتنا أو تكرار): نفس التوقيت والحذف ونفس الجهاز */
+   if(r.k==='sx'&&!x&&!e.x&&r.v&&r.v.v&&S.sx&&S.sx[String(r.v.e)]&&typeof sxApplyRemote==='function'){const q=sxApplyRemote(r,key,rd);if(q){n++;continue}}
    if(!rsWins(+r.ts,x,rd,e.t,!!e.x,ed||RSM.dev))continue}                                       /* المحلي يفوز (يشمل تعادل التوقيت بفارق الجهاز): يبقى وسيُرسل */
   const val=rsPut(r);if(val===null)continue;
   RSM.rec[key]={h:x?0:rsH(JSON.stringify(val)),t:+r.ts,x:x?1:0,d:rd};n++}                       /* قرار الخادم: القيمة والتوقيت والجهاز الفائز وزوال الانتظار */
- if(n){try{norm();localStorage.setItem('fit1',JSON.stringify(S))}catch(e){lg(e)}}
+ if(n){try{norm();let rc=0;(RS.sxm||[]).forEach(i=>{if(S.sx[i]&&sxReconcile(S.sx[i]))rc=1});RS.sxm=[];if(rc)S.ts=Date.now();localStorage.setItem('fit1',JSON.stringify(S));if(rc)rsStamp()}catch(e){lg(e)}}
  return n}
 async function rsCall(body){if(!(await SB.fresh()))throw{code:SB.ses?'net':'auth'};
  const r=await fetch(CFG.sbUrl+'/rest/v1/rpc/sync_exchange',{method:'POST',headers:SB.hd(1),body:JSON.stringify(body)});
@@ -4016,11 +4022,38 @@ const sxPrev=()=>sxList().filter(x=>x.st==='p'&&x.wk!==W());
 function dayKeys(d){return tasks().filter(t=>t.d===d&&!t.r).map(t=>t.k)}
 function sxMissed(){const ti=TI(),T=tasks(),o=[];S.plan.forEach((p,d)=>{if(d>=ti||!p.ex.length)return;const ts=T.filter(x=>x.d===d),left=ts.filter(x=>!x.r);if(!left.length)return;const q=sxPart(d);o.push({d:d,t:p.t,n:left.length,tot:ts.length,s:q,pr:q?sxProg(q):null})});return o}
 function sxProg(s){let d=0,t=0;s.ex.forEach(x=>{t+=x.tg;d+=Math.min(sxCnt(x),x.tg)});return{d:d,t:t}}
+/* ---- دمج جلسة واحدة من جهازين (نفس المعرّف): اتحاد المجموعات بمعرّفها، والأحدث (up) يفوز لنفس المجموعة، والحذف (rm) يغلب.
+   النتيجة قانونية الترتيب حتى يعطي الجهازان البصمة نفسها ولا يتبادلان الرفع بلا نهاية. ---- */
+const sxRid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3);
+const sxSid=q=>q.i||('l'+q.at+'.'+q.w+'.'+q.r+'.'+q.ty);
+function sxCanon(s){const ex=(s.ex||[]).slice().sort((a,b)=>((a.o==null?1e6:a.o)-(b.o==null?1e6:b.o))||(a.d-b.d)||(a.k<b.k?-1:a.k>b.k?1:0));
+ const o={id:s.id,wk:s.wk,date:s.date,ts:s.ts,up:s.up||s.ts,dy:s.dy,kd:s.kd,t:s.t,st:s.st,sec:+s.sec||0,vol:+s.vol||0};
+ if(s.fin)o.fin=s.fin;if(s.dy==null){delete o.dy;delete o.kd}
+ o.ex=ex.map(x=>{const rm=Array.from(new Set(x.rm||[])).sort(),dead=new Set(rm);
+  const sets=(x.sets||[]).filter(q=>!dead.has(sxSid(q))).sort((a,b)=>(a.at-b.at)||(sxSid(a)<sxSid(b)?-1:1)).map(q=>({i:q.i,w:q.w,r:q.r,ty:q.ty,rp:q.rp||0,at:q.at,up:q.up||q.at}));
+  sets.forEach(q=>{if(q.i==null)delete q.i});
+  const r={k:x.k,id:x.id,n:x.n,d:x.d,tg:x.tg,tr:x.tr,o:x.o==null?undefined:x.o,sets:sets,rm:rm,dn:x.dn?1:0,sk:x.sk?1:0};if(r.o===undefined)delete r.o;return r});
+ return o}
+function sxMerge(a,b){const A=sxCanon(a),B=sxCanon(b),by={};
+ [A,B].forEach(s=>s.ex.forEach(x=>{const c=by[x.k];if(!c){by[x.k]=JSON.parse(JSON.stringify(x));return}
+  c.rm=Array.from(new Set(c.rm.concat(x.rm))).sort();const m={};c.sets.concat(x.sets).forEach(q=>{const id=sxSid(q),e=m[id];if(!e||(q.up||q.at)>(e.up||e.at))m[id]=q});
+  c.sets=Object.keys(m).map(i=>m[i]);c.dn=c.dn||x.dn?1:0;c.sk=c.sk&&x.sk?1:0;if(c.o==null&&x.o!=null)c.o=x.o}));
+ const o={};Object.keys(A).forEach(k=>{o[k]=A[k]});o.ex=Object.keys(by).map(k=>by[k]);
+ o.ts=Math.min(A.ts,B.ts);o.up=Math.max(A.up||0,B.up||0);o.sec=Math.max(A.sec,B.sec);o.vol=Math.max(A.vol,B.vol);
+ o.st=(A.st==='c'||B.st==='c')?'c':'p';if(o.st==='c'){o.fin=Math.max(A.fin||0,B.fin||0)||undefined;if(!o.fin)delete o.fin}
+ return sxCanon(o)}
+/* يوفّق الجلسة مع الإنجاز بعد الدمج: التمرين مكتمل إذا بلغت مجموعاته هدفه أو سُجّل في S.done؛ ويُكتب S.done إن لزم. يعيد true عند أي تغيير */
+function sxReconcile(s){let ch=false;const T=tasks();
+ s.ex.forEach(x=>{const t=T.find(q=>q.k===x.k),cnt=sxCnt(x),dn=cnt>=x.tg||!!(t&&t.r);
+  if(dn&&t&&!t.r&&s.wk===W()&&cnt>=x.tg){const ls=x.sets.filter(q=>q.ty!=='w').slice(-1)[0]||{};mark(x.k,ls.w||0,ls.r||x.tr);if(S.done[x.k]){S.done[x.k].date=s.date;const rr=ls.ty==='f'?10:ls.rp;if(rr)S.done[x.k].rpe=rr}ch=true}
+  const v=dn?1:0;if((x.dn?1:0)!==v){x.dn=v;ch=true}});
+ const all=s.ex.every(x=>x.dn),st=all?'c':'p';if(s.st!==st){s.st=st;if(st==='c'&&!s.fin)s.fin=Date.now();if(st==='p')delete s.fin;ch=true}
+ return ch}
 function sxNew(ks){const T=tasks(),id='sx'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
- const ex=ks.map(k=>T.find(t=>t.k===k)).filter(Boolean).map(t=>({k:t.k,id:t.e.id,n:t.e.n,d:t.d,tg:t.e.s,tr:t.e.r,sets:[],dn:0,sk:0}));
+ const ex=ks.map(k=>T.find(t=>t.k===k)).filter(Boolean).map((t,o)=>({k:t.k,id:t.e.id,n:t.e.n,d:t.d,tg:t.e.s,tr:t.e.r,o:o,sets:[],rm:[],dn:0,sk:0}));
  const dy=ex.length?ex[0].d:TI();return S.sx[id]={id:id,wk:W(),date:TD(),ts:Date.now(),up:Date.now(),dy:dy,kd:dy===TI()?'t':'m',t:(S.plan[dy]||{}).t||'',st:'p',sec:0,vol:0,ex:ex}}
 function sxRec(t,w,r,ty,rp){const U=UI.wk;let s=U.sid&&S.sx[U.sid];if(!s){s=sxNew(U.ks);U.sid=s.id}
- const x=s.ex.find(q=>q.k===t.k);if(x)x.sets.push({w:w,r:r,ty:ty,rp:rp||0,at:Date.now()});s.up=Date.now();return{s:s,x:x}}
+ const x=s.ex.find(q=>q.k===t.k),now=Date.now();if(x)x.sets.push({i:sxRid(),w:w,r:r,ty:ty,rp:rp||0,at:now,up:now});s.up=now;return{s:s,x:x}}
 function sxAfter(s){const U=UI.wk,T=tasks();if(U){s.vol=U.vol;s.sec=Math.round(tmEl())}
  if(s.ex.every(x=>x.dn||(T.find(q=>q.k===x.k)||{}).r)){s.st='c';s.fin=Date.now()}}
 function sxBoot(s,ks){TM.acc=s?(+s.sec||0):0;TM.t0=Date.now();TM.run=true;TM.rest=0;
@@ -4561,7 +4594,9 @@ const ACT={
  obgo:()=>{const g=i=>$(i);S.prof.name=(g('#ob-n')||{value:S.prof.name}).value;S.prof.ob=1;const w=+S.prof.startW||0;if(w){S.bw[TD()]=w}S.tab='home'},
  obskip:()=>{S.prof.ob=1;S.tab='home'},
  done:b=>{const k=b.dataset.k;mark(k,$('[data-wk="'+k+'"]').value,$('[data-rk="'+k+'"]').value)},
- undo:b=>{delete S.done[b.dataset.k]},
+ undo:b=>{const k=b.dataset.k;delete S.done[k];
+  /* المسار القديم يلغي الإكمال: نُبقي سجل الجلسة متسقًا (آخر مجموعة عمل تُحذف بعلامة rm، والتمرين غير مكتمل) كي لا يعيد الدمج كتابة S.done */
+  sxList().forEach(s=>{const x=s.ex.find(q=>q.k===k);if(!x||!x.dn)return;const ws=x.sets.filter(q=>q.ty!=='w');const l=ws[ws.length-1];if(l){x.sets.splice(x.sets.indexOf(l),1);x.rm=(x.rm||[]).concat([sxSid(l)]).slice(-60)}x.dn=0;if(s.st==='c'){s.st='p';delete s.fin}s.up=Date.now()})},
  qd:b=>{const k=b.dataset.k;if(S.done[k])delete S.done[k];else{const p=k.split('|'),e=S.plan[+p[1]].ex.find(x=>x.id===p[2]);mark(k,e.w||S.base[e.n]||lastW(e.n),e.r)}},
  del:b=>{S.plan[+b.dataset.d].ex.splice(+b.dataset.i,1)},
  add:b=>{const c=b.closest('.card'),g=f=>c.querySelector('[data-f="'+f+'"]').value,n=g('n').trim();if(!n)return false;const wv=+g('w')||0;if(wv)S.base[n]=wv;S.plan[+b.dataset.d].ex.push(E(n,+g('s')||3,+g('r')||10,wv))},
@@ -4762,7 +4797,7 @@ Object.assign(ACT,{
  wknext:()=>{const U=UI.wk,sx=U.sid&&S.sx[U.sid];if(sx){const x=sx.ex.find(q=>q.k===U.ks[U.i]);if(x&&!x.dn)x.sk=1}U.i++;U.s=0;U.w=null;U.r=null;TM.rest=0;if(sx)sxAfter(sx)},
  wkskip:()=>{TM.rest=0},
  wkundo:()=>{const U=UI.wk,sx=U&&U.sid&&S.sx[U.sid];if(!sx)return false;let bx=null;sx.ex.forEach(x=>x.sets.forEach((q,i)=>{if(!bx||q.at>=bx.q.at)bx={x:x,q:q,i:i}}));if(!bx)return false;
-  const x=bx.x,q=bx.q;x.sets.splice(bx.i,1);if(x.dn){x.dn=0;delete S.done[x.k]}if(q.ty!=='w')U.vol=Math.max(0,U.vol-(q.w||0)*(q.r||0));
+  const x=bx.x,q=bx.q;x.sets.splice(bx.i,1);x.rm=(x.rm||[]).concat([sxSid(q)]).slice(-60);if(x.dn){x.dn=0;delete S.done[x.k]}if(q.ty!=='w')U.vol=Math.max(0,U.vol-(q.w||0)*(q.r||0));
   sx.vol=U.vol;sx.up=Date.now();if(sx.st==='c'){sx.st='p';delete sx.fin}x.sk=0;const i=U.ks.indexOf(x.k);if(i>=0){U.i=i;U.s=sxCnt(x)}U.w=q.w||null;U.r=q.r||null;U.ty='n';U.rp=0;TM.rest=0;
   if(!sx.ex.some(y=>y.sets.length)){delete S.sx[sx.id];U.sid=null}toast('تراجعت عن آخر مجموعة')},
  wkend:()=>{const U=UI.wk;if(!U){S.sub=null;return}const sx=U.sid&&S.sx[U.sid];
