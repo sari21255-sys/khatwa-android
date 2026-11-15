@@ -1086,6 +1086,19 @@ html[data-sj="white"] body .sjday{background:color-mix(in srgb,var(--dc) 7%,#fff
 .sjxo .sico,.sjxp .sico{flex:0 0 40px;width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:color-mix(in srgb,var(--sj-tx) 7%,transparent)}
 .sjxo .sico svg,.sjxp .sico svg{width:30px;height:30px}
 .sjadd input[data-f="n"]{margin-top:8px}
+.sjtrk{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sjtk{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:start;padding:14px;border-radius:20px;border:1px solid var(--sj-ln);background:var(--sj-s1);color:var(--sj-tx);min-height:150px}
+.sjtk b{font-size:19px;margin-top:6px}.sjtk small{color:var(--sj-mu);direction:ltr;font-size:13px}.sjtk .mu{font-size:13px;margin-top:auto}
+.sjtk.soon{opacity:.72}
+.sjemp{display:flex;flex-direction:column;align-items:center;gap:8px;padding:34px 16px;text-align:center}
+html[data-sj] body .wkh{background:var(--sj-s1)!important;color:var(--sj-tx)!important;border:1px solid var(--sj-ln)!important}
+html[data-sj] body .wkh .wkn{border-color:var(--sj-ln)!important}
+html[data-sj] body .wkh .bar{background:var(--sj-ln)!important}html[data-sj] body .wkh .bar i,html[data-sj] body .wkh .wtl i.dn,html[data-sj] body .wkh .wtl i.cu{background:var(--sj-tx)!important}
+html[data-sj] body .dgrid{display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;gap:6px!important}
+html[data-sj] body .dgrid .dt{min-width:0;width:auto;padding:8px 2px!important;border-radius:14px!important;background:var(--sj-s1)!important;border:1px solid var(--sj-ln)!important;color:var(--sj-tx)!important;box-shadow:none!important}
+html[data-sj] body .dgrid .dt.on{border-color:var(--sj-tx)!important;box-shadow:inset 0 0 0 1px var(--sj-tx)!important}
+html[data-sj] body .dgrid .dt b{font-size:12px}html[data-sj] body .dgrid .dt small,html[data-sj] body .dgrid .dt em{font-size:10px}
+html[data-sj] body .dgrid .dt .ck{border-color:var(--sj-mu)!important}html[data-sj] body .dgrid .dt .ck.ok{background:var(--sj-ok)!important;border-color:var(--sj-ok)!important;color:#fff!important}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -1435,10 +1448,12 @@ function taskRow(t,late){
  else h+='<div class="wrow"><div class="cur"><small>الحالي</small><b>'+F(bs,1)+'</b></div><label><small>وزن هذا الأسبوع</small><input type="number" inputmode="decimal" min="'+bs+'" data-wk="'+t.k+'" value="'+w+'" aria-label="وزن هذا الأسبوع"></label><label><small>التكرار</small><input type="number" inputmode="numeric" data-rk="'+t.k+'" value="'+rp+'" aria-label="التكرار"></label><button class="btn sm" data-a="done" data-k="'+t.k+'">تم</button></div>'+suggLine(t);
  return h+'</div>'}
 function vTrain(){
+ if(UI.trk==='hub'||!UI.trk)return trkHub();
+ if(UI.trk==='cardio')return trkBack()+'<h1>الكارديو</h1><div class="mu" style="margin-bottom:10px">'+DAYS[TI()]+' · '+TD()+'</div>'+vCardio(1);
+ if(UI.trk!=='iron')return trkEmpty(UI.trk);
  const T=tasks(),ti=TI(),dn=T.filter(t=>t.r).length,late=T.filter(t=>t.d<ti&&!t.r),now=T.filter(t=>t.d===ti),pw=S.plan[ti],td=TD(),rs=restLeft();
- let h='<h1>التمرين</h1><div class="mu" style="margin-bottom:10px">'+DAYS[ti]+' · '+(pw.ex.length?esc(pw.t):'يوم راحة')+'</div>'+seg([['today','اليوم'],['week','الأسبوع'],['cardio','كارديو'],['plan','الخطة'],['cum','لم تتحقق'],['disc','اكتشف']],'tw',UI.tw);
+ let h=trkBack()+'<h1>الحديد</h1><div class="mu" style="margin-bottom:10px">'+DAYS[ti]+' · '+(pw.ex.length?esc(pw.t):'يوم راحة')+'</div>'+seg([['today','اليوم'],['week','الأسبوع'],['plan','الخطة'],['cum','لم تتحقق'],['disc','اكتشف']],'tw',UI.tw);
  if(UI.tw==='plan')return h+vPlan().replace(/^<button class="back"[^>]*>.*?<\/button>/,'').replace(/<h1>.*?<\/h1>/,'');
- if(UI.tw==='cardio')return h+vCardio(1);
  if(UI.tw==='disc')return h+vDisc();
  if(UI.tw==='cum')return h+vCum();
  if(UI.tw==='today')h+=planHead()+sxHero(0,0).note+'<div class="row" style="margin:10px 0 12px">'+sxHero(0,0).btn+'</div>'+sxHero(0,0).mk+(isDl()?deloadCard():'');
@@ -3345,6 +3360,8 @@ function vDisc(){
  let h=recoCard();
  h+='<button class="lnk" style="border:1px solid var(--bd);border-radius:18px;padding:14px;margin-bottom:12px;background:var(--card)" data-a="sub" data-v="exl">'+ic('book')+'<span class="t"><b>مكتبة التمارين</b><br><span class="mu">'+XL.length+' تمرينًا بشرح وعضلات مستهدفة، مع بحث وتصفية</span></span>'+ic('next')+'</button>';
  h+='<button class="lnk" style="border:1px solid var(--bd);border-radius:18px;padding:14px;margin-bottom:12px;background:var(--card)" data-a="sub" data-v="aip">'+ic('spark')+'<span class="t"><b>خطة بالذكاء الاصطناعي</b><br><span class="mu">خطة أسبوعية من مكتبة التمارين حسب مستواك</span></span>'+ic('next')+'</button>';
+h+='<button class="lnk" style="border:1px solid var(--bd);border-radius:18px;padding:14px;margin-bottom:12px;background:var(--card)" data-a="sub" data-v="nau">'+ic('dumbbell')+'<span class="t"><b>الأجهزة الرياضية</b><br><span class="mu">دليل أجهزة النادي وطريقة استخدامها</span></span>'+ic('next')+'</button>';
+h+='<button class="lnk" style="border:1px solid var(--bd);border-radius:18px;padding:14px;margin-bottom:12px;background:var(--card)" data-a="sub" data-v="prg">'+ic('book')+'<span class="t"><b>البرامج الجاهزة</b><br><span class="mu">برامج حديد جاهزة تضيفها إلى خطتك</span></span>'+ic('next')+'</button>';
  const mine=S.my||[];
  if(mine.length)h+='<h2 style="margin:14px 0 8px">'+ic('user')+'جلساتي</h2><div class="car">'+mine.map(sessCard).join('')+'</div>';
  CAT.forEach(c=>{const L=SESS.filter(s=>s.cat===c[0]);if(L.length)h+='<h2 style="margin:14px 0 8px">'+c[1]+'</h2><div class="car">'+L.map(sessCard).join('')+'</div>'});
@@ -5299,7 +5316,7 @@ function vEx(){
  let h='<div class="sjttl"><div><h1>المزيد</h1><div class="mu">إدارة التطبيق وتفضيلاتك</div></div></div>';
  h+='<button class="sjrow" data-a="go" data-v="me" style="background:var(--sj-btn)!important;color:var(--sj-btnt)!important"><span class="av" style="width:40px;height:40px;display:grid;place-items:center;border-radius:50%;flex:none">'+(P.av?'<img alt="" src="'+P.av+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover">':esc((P.name||'س').charAt(0)))+'</span><span class="t">الملف الشخصي<small style="color:inherit;opacity:.75">إدارة بياناتك وتفضيلاتك</small></span>'+ic('next')+'</button>';
  h+='<div class="sjsec">الصحة والجسم</div>'+R('hr','heart','الربط الصحي',F2('link'))+R('wl','scale','الوزن والقياسات',F2('wgt'))+R('nu','fork','التغذية','data-a="fgo" data-v="food"');
- h+='<div class="sjsec">النادي</div>'+R('ar','pin','الأندية والزيارات',F2('gyms'),'جدول زياراتي والأجهزة')+R('tr','dumbbell','الأجهزة الرياضية',F2('nau'));
+ h+='<div class="sjsec">النادي</div>'+R('ar','pin','الأندية والزيارات',F2('gyms'),'جدول زياراتي والأجهزة')+R('tr','dumbbell','الأجهزة الرياضية',F2('nau'))+R('tr','gear','خطة التمارين والأوزان','data-a="sub" data-v="plan"');
  h+='<div class="sjsec">تعلّم</div>'+R('rp','timer','المنبهات',F2('rem'))+R('rp','book','الثقافة الرياضية',F2('cul'))+R('wt','calc','الأدوات',F2('tools'))+R('md','spark','المدرب الذكي',F2('coach'));
  h+='<div class="sjsec">التطبيق وحسابي</div>'+R('nt','gear','الإعدادات','data-a="sub" data-v="set"','المظهر والخط واللغة')+R('nt','users','المجتمع',F2('comm'))+R('nt','info','بياناتي والخصوصية','data-a="sub" data-v="set"','النسخ الاحتياطي والحذف');
  h+='<div class="sechead"><h2>كل المزايا</h2></div>';
@@ -5310,6 +5327,24 @@ function vEx(){
  [['التدريب',['wk','plan','prog','ach','arch','rpt']],['الصحة والتغذية',['meal','wgt','tools','link','rem']],['النادي والمعرفة',['gyms','nau','vis','cul','coach']],['المجتمع والحساب',['comm','nc','set','me']]].forEach(g=>{h+='<div class="sechead"><h2>'+g[0]+'</h2></div>'+rail(g[1].map(i=>chipF(FD[i])))});
  return h}
 Object.assign(ENT,{'اليوم':'Today','التمرين':'Workout','التقدّم':'Progress','المزيد':'More','المظهر':'Appearance','تسجيل سريع':'Quick log','تسجيل الماء':'Log water','تسجيل الوزن':'Log weight','تسجيل وجبة':'Log meal','تسجيل تمرين':'Log workout','أهلًا بك':'Welcome','ابدأ الآن':'Start now','تسجيل الدخول':'Sign in','تمرين اليوم':'Today\'s workout','يوم راحة':'Rest day','سجلاتي':'My records','الصحة والجسم':'Health & body','النادي':'Gym','تعلّم':'Learn','التطبيق وحسابي':'App & account','الأسود':'Black','الأبيض':'White','الأزرق':'Blue','الزمردي':'Emerald','الزيتوني':'Olive','البنفسجي':'Purple','الملف الشخصي':'Profile','النبض':'Pulse','الماء':'Water','التغذية':'Nutrition','التقارير':'Reports','الأرشيف':'Archive','الأوسمة':'Medals','مراقبة الوزن':'Weight tracking','النوم':'Sleep','الإعدادات':'Settings'});
+/* ===== مسارات التمرين الكبرى ===== */
+const TRKS=[['iron','الحديد','Iron','tr','dumbbell'],['cardio','الكارديو','Cardio','hr','pulse'],['cali','الكاليسثنكس','Calisthenics','wl','target'],['lift','رفع الأوزان','Weightlifting','wm','trophy'],['swim','السباحة','Swimming','wt','drop'],['run','الركض','Running','nu','step']];
+UI.trk=UI.trk||'hub';
+(()=>{let v=UI.tw;Object.defineProperty(UI,'tw',{configurable:true,enumerable:true,get(){return v},set(x){v=x;UI.trk=x==='cardio'?'cardio':'iron'}})})();
+function trkBack(){return '<button class="back" data-a="trkhub">'+ic('next')+'مسارات التمرين</button>'}
+function trkSub(k){const T=tasks(),ti=TI(),pw=S.plan[ti];
+ if(k==='iron'){const now=T.filter(t=>t.d===ti);return pw.ex.length?esc(pw.t)+' · '+now.filter(t=>t.r).length+'/'+now.length:'يوم راحة'}
+ if(k==='cardio'){const c=cdv(TD());return F(c.min)+' دقيقة · '+F(c.steps)+' خطوة اليوم'}
+ return 'قريبًا'}
+function trkHub(){
+ let h='<h1>التمرين</h1><div class="mu" style="margin-bottom:12px">اختر المسار</div><div class="sjtrk">';
+ h+=TRKS.map(x=>'<button class="sjtk'+(x[0]==='iron'||x[0]==='cardio'?'':' soon')+'" data-a="trk" data-v="'+x[0]+'">'+sjI(x[3],x[4])+'<b>'+x[1]+'</b><small>'+x[2]+'</small><span class="mu">'+trkSub(x[0])+'</span></button>').join('');
+ return h+'</div>'}
+function trkEmpty(k){const x=TRKS.find(a=>a[0]===k)||TRKS[0];
+ return trkBack()+'<h1>'+x[1]+'</h1><div class="card sjemp">'+sjI(x[3],x[4])+'<b>هذا المسار فارغ حاليًا</b><div class="mu">سيُجهَّز محتواه لاحقًا.</div></div>'}
+Object.assign(ACT,{trk:b=>{UI.trk=b.dataset.v;window.scrollTo(0,0)},trkhub:()=>{UI.trk='hub';window.scrollTo(0,0)}});
+(()=>{const g=ACT.go;ACT.go=function(b,ev){if(b&&b.dataset&&b.dataset.v==='train')UI.trk='hub';return g.apply(this,arguments)}})();
+Object.assign(ENT,{"مسارات التمرين":"Workout tracks","اختر المسار":"Choose a track","الحديد":"Iron","الكارديو":"Cardio","الكاليسثنكس":"Calisthenics","رفع الأوزان":"Weightlifting","السباحة":"Swimming","الركض":"Running","قريبًا":"Coming soon","هذا المسار فارغ حاليًا":"This track is empty for now","سيُجهَّز محتواه لاحقًا.":"Its content will be added later."});
 /* ===== خطة التمارين: نوع اليوم قائمة منسدلة، لون خفيف لكل يوم، وقائمة تمارين تناسب اليوم بالعربية والإنجليزية مع أيقونة الشكل ===== */
 const DAYT=[['صدر','Chest','chest'],['ظهر','Back','back'],['أكتاف','Shoulders','sho'],['باي','Biceps','bic'],['تراي','Triceps','tri'],['صدر وترايسبس','Chest & Triceps','chest,tri'],['ظهر وبايسبس','Back & Biceps','back,bic'],['أكتاف وبطن','Shoulders & Abs','sho,core'],['أرجل','Legs','quad,ham,glu,calf,add,hip'],['جسم علوي','Upper body','chest,back,sho,bic,tri,fore'],['جسم سفلي','Lower body','quad,ham,glu,calf,add,hip'],['جسم كامل','Full body','full'],['تكميلي','Accessory',''],['راحة','Rest','']];
 const DAYHUE=['#e5484d','#f5a524','#c9b80f','#3fb950','#16b3b3','#4c7dff','#a35ee8'];

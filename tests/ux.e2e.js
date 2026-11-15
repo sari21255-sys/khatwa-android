@@ -39,7 +39,7 @@ const ovf=p=>p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
   await click(p,'[data-a="wkend"]');t=await txt(p);
   ok(/تمرين جزئي محفوظ · 1 من 7 مجموعة/.test(t.replace(/\s+/g,' '))||/تمرين جزئي محفوظ · 1 من 9 مجموعة/.test(t.replace(/\s+/g,' ')),'اليوم يعرض «تمرين جزئي محفوظ · 1 من 9 مجموعة»',t.match(/تمرين جزئي[^\n]*/));
   ok(/أكمل التمرين/.test(t)&&/هدف الأسبوع: 0 من 3/.test(t),'الزر «أكمل التمرين» والهدف ما زال 0 من 3');
-  await click(p,'[data-a="go"][data-v="train"]');ok(/أكمل التمرين/.test(await txt(p)),'تبويب التمرين يعرض «أكمل» أيضًا');
+  await click(p,'[data-a="go"][data-v="train"]');await click(p,'.sjtk[data-v="iron"]');ok(/أكمل التمرين/.test(await txt(p)),'تبويب التمرين يعرض «أكمل» أيضًا');
   await click(p,'[data-a="go"][data-v="dash"]').catch(()=>{});
   await p.reload();await p.waitForTimeout(500);
   t=await txt(p);ok(/أكمل التمرين/.test(t)&&/1 من 9 مجموعة/.test(t.replace(/\s+/g,' ')),'بعد تحديث الصفحة: الجلسة الجزئية محفوظة');

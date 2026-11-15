@@ -80,4 +80,15 @@ const IND=/[٠-٩]/;
   await p.click('.sjday[data-d="1"] summary');await p.click('.sjday[data-d="1"] .sjxo.oth');await p.fill('.sjday[data-d="1"] [data-f=n]','تمرين كتبته');await p.click('.sjday[data-d="1"] [data-a=add]');await p.waitForTimeout(200);
   ok(await p.evaluate(()=>S.plan[1].ex.some(e=>e.n==='تمرين كتبته')),'خيار «أخرى» يقبل اسمًا يكتبه المستخدم');
   ok(p.errs.length===0,'لا أخطاء سكربت',p.errs.join('|'));await ctx.close()}
+ /* 6) مسارات التمرين الكبرى */
+ {const {ctx,p}=await mk(390);await p.evaluate(seed);await p.click('#nav button[data-v=train]');await p.waitForTimeout(200);
+  const ks=await p.$$eval('.sjtk',a=>a.map(x=>x.dataset.v));ok(JSON.stringify(ks)===JSON.stringify(['iron','cardio','cali','lift','swim','run']),'ستة مسارات: الحديد، الكارديو، الكاليسثنكس، رفع الأوزان، السباحة، الركض',ks.join());
+  await p.click('.sjtk[data-v=iron]');await p.waitForTimeout(150);
+  const segs=await p.$$eval('.seg [data-a=seg]',a=>a.map(x=>x.dataset.v));ok(segs.join()==='today,week,plan,cum,disc','مسار الحديد: اليوم، الأسبوع، الخطة، لم تتحقق، اكتشف (دون الكارديو)',segs.join());
+  ok(!!await p.$('#sx-go,[data-a=wkstart],[data-a=sxgo]')||/ابدأ|أكمل/.test(await p.evaluate(()=>document.body.innerText)),'مسار الحديد يعرض بدء التمرين');
+  await p.click('[data-a=seg][data-v=disc]');await p.waitForTimeout(150);const dv=await p.$$eval('[data-a=sub]',a=>a.map(x=>x.dataset.v));ok(['exl','aip','nau','prg'].every(x=>dv.includes(x)),'«اكتشف» في الحديد يضم المكتبة والذكاء الاصطناعي والأجهزة والبرامج',dv.join());
+  await p.click('[data-a=trkhub]');await p.click('.sjtk[data-v=cardio]');await p.waitForTimeout(150);ok(/الكارديو/.test(await p.evaluate(()=>document.querySelector('h1').innerText))&&!!await p.$('[data-a=ss]'),'مسار الكارديو يضم تسجيل الجلسات والبيانات');
+  for(const k of ['cali','lift','swim','run']){await p.click('[data-a=trkhub]');await p.click('.sjtk[data-v='+k+']');await p.waitForTimeout(100);ok(!!await p.$('.sjemp')&&(await p.$$('.card')).length===1,'مسار '+k+' فارغ بانتظار التكوين')}
+  await p.click('#nav button[data-v=train]');ok(!!await p.$('.sjtk'),'زر التمرين في الشريط يعيد إلى قائمة المسارات');
+  ok(p.errs.length===0,'لا أخطاء سكربت',p.errs.join('|'));await ctx.close()}
  await b.close();console.log('\n'+pass+' ناجح، '+fail+' فاشل');process.exit(fail?1:0)})();
