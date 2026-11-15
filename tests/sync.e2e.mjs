@@ -72,6 +72,7 @@ try{
  {const lt='legacylegacylegacy0123456789ab';const snapState=await d1.evaluate(()=>JSON.parse(JSON.stringify(S)));
   const old=JSON.parse(JSON.stringify(snapState));old.ts=Date.now()-86400000;old.bw={'2026-10-01':99,'2026-11-01':1};old.meals={'2026-10-02':[{n:'قديمة',kcal:7}]};old.lib=[{id:'old_lib',n:'وجبة قديمة',kcal:1,p:1,c:1,f:1}];
   await fetch('http://127.0.0.1:8792/api/state',{method:'PUT',headers:{Authorization:'Bearer '+lt,Origin:'http://127.0.0.1:8790'},body:JSON.stringify(old)});
+  wenv.AUTH_MODE='supabase';   // النشر الموصى به: القراءة والترحيل والتجميد فقط، لا كتابة قديمة
   const m=await device();await m.evaluate(SEED);await m.evaluate(t=>{SYNC.token=t},lt);await up(m,email('m'));
   await edit(m,"S.bw['2026-11-01']=82");   // محلي أحدث من اللقطة القديمة لنفس السجل
   const r1=await m.evaluate(()=>rsLegacyImport());await sync(m);const s1=await get(m,"JSON.stringify([S.bw,S.meals['2026-10-02'],S.lib.filter(x=>x.id==='old_lib').length,S.lib.length])");
@@ -82,16 +83,17 @@ try{
   // تجميد اللقطة القديمة بعد الترحيل: جهاز قديم يكتب = 410
   await fetch('http://127.0.0.1:8792/api/migrated',{method:'POST',headers:{Authorization:'Bearer '+lt,Origin:'http://127.0.0.1:8790'}});
   const w=await fetch('http://127.0.0.1:8792/api/state',{method:'PUT',headers:{Authorization:'Bearer '+lt,Origin:'http://127.0.0.1:8790'},body:JSON.stringify(old)});
-  rec('MIG-03','جهاز قديم لا يستطيع الكتابة فوق النسخة بعد الترحيل (410)',w.status===410,'status '+w.status);await m.ctx.close()}
+  rec('MIG-03','جهاز قديم لا يستطيع الكتابة فوق النسخة بعد الترحيل (410)، والوسيط بوضع supabase',w.status===410,'status '+w.status);wenv.AUTH_MODE='transition';await m.ctx.close()}
  /* ---- جهاز جديد بلا رمز قديم: دخول الحساب القديم بالبريد وكلمة المرور ثم النقل ---- */
  {const o=await fetch('http://127.0.0.1:8792/api/register',{method:'POST',headers:{'content-type':'application/json',Origin:'http://127.0.0.1:8790','CF-Connecting-IP':'9.9.9.'+(Date.now()%200)},body:JSON.stringify({email:email('lg'),password:'legacypass123'})});const reg=await o.json();
   const lem=email('lg2');const o2=await fetch('http://127.0.0.1:8792/api/register',{method:'POST',headers:{'content-type':'application/json',Origin:'http://127.0.0.1:8790','CF-Connecting-IP':'8.8.8.'+(Date.now()%200)},body:JSON.stringify({email:lem,password:'legacypass123'})});const tk=(await o2.json()).token;
   const st=await d1.evaluate(()=>JSON.parse(JSON.stringify(S)));st.ts=Date.now()-5000;st.bw={'2026-09-09':91};st.meals={};
   await fetch('http://127.0.0.1:8792/api/state',{method:'PUT',headers:{Authorization:'Bearer '+tk,Origin:'http://127.0.0.1:8790'},body:JSON.stringify(st)});
+  wenv.AUTH_MODE='supabase';   // الدخول القديم بالبريد وكلمة المرور يبقى متاحًا للترحيل
   const n=await device();await n.evaluate(SEED);await up(n,email('nl'));await n.evaluate(()=>{S.tab='me';S.sub='set';render()});
   await n.fill('#olem',lem);await n.fill('#olpw','legacypass123');await n.click('[data-a=lglogin]');await n.waitForFunction(()=>!!SYNC.token);
   await n.click('[data-a=rsmig]');await n.waitForFunction(()=>RSM.migrated===1,null,{timeout:8000});const v=await get(n,"S.bw['2026-09-09']");const frozen=await fetch('http://127.0.0.1:8792/api/state',{method:'PUT',headers:{Authorization:'Bearer '+tk,Origin:'http://127.0.0.1:8790'},body:JSON.stringify(st)});
-  rec('MIG-04','حساب مزامنة قديم (بريد وكلمة مرور) على جهاز جديد: الدخول من الإعدادات ثم النقل يجلب بياناته ويجمّد النسخة القديمة',v===91&&frozen.status===410&&!!reg.token,JSON.stringify({v,frozen:frozen.status}));await n.ctx.close()}
+  rec('MIG-04','حساب مزامنة قديم (بريد وكلمة مرور) على جهاز جديد: الدخول من الإعدادات ثم النقل يجلب بياناته ويجمّد النسخة القديمة',v===91&&frozen.status===410&&!!reg.token,JSON.stringify({v,frozen:frozen.status}));wenv.AUTH_MODE='transition';await n.ctx.close()}
  /* ---- F-TIE: تعادل التوقيت والحذف بين جهازين: الطرفان يحسمان بالقاعدة نفسها (الجهاز الأكبر يفوز) ---- */
  {const em=email('tie');const X=await device();await X.evaluate(SEED);await up(X,em);await sync(X);const u=await uidOf(X);const Y=await device();await login(Y,em);await sync(Y);
   const dx=await get(X,'RSM.dev'),dy=await get(Y,'RSM.dev'),xWins=dx>dy,[W1,L1]=xWins?[X,Y]:[Y,X];

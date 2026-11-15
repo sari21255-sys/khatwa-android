@@ -5,6 +5,7 @@ echo "== الوسيط =="; node tests/worker.test.mjs
 echo "== التطبيق =="; NODE_PATH="$(npm root -g)" node tests/app.e2e.js
 echo "== قبول P0 =="; NODE_PATH="$(npm root -g)" node docs/technical-audit/evidence/p0-acceptance.mjs
 echo "== هوية الوسيط (P1) =="; node tests/worker.p1.test.mjs
+echo "== ترحيل المزامنة القديمة (قبول) =="; node tests/worker.migration.test.mjs
 echo "== اليوم/التمرين/الأرشيف (UX) =="; NODE_PATH="$(npm root -g)" node tests/ux.e2e.js
 echo "== الخط المحلي =="; NODE_PATH="$(npm root -g)" node tests/font.e2e.js
 echo "== دمج الجلسات (تعادل، حجم، تراجع) =="; NODE_PATH="$(npm root -g)" node tests/sxmerge.e2e.js

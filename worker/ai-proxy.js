@@ -2,7 +2,7 @@
    الهوية: JWT من Supabase Auth (HS256 بسرّ SUPABASE_JWT_SECRET أو ES256/RS256 عبر JWKS). الحصص ذرّية في Postgres عبر الدالة consume_quota_trusted التي لا ينفذها إلا مفتاح الخدمة SUPABASE_SERVICE_KEY (Secret)؛ حدود المستخدم والحد الكلي في جدول quota_settings على الخادم لا في هذا الملف، والدالة تتحقق من أن الجلسة قائمة.
    المزامنة صارت مباشرة بين التطبيق وSupabase (الدالة sync_exchange)؛ مسارات /api/state هنا للترحيل من النسخ القديمة فقط.
    المتغيرات: ANTHROPIC_API_KEY (Secret)، STATE (KV)، ALLOW_ORIGIN (قائمة نطاقات مفصولة بفاصلة)، SUPABASE_URL، SUPABASE_ANON_KEY (المفتاح العام)، SUPABASE_SERVICE_KEY (Secret، مفتاح service_role: للحصص فقط، لا يوضع في الواجهة ولا المستودع)، SUPABASE_JWT_SECRET (اختياري، للمشاريع ذات HS256)،
-   AUTH_MODE: 'supabase' (الافتراضي حين يُضبط SUPABASE_URL: يُرفض رمز الوسيط القديم للذكاء والكتابة) أو 'transition' (الافتراضي بلا SUPABASE_URL: يُقبل الرمز القديم)، AI_DAILY_CAP (سقف يومي كلي لوضع الانتقال فقط، افتراضي 500؛ في وضع supabase الحدود من quota_settings)، LEGACY_SYNC='0' يعطّل مسارات الحسابات القديمة.
+   AUTH_MODE: 'supabase' (الافتراضي حين يُضبط SUPABASE_URL: يُرفض رمز الوسيط القديم للذكاء والكتابة) أو 'transition' (الافتراضي بلا SUPABASE_URL: يُقبل الرمز القديم)، LEGACY_SYNC='0' (يغلق كل مسارات الرمز القديم برد 410 legacy_disabled)، AI_DAILY_CAP (سقف يومي كلي لوضع الانتقال فقط، افتراضي 500؛ في وضع supabase الحدود من quota_settings)، LEGACY_SYNC='0' يعطّل مسارات الحسابات القديمة.
    ملاحظة: حدود المعدل على KV تقريبية (القراءة ثم الكتابة غير ذرّية)؛ السقف اليومي الكلي هو الحماية الفعلية للتكلفة. PBKDF2 مثبّت على 100,000 دورة لأنه الحد الأقصى في Workers. */
 const MODELS={default:'claude-sonnet-5-5',fast:'claude-haiku-5-5'};
 const hex=b=>[...new Uint8Array(b)].map(x=>('0'+x.toString(16)).slice(-2)).join('');
@@ -40,7 +40,11 @@ export default{async fetch(req,env){
  if(og&&!ok)return J({error:'origin'},403);
 
  const p0=new URL(req.url).pathname;
+ const mode=env.AUTH_MODE||(env.SUPABASE_URL?'supabase':'transition'),legacyOn=env.LEGACY_SYNC!=='0';
  if((p0==='/api/register'||p0==='/api/login')&&req.method==='POST'){
+  /* الحسابات القديمة: لا إنشاء جديد خارج وضع transition، ولا دخول قديم إطلاقًا عند LEGACY_SYNC=0 (الدخول يبقى متاحًا في وضع supabase ليستعيد صاحب الحساب القديم رمزه وينقل نسخته) */
+  if(!legacyOn)return J({error:'legacy_disabled'},410);
+  if(p0==='/api/register'&&mode!=='transition')return J({error:'registration_closed'},403);
   let b;try{b=await req.json()}catch(e){return J({error:'bad_json'},400)}
   const em=String(b.email||'').trim().toLowerCase(),pw=String(b.password||'');
   if(!/^\S+@\S+\.\S+$/.test(em)||em.length>120)return J({error:'bad_email'},400);
@@ -52,9 +56,9 @@ export default{async fetch(req,env){
   if(!u||(await pbk(pw,u.salt))!==u.hash)return J({error:'bad_creds'},401);
   await env.STATE.put('t:'+u.token,em);return J({token:u.token})}
  const bearer=(req.headers.get('Authorization')||'').replace(/^Bearer\s+/i,'');
- const mode=env.AUTH_MODE||(env.SUPABASE_URL?'supabase':'transition'),legacyOn=env.LEGACY_SYNC!=='0';
  let id=null;if(bearer.split('.').length===3)id=await verifyJwt(bearer,env);else if(/^[a-z0-9]{20,64}$/i.test(bearer))id={kind:'legacy',tok:bearer};
  if(!id)return J({error:'bad_token'},401);
+ if(id.kind==='legacy'&&!legacyOn)return J({error:'legacy_disabled'},410);
  const tok=id.tok||'',p=new URL(req.url).pathname;
  /* مسارات الحسابات القديمة: قراءة اللقطة للترحيل، تجميدها بعد الترحيل، حذفها. الكتابة العادية مسموحة فقط في وضع transition. */
  if(id.kind==='legacy'&&legacyOn&&(p==='/api/state'||p==='/api/migrated'||p==='/api/account/delete')){

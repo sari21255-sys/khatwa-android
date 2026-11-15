@@ -58,6 +58,7 @@ jobs:
         run: |
           PSQL="psql -h localhost -U postgres -d postgres -q -At" bash supabase/tests/03_concurrency.sh
           node tests/worker.p1.test.mjs
+          node tests/worker.migration.test.mjs
           PSQL="psql -h localhost -U postgres -d postgres -q -At" NODE_PATH="$(npm root -g)" node tests/sync.e2e.mjs
           PSQL="psql -h localhost -U postgres -d postgres -q -At" NODE_PATH="$(npm root -g)" node tests/sync-sx.e2e.mjs
   build-reproducible:
