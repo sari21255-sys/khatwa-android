@@ -36,11 +36,14 @@ const PLAN=`(()=>{const rest={t:'راحة',ex:[]};return[rest,rest,rest,rest,{t:
   const c=await b.newContext({viewport:{width:w,height:760},deviceScaleFactor:1});await blockG(c);const p=await c.newPage();await c.addInitScript(t=>{try{localStorage.setItem('fit_theme',t)}catch(e){}},th);
   await p.clock.install({time:new Date('2026-11-18T10:00:00+03:00')});await p.goto(U);await p.waitForTimeout(500);await p.clock.resume();
   await p.evaluate(plan=>{S.prof.ob=1;S.prof.name='سارة';S.prof.sex='f';S.prof.age=28;S.prof.ht=165;S.prof.startW=70;S.prof.dpw=3;S.prof.goalType='lose';S.bw[TD()]=70;S.plan=eval(plan);S.tab='dash';save();render()},PLAN);
-  const shot=async n=>{await p.waitForTimeout(250);const o=await p.evaluate(()=>[document.documentElement.scrollWidth>innerWidth+1,[...document.querySelectorAll('#nav button')].some(e=>e.scrollWidth>e.clientWidth+1)]);ok(!o[0],`${w}/${th} ${n}: بلا تجاوز أفقي`);ok(!o[1],`${w}/${th} ${n}: أزرار الشريط لا تُقصّ`);await p.screenshot({path:`${OUT}/${n}-${w}-${th}.png`})};
+  const shot=async n=>{await p.waitForTimeout(250);const o=await p.evaluate(()=>[document.documentElement.scrollWidth>innerWidth+1,[...document.querySelectorAll('#nav button')].some(e=>e.scrollWidth>e.clientWidth+1)]);ok(!o[0],`${w}/${th} ${n}: بلا تجاوز أفقي`);ok(!o[1],`${w}/${th} ${n}: أزرار الشريط لا تُقصّ`);const cl=await p.evaluate(()=>[...document.querySelectorAll('main *, #app *, .card *')].filter(e=>{const r=e.getBoundingClientRect();return r.width>0&&(r.right>innerWidth+1||r.left<-1)&&getComputedStyle(e).position!=='fixed'&&!e.closest('svg')&&!(()=>{for(let a=e.parentElement;a&&a!==document.body;a=a.parentElement){const o=getComputedStyle(a).overflowX;if(o==='auto'||o==='scroll')return true}return false})()}).slice(0,3).map(e=>e.tagName+'.'+e.className));ok(cl.length===0,`${w}/${th} ${n}: لا عنصر يخرج عن عرض الشاشة`,cl.join(','));await p.screenshot({path:`${OUT}/${n}-${w}-${th}.png`})};
   await shot('today');
   await p.click('#sx-go');await p.click('[data-a=wkty][data-v=d]');await p.click('[data-a=wkrp][data-v="9"]');await shot('player');await p.click('[data-a=wkset]');await shot('player-set');await p.click('[data-a=wkend]');
   await p.click('[data-a=sub][data-v=arch]');await shot('archive');
   await p.evaluate(()=>{S.sub=null;S.tab='food';render()});await shot('food');
   await p.evaluate(()=>{S.tab='me';S.sub='rpt';render()});await shot('reports');
+  await p.evaluate(()=>{S.sub=null;S.tab='pg';render()});await shot('progress');
+  await p.evaluate(()=>{S.tab='ex';S.sub='wgt';render()});await shot('weight');
+  await p.evaluate(()=>{S.sub=null;S.tab='dash';render()});await p.click('#wform summary');await shot('today-weight-open');
   await c.close()}
  await b.close();srv.close();console.log(`\n${pass} ناجح، ${fail} فاشل`);process.exit(fail?1:0)})();
