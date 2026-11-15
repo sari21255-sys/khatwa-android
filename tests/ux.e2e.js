@@ -18,7 +18,9 @@ const ovf=p=>p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
 
  console.log('1) مستخدم جديد: اختيار الخطة ← أول تمرين ← الأرشيف');
  {const {ctx,p}=await ctxOf(b);
-  ok(/ما اسمك/.test(await txt(p)),'معالج الترحيب يظهر لمستخدم جديد');
+  ok(await p.$('#wel-go')!==null,'شاشة الترحيب SIJIL تظهر لمستخدم جديد قبل المعالج');
+  await click(p,'#wel-go');
+  ok(/ما اسمك/.test(await txt(p)),'«ابدأ الآن» يفتح معالج الهدف والخطة بلا حساب');
   await p.fill('#wz-v','سارة');await click(p,'[data-a="wznext"]');await click(p,'[data-a="wzopt"][data-v="f"]');
   await p.fill('#wz-m-age','28');await p.fill('#wz-m-ht','165');await p.fill('#wz-m-startW','70');await click(p,'[data-a="wznext"]');
   await click(p,'[data-a="wzopt"][data-v="lose"]');await click(p,'[data-a="wzopt"][data-v="b"]');await click(p,'[data-a="wzopt"][data-v="gym"]');await click(p,'[data-a="wzopt"][data-v="3"]');

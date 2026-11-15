@@ -12,7 +12,7 @@ const PLAN=`(()=>{const rest={t:'راحة',ex:[]};return[rest,rest,rest,rest,{t:
  {const c=await b.newContext({viewport:{width:390,height:844}});await blockG(c);const p=await c.newPage();const reqs=[];p.on('response',r=>reqs.push({u:r.url(),sw:r.fromServiceWorker()}));
   await p.goto(U);await p.waitForTimeout(800);
   await p.evaluate(async()=>{await navigator.serviceWorker.ready;await document.fonts.load('400 16px Cairo','بنش');await document.fonts.load('700 16px Cairo','بنش');await document.fonts.load('800 16px Cairo','بنش');await document.fonts.load('400 16px Cairo','RPE 9')});
-  const fam=await p.evaluate(()=>getComputedStyle(document.body).fontFamily);ok(/QamraUser.*Cairo/.test(fam),'الخط الافتراضي في body يبدأ بـ Cairo بعد خط المستخدم المرفوع',fam);
+  const fam=await p.evaluate(()=>getComputedStyle(document.body).fontFamily);ok(/QamraUser.*Amiri.*Cairo/.test(fam),'الخط الافتراضي في body أميري ثم Cairo احتياطًا بعد خط المستخدم المرفوع',fam);
   const loaded=await p.evaluate(()=>[...document.fonts].filter(f=>f.family.replace(/"/g,'')==='Cairo'&&f.status==='loaded').map(f=>f.weight+(/6{1}00|0600/i.test(f.unicodeRange)?'ar':'lat')));
   ok(loaded.includes('400lat')&&loaded.includes('400ar')&&loaded.filter(x=>x.startsWith('700')).length&&loaded.filter(x=>x.startsWith('800')).length,'أوجه Cairo المحمّلة: '+loaded.join(','));
   ok(reqs.some(r=>/fonts\/Cairo-Regular\.ttf/.test(r.u))&&reqs.some(r=>/fonts\/Cairo-700-arabic\.woff/.test(r.u)),'الطلبات تذهب إلى fonts/ المحلية');
@@ -30,7 +30,7 @@ const PLAN=`(()=>{const rest={t:'راحة',ex:[]};return[rest,rest,rest,rest,{t:
  console.log('2) خيار تغيير الخط');
  {const c=await b.newContext({viewport:{width:390,height:844}});await blockG(c);const p=await c.newPage();await p.goto(U);await p.waitForTimeout(500);
   const cls=async v=>{await p.evaluate(v=>{ACT.fontset({dataset:{v}})},v);return p.evaluate(()=>[document.body.className,localStorage.getItem('fit_font'),getComputedStyle(document.body).fontFamily])};
-  let r=await cls('q');ok(/f-q/.test(r[0])&&/Qomra/.test(r[2]),'قمرة يعمل',r.join('|'));r=await cls('s');ok(/f-s/.test(r[0]),'النظام يعمل');r=await cls('c');ok(!/f-[qs]/.test(r[0])&&/Cairo/.test(r[2]),'Cairo هو الافتراضي',r.join('|'));await c.close()}
+  let r=await cls('q');ok(/f-q/.test(r[0])&&/Qomra/.test(r[2]),'قمرة يعمل',r.join('|'));r=await cls('s');ok(/f-s/.test(r[0]),'النظام يعمل');r=await cls('c');ok(!/f-[qs]/.test(r[0])&&/Cairo/.test(r[2]),'Cairo يعمل خيارًا',r.join('|'));await c.close()}
  console.log('3) الشاشات 320/390 (الوضع الفاتح فقط: effTheme ثابت على light في التطبيق الحالي)');
  for(const w of [320,390])for(const th of ['light']){
   const c=await b.newContext({viewport:{width:w,height:760},deviceScaleFactor:1});await blockG(c);const p=await c.newPage();await c.addInitScript(t=>{try{localStorage.setItem('fit_theme',t)}catch(e){}},th);
