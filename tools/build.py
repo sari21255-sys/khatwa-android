@@ -29,14 +29,20 @@ def compose(cfg,tail):
             out.append(cfg);done=True
     assert done,'لم يوجد </style> في المصدر'
     return '\n'.join(out)+'\n'+tail
+FONTS=sorted(os.listdir(os.path.join(ROOT,'app/fonts'))) if os.path.isdir(os.path.join(ROOT,'app/fonts')) else []
 def outputs():
-    return {'www/index.html':compose('<script src="config.js"></script>',TAIL),
-            'pwa/index.html':compose('<script src="config.js"></script>',SW+TAIL)}
+    o={'www/index.html':compose('<script src="config.js"></script>',TAIL),
+       'pwa/index.html':compose('<script src="config.js"></script>',SW+TAIL)}
+    for f in FONTS:  # الخطوط المحلية تُنسخ كما هي (ثنائية) إلى النسختين
+        b=open(os.path.join(ROOT,'app/fonts',f),'rb').read()
+        o['www/fonts/'+f]=b;o['pwa/fonts/'+f]=b
+    return o
 def write(root,files):
     for rel,txt in files.items():
         p=os.path.join(root,rel);os.makedirs(os.path.dirname(p),exist_ok=True)
-        open(p,'w',encoding='utf8',newline='\n').write(txt)
-SUMFILES=['www/index.html','pwa/index.html','pwa/_headers']
+        if isinstance(txt,bytes): open(p,'wb').write(txt)
+        else: open(p,'w',encoding='utf8',newline='\n').write(txt)
+SUMFILES=['www/index.html','pwa/index.html','pwa/_headers']+['pwa/fonts/'+f for f in FONTS]
 def sums(root):
     return ''.join(hashlib.sha256(open(os.path.join(root,f),'rb').read()).hexdigest()+'  '+f+'\n' for f in SUMFILES)
 def main():
@@ -52,7 +58,7 @@ def main():
             for rel in list(files)+['pwa/_headers']:
                 a=open(os.path.join(tmp,rel),'rb').read()
                 b=open(os.path.join(ROOT,rel),'rb').read()
-                if b'\r' in b: print('CRLF في',rel);bad=1
+                if b'\r' in b and rel.endswith('.html'): print('CRLF في',rel);bad=1
                 if a!=b:
                     print('اختلاف مولَّد/مرجعي:',rel,hashlib.sha256(a).hexdigest()[:12],hashlib.sha256(b).hexdigest()[:12]);bad=1
             if sums(tmp)!=open(os.path.join(ROOT,'tools/build.sha256'),'rb').read().decode('utf-8'):
