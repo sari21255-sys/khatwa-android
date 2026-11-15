@@ -399,8 +399,7 @@ const SV={
  foodins:{t:'تحليل التغذية',ic:'chart',col:'--c-prog',st:'demo',sub:'سبعة أيام من أكلك مقابل أهدافك',has:['متوسط السعرات والبروتين','الأيام القريبة من الهدف'],imp:['يظهر ملخصه في «التقدّم» أيضًا']},
  mealgen:{t:'مولّد خطة الوجبات',ic:'spark',col:'--c-done',st:'demo',sub:'أسبوع كامل من أطباق حلال حسب هدفك ومطبخك',has:['اختيار المطبخ والنظام (نباتي)','استبعاد الحساسيات (ألبان، مكسرات، بيض، سمك، غلوتين)','تأكيد قبل استبدال خطة الوجبات'],imp:['يُفتح من «التغذية» فقط']},
  fasting:{t:'الصيام المتقطع',ic:'fast',col:'--c-warn',st:'demo',sub:'مؤقت صيام 12 إلى 24 ساعة مع سجل',has:['اختيار مدة الصيام','بدء الصيام وإنهاؤه','آخر 7 صيامات'],imp:['تنبيه صحي ظاهر قبل البدء']},
- weight:{t:'مراقبة الوزن',ic:'scale',col:'--c-prog',st:'live',sub:'سجل الوزن والمسار نحو هدفك',has:['تسجيل وزن مع نسبة دهون وملاحظة','وحدات كغ وباوند وستون','رسم لـ 30 و90 يومًا وسنة','الهدف وتاريخ تحقيقه والمتبقي','الوزن المثالي بمعادلة ديفاين ونطاق BMI'],imp:['زر التسجيل نفسه في «اليوم» و«التقدّم»','حالة أولى فارغة بجملة تشرح الخطوة']},
- measures:{t:'قياسات الجسم',ic:'ruler',col:'--c-prog',st:'demo',sub:'محيط الصدر والخصر والذراع وغيرها',has:['قياسات بتاريخ','مقارنة بأول قياس'],imp:['تدخل ضمن «مراقبة الوزن» كتبويب ثانٍ']},
+ weight:{t:'مراقبة الوزن',ic:'scale',col:'--c-prog',st:'live',sub:'سجل الوزن والمسار نحو هدفك',has:['تسجيل وزن مع نسبة دهون وملاحظة','وحدات كغ وباوند وستون','رسم لـ 30 و90 يومًا وسنة','الهدف وتاريخ تحقيقه والمتبقي','الوزن المثالي بمعادلة ديفاين ونطاق BMI','قياسات الجسم (الصدر والخصر والذراع) في تبويب داخل الصفحة','تصدير سجل الوزن CSV'],imp:['زر التسجيل نفسه في «اليوم» و«التقدّم»','حالة أولى فارغة بجملة تشرح الخطوة']},
  photos:{t:'صور التقدم',ic:'image',col:'--c-prog',st:'cfg',sub:'صور قبل وبعد تبقى على جوالك',has:['تُحفظ على الجهاز فقط','مقارنة صورتين'],need:['اختبار صلاحية الكاميرا والتخزين على جهاز حقيقي'],imp:['تظهر ضمن «التقدّم» وتُذكر في «بياناتي والخصوصية»']},
  archive:{t:'الأرشيف',ic:'box',col:'--c-rest',st:'live',sub:'كل جلساتك السابقة بتفاصيلها',has:['جلسات مكتملة وجزئية','بحث وتصفية','تفاصيل كل مجموعة','تصدير'],imp:['اليوم يعرض عدد التمارين فقط؛ هنا كل مجموعة']},
  badges:{t:'الأوسمة والإنجازات',ic:'trophy',col:'--c-warn',st:'live',sub:'12 وسامًا للسلسلة والتمارين والوجبات',has:['سلسلة حالية وأفضل سلسلة','أوسمة تُفتح بالإنجاز','رقم قياسي جديد'],imp:['تظهر بالعربية، والمقفل منها يوضح الشرط']},
@@ -422,7 +421,7 @@ const SV={
  account:{t:'الحساب والمزامنة',ic:'user',col:'--c-rest',st:'cfg',sub:'احفظ بياناتك وانتقل بين أجهزتك',has:['تسجيل ودخول','مزامنة بين الأجهزة','حذف السحابة وبدء مزامنة جديدة'],need:['التحقق المرحلي على Supabase وCloudflare (انظر تقرير P1)'],imp:['تُخفى في النسخة الأولى وتكفي النسخة الاحتياطية بملف']}
 };
 const GROUPS=[
- ['الصحة والجسم',['weight','measures','photos','sleep','cardio','fasting','link']],
+ ['الصحة والجسم',['weight','sleep','cardio','fasting','link']],
  ['النادي',['gyms','visits','reminders']],
  ['تعلّم',['culture','exlib','devices','tools']],
  ['التطبيق وحسابي',['profile','settings','notifs','privacy','account','coach','community']]
@@ -431,7 +430,7 @@ const STN={live:'يعمل في النموذج',demo:'عرض تجريبي',cfg:'�
 
 /* ===== الحالة ===== */
 const KEY='khatwa-proto-v2';
-const NEW=()=>({screen:'welcome',tab:'home',stack:[],goal:null,place:'gym',days:3,level:'b',planId:null,sessions:[],cur:null,hint:true,detail:null,svc:null,weights:[],meals:[],water:0,sleep:null,target:72,startKg:78,visits:[],flt:'all',q:''});
+const NEW=()=>({screen:'welcome',tab:'home',stack:[],goal:null,place:'gym',days:3,level:'b',planId:null,sessions:[],cur:null,hint:true,detail:null,svc:null,weights:[],meals:[],water:0,sleep:null,target:72,startKg:78,visits:[],flt:'all',q:'',rpw:8});
 let S=NEW();
 try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r&&r.screen)S=Object.assign(NEW(),r)}catch(e){}
 if(S.screen==='workout'&&!S.cur)S.screen='home';
@@ -469,13 +468,25 @@ const BADGES=[
  ['صور التقدم','image',()=>false,'أضف صورة تقدّم (تحتاج جهازًا حقيقيًا)']
 ];
 /* ===== مكونات ===== */
+function reportData(n){
+ const w0=wkStart(Date.now()),wi=ts=>Math.round((w0-wkStart(ts))/(7*DAY));
+ const inW=ts=>wi(ts)>=0&&wi(ts)<n;
+ const ss=S.sessions.filter(s=>s.status==='complete'&&inW(s.ts)),ms=S.meals.filter(m=>inW(m.ts)),ws=S.weights.filter(x=>inW(x.ts));
+ const tr=Math.min(100,Math.round(ss.length/(plan().d*n)*100));
+ let nuSum=0;for(let i=0;i<n;i++){const days={};ms.filter(m=>wi(m.ts)===i).forEach(m=>{const d=dkey(m.ts);const o=days[d]=days[d]||{k:0,p:0};o.k+=m.kcal;o.p+=m.p});const ds=Object.values(days),lg=ds.length;if(lg){const ko=ds.filter(d=>Math.abs(d.k-TG.kcal)<=TG.kcal*.1).length,po=ds.filter(d=>d.p>=TG.p*.9).length;nuSum+=Math.round(lg/7*40+ko/lg*30+po/lg*30)}}
+ const nu=Math.round(nuSum/n);
+ let coSum=0;for(let i=0;i<n;i++){const d=new Set([...ss.filter(s=>wi(s.ts)===i).map(s=>dkey(s.ts)),...S.visits.filter(t=>wi(t)===i).map(dkey)]);coSum+=Math.min(100,Math.round(d.size/plan().d*100))}
+ const co=Math.round(coSum/n),sl=S.sleep?Math.min(100,Math.round(S.sleep/8*100)):0;
+ let pr=0;if(ws.length>=2){const f=ws[0].kg,l=ws[ws.length-1].kg,wk=(l-f)/Math.max(1,n),dir=S.target<f?-1:1;pr=Math.max(0,Math.min(100,Math.round(50+(wk*dir)/0.5*50)))}
+ return {tr,nu,co,sl,pr,score:Math.round(tr*.35+nu*.25+co*.2+sl*.1+pr*.1),has:!!(ss.length||ms.length||ws.length)};
+}
 const ico=(k,c,sz)=>`<span class="ico" style="${sz?'width:'+sz+'px;height:'+sz+'px;':''}color:var(${c||'--ink'})">${IC[k]()}</span>`;
 const pill=st=>`<span class="pill ${st}">${STN[st]}</span>`;
 const WHERE={};
 const TABLINKS={
  train:['plan','programs','sessions','aiplan','exlib','devices','cardio','missed'],
  food:['foodplan','foodlib','foodins','mealgen','fasting'],
- prog:['archive','badges','reports','measures','photos','sleep','weight']
+ prog:['archive','badges','reports','photos','sleep','weight']
 };
 Object.keys(TABLINKS).forEach(t=>TABLINKS[t].forEach(k=>{WHERE[k]=WHERE[k]||({train:'التمرين',food:'التغذية',prog:'التقدّم'})[t]}));
 GROUPS.forEach(g=>g[1].forEach(k=>{WHERE[k]=(WHERE[k]?WHERE[k]+' و':'')+'المزيد › '+g[0]}));
@@ -565,7 +576,14 @@ function vHome(){
   <button data-a="sheet" data-v="water"><span class="i">${IC.drop('var(--c-rest)')}</span>ماء<small>${S.water} مل</small></button>
   <button data-a="sheet" data-v="sleep"><span class="i">${IC.moon('var(--c-prog)')}</span>نوم<small>${S.sleep?S.sleep+' ساعات':'لم يُسجَّل'}</small></button>
  </div>
- <div class="card"><div class="rowx"><b class="grow">هدف الأسبوع</b><span class="mu">${wd} من ${goal} تمارين</span></div><div class="prog" style="margin-top:10px"><i style="width:${Math.min(100,Math.round(wd/goal*100))}%"></i></div><p class="hint2" style="margin-top:8px">يُحسب التمرين عند اكتماله فقط، ومرة واحدة.</p></div>
+ <div class="lab">اختصاراتي</div>
+ <div class="qk" id="shortcuts">
+  <button data-a="svc" data-v="archive"><span class="i">${IC.box('var(--c-rest)')}</span>الأرشيف<small>جلساتك السابقة</small></button>
+  <button data-a="svc" data-v="reports"><span class="i">${IC.share('var(--c-rest)')}</span>تقاريري<small>تحليل التزامك</small></button>
+  <button data-a="svc" data-v="culture"><span class="i">${IC.cap('var(--c-prog)')}</span>الثقافة<small>مقالات وقاموس</small></button>
+  <button data-a="svc" data-v="tools"><span class="i">${IC.calc('var(--c-rest)')}</span>الأدوات<small>حاسبات</small></button>
+ </div>
+ <div class="card" style="margin-top:12px"><div class="rowx"><b class="grow">هدف الأسبوع</b><span class="mu">${wd} من ${goal} تمارين</span></div><div class="prog" style="margin-top:10px"><i style="width:${Math.min(100,Math.round(wd/goal*100))}%"></i></div><p class="hint2" style="margin-top:8px">يُحسب التمرين عند اكتماله فقط، ومرة واحدة.</p></div>
  <div class="card"><div class="rowx"><b class="grow">التغذية اليوم</b><button class="lnk sm" data-a="tab" data-v="food">التفاصيل</button></div>${todayMeals().length?`<div class="kv"><span>السعرات</span><span>${m.kcal} من ${TG.kcal}</span></div><div class="kv"><span>البروتين</span><span>${m.p} من ${TG.p} غ</span></div>`:`<p class="mu">لم تسجّل وجبة اليوم.</p><button class="btn ghost" data-a="sheet" data-v="meal">سجّل وجبة</button>`}</div>
  <div class="rowx" style="margin:6px 0 2px"><span class="partial-tag">${IC.flame()} سلسلة ${streak()} أيام</span><span class="sp"></span><button class="lnk sm" data-a="svc" data-v="badges">الأوسمة</button></div>
  ${S.sessions.some(s=>s.status==='partial'&&dkey(s.ts)!==dkey(Date.now()))?`<button class="row" data-a="svc" data-v="missed">${ico('target','--c-warn')}<span class="grow"><b>جلسة جزئية سابقة</b><small>تجدها في الأرشيف وتكملها</small></span>${IC.chev()}</button>`:''}
@@ -627,7 +645,7 @@ function svcBody(k){
   else{
    h+=`<div class="card"><div class="bigno">${fmt(lw)} <small>كغ</small></div><p class="mu">من ${fmt(fi)} إلى ${fmt(lw)} (${lw-fi>0?'+':''}${fmt(lw-fi)} كغ) · الهدف ${S.target}</p>${wChart(a.slice(-30))}</div><div class="lab">السجل</div><div class="card lst">${a.slice().reverse().slice(0,20).map(x=>`<div><span class="g"><b>${fmt(x.kg)} كغ</b><span>${dshort(x.ts)}${x.note?' · '+esc(x.note):''}</span></span></div>`).join('')}</div>`;
   }
-  h+=`<div class="note2">الوزن المثالي بمعادلة ديفاين ونطاق BMI يعرضها التطبيق الحالي هنا، وتبقى كما هي.</div>`;
+  h+=`<div class="rowx" style="margin-top:6px"><button class="btn ghost sm" data-a="wexp">تصدير CSV (عرض)</button></div><div class="note2" style="margin-top:12px">يبقى في هذه الصفحة كما في التطبيق: قياسات الجسم (الصدر والخصر والذراع)، نسبة الدهون، الوحدات (كغ، باوند، ستون)، الوزن المثالي ونطاق BMI. هنا للعرض فقط.</div>`;
  }
  else if(k==='badges'){
   h+=`<div class="cols2"><div class="stat"><b>${streak()}</b><span>سلسلتك الحالية</span></div><div class="stat"><b>${bestStreak()}</b><span>أفضل سلسلة</span></div></div><div class="lab">الأوسمة</div><div class="bd">${BADGES.map(b=>`<div class="${b[2]()?'on':''}">${IC[b[1]]('var(--c-warn)')}<b>${b[0]}</b><small class="mu">${b[2]()?'مفتوح':b[3]}</small></div>`).join('')}</div>`;
@@ -637,19 +655,16 @@ function svcBody(k){
   let l=S.sessions.filter(s=>setsOf(s)>0).slice().reverse();
   if(f!=='all')l=l.filter(s=>s.status===f);
   if(q)l=l.filter(s=>s.t.includes(q)||s.exs.some(e=>e.n.includes(q)));
-  h+=`<div class="srch"><input class="in" id="aq" placeholder="ابحث باسم تمرين أو يوم" value="${esc(S.q)}" aria-label="بحث في الأرشيف"></div><div class="tabs2">${[['all','الكل'],['complete','مكتملة'],['partial','جزئية']].map(x=>`<button class="${f===x[0]?'on':''}" data-a="flt" data-v="${x[0]}">${x[1]}</button>`).join('')}</div>`;
+  h+=`<div class="rowx" style="margin-bottom:10px"><span class="mu grow">عرض فقط: في التطبيق يحفظ التصدير ملف JSON بكل بياناتك.</span><button class="btn ghost sm" style="width:auto;padding:0 14px" data-a="exp">تصدير (عرض)</button></div><div class="srch"><input class="in" id="aq" placeholder="ابحث باسم تمرين أو يوم" value="${esc(S.q)}" aria-label="بحث في الأرشيف"></div><div class="tabs2">${[['all','الكل'],['complete','مكتملة'],['partial','جزئية']].map(x=>`<button class="${f===x[0]?'on':''}" data-a="flt" data-v="${x[0]}">${x[1]}</button>`).join('')}</div>`;
   if(!S.sessions.some(s=>setsOf(s)>0))h+=`<div class="empty"><p>لا جلسات بعد.</p><p class="mu">أول تمرين تحفظ فيه ولو مجموعة واحدة يظهر هنا.</p><button class="btn" data-a="start">ابدأ أول تمرين</button></div>`;
   else if(!l.length)h+=`<div class="empty"><p>لا نتائج.</p></div>`;
   else h+=`<div class="card lst">${l.map(s=>`<button data-a="detail" data-v="${s.id}"><span class="g"><b>${s.t}</b><span>${dshort(s.ts)} · ${setsOf(s)} من ${totOf(s)} مجموعة</span></span>${s.status==='partial'?`<span class="partial-tag">جزئي</span>`:`<span class="pill live">مكتمل</span>`}</button>`).join('')}</div>`;
  }
  else if(k==='reports'){
-  const cn=completeN(),mn=S.meals.length,wn=S.weights.length;
-  if(!cn&&!mn&&!wn)h+=`<div class="empty"><p>لا بيانات كافية للتقرير.</p><p class="mu">أكمل تمرينًا واحدًا وسجّل وجبة ووزنًا، ثم عد.</p><button class="btn" data-a="start">ابدأ أول تمرين</button></div>`;
-  else{
-   const tr=Math.min(100,Math.round(cn/Math.max(1,plan().d*2)*100)),nu=Math.min(100,Math.round(mn/12*100)),co=Math.min(100,Math.round(streak()/7*100)),pg=wn>=2?70:wn?40:0;
-   const sc=Math.round((tr+nu+co+pg)/4);
-   h+=`<div class="card"><div class="bigno">${sc} <small>من 100</small></div><p class="mu">درجة التزامك في آخر 4 أسابيع</p></div><div class="card mac">${[['التمارين',tr],['التغذية',nu],['الانتظام',co],['التقدّم',pg]].map(x=>`<div class="l"><span>${x[0]}</span><div class="prog"><i style="width:${x[1]}%"></i></div><b>${x[1]}</b></div>`).join('')}</div><div class="note2">النوم يدخل في الدرجة عند تسجيله. هذه أرقام تجريبية من بيانات النموذج.</div>`;
-  }
+  const R=reportData(S.rpw);
+  h+=`<div class="tabs2">${[4,8,12].map(n=>`<button class="${S.rpw===n?'on':''}" data-a="rpw" data-v="${n}">${n===12?'12 أسبوعًا':n+' أسابيع'}</button>`).join('')}</div>`;
+  if(!R.has)h+=`<div class="empty"><p>لا بيانات كافية في هذه الفترة.</p><p class="mu">أكمل تمرينًا وسجّل وجبة ووزنًا لتظهر الدرجة.</p><button class="btn" data-a="start">ابدأ أول تمرين</button></div>`;
+  else h+=`<div class="card"><div class="rowx"><div class="bigno">${R.score} <small>من 100</small></div><span class="pill demo">تجريبي</span></div><p class="mu">آخر ${S.rpw} أسابيع، بمعادلة التطبيق: التمارين 35٪، التغذية 25٪، الانتظام 20٪، النوم 10٪، التقدّم 10٪.</p></div><div class="card mac">${[['التمارين',R.tr],['التغذية',R.nu],['الانتظام',R.co],['النوم',R.sl],['التقدّم',R.pr]].map(x=>`<div class="l"><span>${x[0]}</span><div class="prog"><i style="width:${x[1]}%"></i></div><b>${x[1]}</b></div>`).join('')}</div><div class="note2">النوم في النموذج يقرأ آخر تسجيل فقط، لذلك يُحسب 0 إن لم تسجّل نومًا. التقدّم يقارن أول وزن وآخر وزن في الفترة. الأرقام لتوضيح الشاشة وليست تحليلًا حقيقيًا.</div>`;
  }
  else if(k==='tools'){
   const w=lastKg()||'',hh=S.height||'';
@@ -687,7 +702,7 @@ function vDetail(id){
  const s=S.sessions.find(x=>x.id===id);if(!s)return `<div class="pad">${hdr('الجلسة')}</div>`;
  return `<div class="pad t">${hdr(s.t,dlabel(s.ts))}<div class="rowx" style="margin-bottom:12px">${s.status==='partial'?`<span class="partial-tag">${IC.clock()} جزئي · ${setsOf(s)} من ${totOf(s)} مجموعة</span>`:`<span class="pill live">مكتمل</span>`}</div>
  ${s.status==='partial'?`<button class="btn" data-a="resume" data-v="${s.id}" style="margin-bottom:14px">أكمل التمرين</button>`:''}
- ${s.exs.map(e=>`<div class="lab">${e.n}</div><div class="card lst">${e.sets.map((x,i)=>`<div><span class="g"><b>المجموعة ${i+1}</b><span>${x.done?x.r+(e.u||' تكرار')+(x.w?' × '+x.w+' كغ':''):'لم تُسجَّل'}</span></span>${x.done?IC.check('var(--c-done)'):''}</div>`).join('')}</div>`).join('')}</div>`;
+ ${s.exs.map(e=>`<div class="lab">${e.n}</div><div class="card lst">${e.sets.map((x,i)=>`<div><span class="g"><b>المجموعة ${i+1}</b><span>${x.done?x.r+(e.u||' تكرار')+(x.w?' × '+x.w+' كغ':'')+(x.rpe?' · RPE '+x.rpe:''):'لم تُسجَّل'}</span></span>${x.done?IC.check('var(--c-done)'):''}</div>`).join('')}</div>`).join('')}</div>`;
 }
 
 /* ===== المشغّل والملخص ===== */
@@ -703,6 +718,7 @@ function vWorkout(){
  ${e.sets[0].w||x.w||e.m!=='البطن'?`<div class="stp2"><span>الوزن (كغ)</span><button class="ib" data-a="adj" data-v="w:-2.5" aria-label="أنقص">−</button><b>${fmt(x.w)}</b><button class="ib" data-a="adj" data-v="w:2.5" aria-label="زِد">+</button></div>`:''}
  <div class="card lst" style="margin-top:12px">${e.sets.map((y,i)=>`<div class="srow ${y.done?'done':i===n[1]?'act':''}"><span class="g"><b>${i+1}</b></span><span class="r">${y.done?y.r+(y.w?' × '+y.w:''):'—'}</span>${y.done?IC.check('var(--c-done)'):''}</div>`).join('')}</div>
  <button class="btn" data-a="done" style="margin-top:14px">تمّت المجموعة</button>
+ ${rest?`<div class="lab" style="margin:12px 0 6px">الجهد RPE للمجموعة الأخيرة (اختياري)</div><div class="opt2">${[7,8,9,10].map(v=>`<button class="${s.exs[rest.e].sets[rest.j].rpe===v?'on':''}" data-a="rpe" data-v="${v}">${v}</button>`).join('')}</div>`:''}
  ${rest?`<div class="rbar"><span>${IC.timer()} راحة <b id="restt">${mmss((rest.end-Date.now())/1000)}</b></span><button class="lnk sm" data-a="undo">تراجع</button><button class="lnk sm" data-a="skiprest">تخطَّ</button></div>`:''}
  </div>`;
 }
@@ -796,6 +812,10 @@ function act(a,v){
   case 'sl':S.sleep=Math.max(0,Math.min(14,(S.sleep||7)+(+v)));break;
   case 'savesl':sheet=null;save();render();toast('حُفظ النوم');return;
   case 'flt':S.flt=v;break;
+  case 'rpw':S.rpw=+v;break;
+  case 'exp':toast('عرض فقط: التصدير يعمل في التطبيق الحالي');return;
+  case 'wexp':toast('عرض فقط: تصدير الوزن يعمل في التطبيق الحالي');return;
+  case 'rpe':{const s=curS();if(s&&rest){s.exs[rest.e].sets[rest.j].rpe=+v;save();render()}return}
   case 'visit':S.visits.push(Date.now());break;
   case 'seed':seed();toast('أُضيفت بيانات تجريبية');break;
   case 'reset':S=NEW();rest=null;sheet=null;break;
