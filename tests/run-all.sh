@@ -10,6 +10,7 @@ echo "== اليوم/التمرين/الأرشيف (UX) =="; NODE_PATH="$(npm roo
 echo "== الخط المحلي =="; NODE_PATH="$(npm root -g)" node tests/font.e2e.js
 echo "== دمج الجلسات (تعادل، حجم، تراجع) =="; NODE_PATH="$(npm root -g)" node tests/sxmerge.e2e.js
 echo "== التقارير (الفترة والعوامل) =="; NODE_PATH="$(npm root -g)" node tests/rpt.e2e.js
+echo "== السمة الفاتحة =="; NODE_PATH="$(npm root -g)" node tests/theme.e2e.js
 echo "== الوزن والوجبات (مسار واحد) =="; NODE_PATH="$(npm root -g)" node tests/wm.e2e.js
 echo "== حصة اليوم والتعويض (UX2) =="; NODE_PATH="$(npm root -g)" node tests/ux2.e2e.js
 echo "== موافقة الذكاء الاصطناعي =="; NODE_PATH="$(npm root -g)" node tests/consent.e2e.js
