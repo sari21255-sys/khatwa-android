@@ -1,7 +1,7 @@
 {
  "id": "/",
- "name": "خطوة",
- "short_name": "خطوة",
+ "name": "SIJIL",
+ "short_name": "SIJIL",
  "description": "تطبيق شامل للتمارين والكارديو والتغذية والنوم",
  "lang": "ar",
  "dir": "rtl",
@@ -13,8 +13,8 @@
   "minimal-ui"
  ],
  "orientation": "portrait",
- "background_color": "#fafafa",
- "theme_color": "#000000",
+ "background_color": "#101010",
+ "theme_color": "#101010",
  "categories": [
   "health",
   "fitness",

@@ -1,5 +1,5 @@
-/* خطوة — Service Worker: شبكة أولًا مع احتياط من الذاكرة، وصفحة رئيسية بديلة دون اتصال */
-const V='khatwa-v67',CORE=['./','index.html','eq-db.js','config.js','manifest.webmanifest','privacy.html','icons/icon-192.png','icons/icon-512.png','icons/icon-192-maskable.png','fonts/Cairo-Regular.ttf','fonts/Cairo-400-arabic.woff','fonts/Cairo-600-arabic.woff','fonts/Cairo-700-arabic.woff','fonts/Cairo-800-arabic.woff','fonts/BarlowCondensed-600-latin.woff','fonts/BarlowCondensed-700-latin.woff','fonts/BarlowCondensed-800-latin.woff'];
+/* SIJIL — Service Worker: شبكة أولًا مع احتياط من الذاكرة، وصفحة رئيسية بديلة دون اتصال */
+const V='sijil-v68',CORE=['./','index.html','eq-db.js','config.js','manifest.webmanifest','privacy.html','icons/icon-192.png','icons/icon-512.png','icons/icon-192-maskable.png','fonts/AmiriQuran-Regular.ttf','fonts/Cairo-Regular.ttf','fonts/Cairo-400-arabic.woff','fonts/Cairo-600-arabic.woff','fonts/Cairo-700-arabic.woff','fonts/Cairo-800-arabic.woff','fonts/BarlowCondensed-600-latin.woff','fonts/BarlowCondensed-700-latin.woff','fonts/BarlowCondensed-800-latin.woff'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>Promise.all(CORE.map(u=>c.add(u).catch(()=>{})))).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==V).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
 self.addEventListener('message',e=>{if(e.data==='SKIP_WAITING')self.skipWaiting()});

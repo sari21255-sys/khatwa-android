@@ -1,0 +1,70 @@
+/* SIJIL: التسجيل السريع (+)، الأرقام الغربية، جدول المجموعات الأخضر في كل سمة، الاستئناف بعد إعادة الفتح،
+   والترقية من بيانات النسخة السابقة. تشغيل: NODE_PATH=$(npm root -g) node tests/sijil.e2e.js [index.html]. بيانات اصطناعية. */
+const {chromium}=require('playwright'),path=require('path');
+const file=path.resolve(process.argv[2]||path.join(__dirname,'../www/index.html'));
+let fail=0,pass=0;const ok=(c,m,x)=>{if(c){pass++;console.log('  ok   '+m)}else{fail++;console.log('  FAIL '+m+(x?'  ['+x+']':''))}};
+const T=['black','white','blue','emerald','olive','purple'];
+const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=30;S.prof.ht=178;S.prof.startW=85;S.prof.goalType='lose';S.prof.lvl='b';S.prof.eq='gym';S.prof.dpw=7;S.bw[TD()]=85;calcTargets();genPlan();S.plan=[0,1,2,3,4,5,6].map(()=>({t:'يوم',ex:[E('بنش',3,8,40)]}));S.tab='dash';S.sub=null;save();render()};
+const IND=/[٠-٩]/;
+(async()=>{const b=await chromium.launch();
+ const mk=async(w,theme,pre)=>{const ctx=await b.newContext({viewport:{width:w||390,height:844}});if(theme)await ctx.addInitScript(t=>{try{if(!sessionStorage.__s){sessionStorage.__s=1;localStorage.setItem('fit_theme',t)}}catch(e){}},theme);if(pre)await ctx.addInitScript(pre);const p=await ctx.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));await p.goto('file://'+file);await p.waitForFunction(()=>typeof S!=='undefined');return{ctx,p}};
+ /* 1) التسجيل السريع */
+ {const {ctx,p}=await mk(390);await p.evaluate(seed);await p.waitForTimeout(200);
+  await p.evaluate(()=>{document.body.style.minHeight='2400px';window.scrollTo(0,300)});const y0=await p.evaluate(()=>Math.round(scrollY));
+  await p.click('#nav .sjplus');await p.waitForTimeout(250);
+  ok(await p.evaluate(()=>S.tab==='dash')&&!!await p.$('.sjq'),'«+» يفتح «تسجيل سريع» ويبقى تبويب اليوم محددًا');
+  ok(await p.evaluate(()=>!document.querySelector('#nav')||getComputedStyle(document.querySelector('#nav')).display!=='none'),'الشريط ظاهر مع «+» خارج مشغّل التمرين');
+  const opts=await p.$$eval('.sjq [data-a=qlm]',a=>a.map(x=>x.dataset.v));ok(['h2o','w','m','wo'].every(x=>opts.includes(x)),'الخيارات الأربعة: ماء، وزن، وجبة، تمرين',opts.join());
+  await p.click('.sjq [data-a=qlm][data-v=h2o]');await p.waitForTimeout(150);
+  const w0=await p.evaluate(()=>+S.wtr[TD()]||0);await p.click('.sjq [data-a=wtr][data-v="250"]');await p.waitForTimeout(150);
+  ok(await p.evaluate(w=>(+S.wtr[TD()]||0)===w+250,w0),'الماء من «+» يمر بمسار الماء الموحّد (+250)');
+  await p.click('.sjq [data-a=qlx][aria-label="إغلاق"]');await p.waitForTimeout(250);
+  ok(await p.evaluate(()=>!document.querySelector('.sjq')&&S.tab==='dash'),'الإغلاق يعيد إلى الصفحة نفسها');
+  const y1=await p.evaluate(()=>Math.round(scrollY));ok(Math.abs(y1-y0)<=2,'موضع التمرير محفوظ بعد الإغلاق ('+y0+'→'+y1+')');
+  /* الوزن بأرقام هندية */
+  await p.click('#nav .sjplus');await p.waitForTimeout(200);await p.click('.sjq [data-a=qlm][data-v=w]');await p.waitForTimeout(150);
+  await p.click('.sjq #we-w',{clickCount:3});await p.keyboard.press('Control+A');await p.keyboard.type('٨٠٫٥');await p.waitForTimeout(100);
+  const typed=await p.$eval('.sjq #we-w',e=>e.value);ok(/^80[.,]5$/.test(typed)&&!IND.test(typed),'إدخال «٨٠٫٥» يتحوّل إلى 80.5 في الحقل',typed);
+  await p.click('.sjq [data-a=wadd]');await p.waitForTimeout(250);
+  ok(await p.evaluate(()=>S.bw[TD()]===80.5),'حفظ الوزن من «+» يخزّن 80.5 رقمًا عاديًا',await p.evaluate(()=>JSON.stringify(S.bw[TD()])));
+  ok(await p.evaluate(()=>!document.querySelector('.sjq')&&S.tab==='dash'),'بعد حفظ الوزن يُغلق الدرج ويبقى اليوم');
+  /* التمرين */
+  await p.click('#nav .sjplus');await p.waitForTimeout(200);await p.click('.sjq [data-a=qlm][data-v=wo]');await p.waitForTimeout(300);
+  ok(await p.evaluate(()=>S.sub==='wk'&&!!UI.wk),'خيار التمرين يفتح مسار البدء/الاستئناف');
+  ok(await p.evaluate(()=>{const n=document.querySelector('#nav');return !n||getComputedStyle(n).display==='none'||n.offsetHeight===0}),'الشريط السفلي مخفي داخل مشغّل التمرين');
+  ok(p.errs.length===0,'لا أخطاء سكربت',p.errs.join('|'));await ctx.close()}
+ /* 2) لا أرقام هندية في الشاشات الرئيسية */
+ {const {ctx,p}=await mk(390);await p.evaluate(seed);const bad=[];
+  for(const [t,s] of [['dash',null],['train',null],['pg',null],['ex',null],['ex','set'],['ex','rpt'],['ex','wgt']]){await p.evaluate(([t,s])=>{S.tab=t;S.sub=s;render()},[t,s]);await p.waitForTimeout(120);
+   const txt=await p.evaluate(()=>document.body.innerText);if(IND.test(txt))bad.push(t+':'+(s||''))}
+  ok(bad.length===0,'الأرقام 0–9 وحدها في اليوم/التمرين/التقدّم/المزيد/الإعدادات/التقارير/الوزن',bad.join(','));await ctx.close()}
+ /* 3) جدول المجموعات الأخضر في كل سمة + الاستئناف */
+ for(const th of T){
+  const {ctx,p}=await mk(390,th);await p.evaluate(seed);
+  await p.evaluate(()=>{sxGo(sxPart(TI()),TI());render()});await p.waitForTimeout(300);
+  const has=await p.$('#wk-w');if(!has){ok(false,th+': مشغّل التمرين يفتح');await ctx.close();continue}
+  await p.fill('#wk-w','40');await p.fill('#wk-r','10');await p.click('[data-a=wkset]');await p.waitForTimeout(300);
+  const g=await p.evaluate(()=>{const r=document.querySelector('.sjsr.sv');const c=r&&r.querySelector('.sjck.on');const ck=c&&getComputedStyle(c);const rs=r&&getComputedStyle(r);const nx=document.querySelector('.sjsr.cur');return{row:!!r,chk:!!c,rbg:rs&&rs.backgroundColor,cbg:ck&&ck.backgroundColor,cur:!!nx,saved:(S.sx&&Object.values(S.sx).some(x=>x.ex&&x.ex.some(e=>e.sets&&e.sets.length)))}});
+  const green=s=>{const m=/rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(s||'');return !!m&&(+m[2]>+m[1]&&+m[2]>=+m[3])};
+  ok(g.row&&g.chk&&green(g.rbg)&&green(g.cbg)&&g.cur&&g.saved,th+': صف المجموعة المحفوظة أخضر بعلامة صح بيضاء والصف التالي محايد',JSON.stringify(g));
+  await p.screenshot({path:'/tmp/pl-'+th+'.png'});
+  /* إعادة الفتح */
+  const pre=await p.evaluate(()=>Object.keys(JSON.parse(localStorage.getItem('fit1')).sx||{}).length);
+  await p.reload();await p.waitForFunction(()=>typeof S!=='undefined');await p.waitForTimeout(400);
+  const saved=await p.evaluate(()=>Object.values(S.sx||{}).some(x=>x.ex&&x.ex.some(e=>e.sets&&e.sets.length&&e.sets[0].w==40&&e.sets[0].r==10)));
+  ok(saved,th+': المجموعة محفوظة بعد إعادة الفتح (الوزن والتكرارات)',await p.evaluate(pre=>'pre='+pre+' now='+Object.keys(S.sx||{}).length+' ob='+S.prof.ob+' date='+TD(),pre));
+  const resume=await p.evaluate(()=>{const e=document.querySelector('#sx-go');return e?e.innerText:''});
+  ok(/أكمل|استئناف|متابعة/.test(resume),th+': «اليوم» يعرض زر الاستئناف مباشرة',resume);
+  await p.click('#sx-go');await p.waitForTimeout(300);
+  ok(await p.evaluate(()=>!!document.querySelector('.sjsr.sv')),th+': الاستئناف يفتح الجلسة نفسها والصف الأخضر باقٍ');
+  ok(p.errs.length===0,th+': لا أخطاء سكربت',p.errs.join('|'));await ctx.close()}
+ /* 4) ترقية من بيانات النسخة السابقة (اصطناعية: حالة مولَّدة بنفس البنية القديمة + سمة light القديمة) */
+ {const {ctx,p}=await mk(390);await p.evaluate(seed);await p.evaluate(()=>{S.bw['2026-10-01']=90;save()});const old=await p.evaluate(()=>localStorage.getItem('fit1'));await ctx.close();
+  const ctx2=await b.newContext({viewport:{width:390,height:844}});await ctx2.addInitScript(o=>{try{if(!localStorage.getItem('fit1')){localStorage.setItem('fit1',o);localStorage.setItem('fit_theme','light');localStorage.setItem('fit_font','c')}}catch(e){}},old);
+  const q=await ctx2.newPage();const errs=[];q.on('pageerror',e=>errs.push(e.message));await q.goto('file://'+file);await q.waitForFunction(()=>typeof S!=='undefined');await q.waitForTimeout(500);
+  const r=await q.evaluate(()=>({n:S.prof.name,bw:Object.keys(S.bw).length,th:document.documentElement.getAttribute('data-sj'),home:!!document.querySelector('#nav'),welcome:!!document.querySelector('#wel-go')}));
+  ok(r.n==='مختبر'&&r.bw>=2&&r.home&&!r.welcome,'الترقية: المستخدم القديم وبياناته يدخلان «اليوم» مباشرة بلا ترحيب',JSON.stringify(r));
+  ok(r.th==='white','الترقية: السمة الفاتحة القديمة تُحوَّل إلى الأبيض',r.th);
+  for(const t of ['dash','train','pg','ex']){await q.click('#nav button[data-v='+t+']');await q.waitForTimeout(100)}
+  ok(errs.length===0,'الترقية: التنقل بين التبويبات بلا أخطاء',errs.join('|'));await ctx2.close()}
+ await b.close();console.log('\n'+pass+' ناجح، '+fail+' فاشل');process.exit(fail?1:0)})();

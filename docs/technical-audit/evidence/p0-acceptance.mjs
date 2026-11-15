@@ -2,7 +2,7 @@
 // الاستعمال: NODE_PATH=$(npm root -g) node p0-acceptance.mjs      (يبني نسخة اختبار من pwa/ ويطبّق _headers كما يفعل Netlify)
 import fs from 'node:fs';import path from 'node:path';import cp from 'node:child_process';
 const ROOT=path.resolve(new URL('../../../',import.meta.url).pathname)+'/';
-const SWV=(fs.readFileSync(ROOT+'pwa/sw.js','utf8').match(/khatwa-v\d+/)||['?'])[0];   // إصدار الكاش الحالي من sw.js
+const SWV=(fs.readFileSync(ROOT+'pwa/sw.js','utf8').match(/(?:khatwa|sijil)-v\d+/)||['?'])[0];   // إصدار الكاش الحالي من sw.js
 const TMP='/tmp/p0site';fs.rmSync(TMP,{recursive:true,force:true});fs.cpSync(ROOT+'pwa',TMP,{recursive:true});
 fs.writeFileSync(TMP+'/config.js','window.APP_CONFIG={aiUrl:"http://127.0.0.1:8788/api/ai",syncUrl:"http://127.0.0.1:8788/api/state",sbUrl:"",sbKey:"",supportEmail:"",storeUrl:""};\n');
 cp.execSync(`python3 ${ROOT}tools/gen-headers.py ${TMP}`,{stdio:'pipe'});

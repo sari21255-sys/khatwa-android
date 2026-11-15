@@ -58,21 +58,21 @@ if V.exists():
 # اسم عربي للتطبيق
 S=A/'app/src/main/res/values/strings.xml'
 if S.exists():
-    t=S.read_text(encoding='utf-8');t=re.sub(r'(<string name="app_name">)[^<]*',r'\1خطوة',t);t=re.sub(r'(<string name="title_activity_main">)[^<]*',r'\1خطوة',t);S.write_text(t,encoding='utf-8')
-# الأيقونات
-try:
-    from PIL import Image
-    src=Image.open('www/icons/icon-512.png').convert('RGBA')
-    res=A/'app/src/main/res'
-    for d,sz in {'mdpi':48,'hdpi':72,'xhdpi':96,'xxhdpi':144,'xxxhdpi':192}.items():
-        o=res/('mipmap-'+d)
-        if o.exists():
-            im=src.resize((sz,sz),Image.LANCZOS)
-            for n in ('ic_launcher.png','ic_launcher_round.png','ic_launcher_foreground.png'): im.save(o/n)
-    for f in (res/'mipmap-anydpi-v26').glob('*.xml'): f.unlink()
-    print('icons ok')
-except Exception as e:
-    print('icons skipped:',e)
+    t=S.read_text(encoding='utf-8');t=re.sub(r'(<string name="app_name">)[^<]*',r'\1SIJIL',t);t=re.sub(r'(<string name="title_activity_main">)[^<]*',r'\1SIJIL',t);S.write_text(t,encoding='utf-8')
+# الأيقونات: أصول SIJIL الجاهزة (تكيفية: خلفية #101010 وطبقة أمامية للشعار) تُنسخ فوق موارد Capacitor
+import shutil
+RES=A/'app/src/main/res';SRC=Path('app/brand/android-res')
+if SRC.exists() and RES.exists():
+    for f in RES.glob('mipmap-*/ic_launcher*'):
+        if f.is_file(): f.unlink()
+    for f in SRC.rglob('*'):
+        if f.is_file():
+            t=RES/f.relative_to(SRC);t.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(f,t)
+    for sp in RES.glob('drawable*/splash.png'):
+        shutil.copy2('app/brand/store/splash-1080x1920.png',sp)
+    print('icons ok (SIJIL adaptive) + splash')
+else:
+    print('icons skipped: missing',SRC,RES)
 # رقم الإصدار تلقائيًا من رقم تشغيل الـCI (يزداد في كل بناء، وهو شرط Google Play)
 G=A/'app/build.gradle'
 if G.exists():
