@@ -16,5 +16,6 @@ echo "== هوية SIJIL (تسجيل سريع، أرقام، مشغّل، ترق�
 echo "== الوزن والوجبات (مسار واحد) =="; NODE_PATH="$(npm root -g)" node tests/wm.e2e.js
 echo "== حصة اليوم والتعويض (UX2) =="; NODE_PATH="$(npm root -g)" node tests/ux2.e2e.js
 echo "== موافقة الذكاء الاصطناعي =="; NODE_PATH="$(npm root -g)" node tests/consent.e2e.js
+echo "== لوحة الاختصارات الجانبية =="; NODE_PATH="$(npm root -g)" node tests/drawer.e2e.js
 echo "== التنقل الخماسي =="; NODE_PATH="$(npm root -g)" node tests/nav.e2e.js
 if [ -n "${PSQL:-}" ]; then echo "== مزامنة السجلات (جهازان + Postgres) =="; NODE_PATH="$(npm root -g)" node tests/sync.e2e.mjs; echo "== مزامنة الجلسات + 50 دورة عشوائية =="; NODE_PATH="$(npm root -g)" node tests/sync-sx.e2e.mjs; else echo "(تخطي sync.e2e: عيّن PSQL)"; fi

@@ -1166,6 +1166,37 @@ html[data-sj] body .x2w .r i{border-style:dashed!important;opacity:.5}
 .sjnp .ico{width:26px;height:26px}
 .sjsr.cur input:focus{outline:0;box-shadow:0 0 0 3px color-mix(in srgb,var(--sj-tx) 30%,transparent)}
 .sjsr.cur input{-moz-appearance:textfield;appearance:textfield}.sjsr.cur input::-webkit-inner-spin-button,.sjsr.cur input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+
+/* ===== لوحة الاختصاراتي الجانبية ===== */
+.sjds{position:fixed;inset:0;z-index:84;background:#000;opacity:0;pointer-events:none;visibility:hidden}
+.sjdw{position:fixed;top:0;bottom:0;left:0;z-index:85;width:min(82vw,330px);--x:0;transform:translate3d(calc(-100% + var(--x)*1px),0,0);will-change:transform;background:var(--sj-s1);color:var(--sj-tx);border-inline-end:1px solid var(--sj-ln);border-radius:0 26px 26px 0;box-shadow:0 0 40px rgba(0,0,0,calc(.35*var(--p,0)));display:none;direction:rtl;touch-action:pan-y}
+.sjdw.show,.sjds.show{display:block}
+.sjds.show{visibility:visible}
+.sjdw.anim{transition:transform .45s cubic-bezier(.22,1.1,.3,1),box-shadow .45s ease}
+.sjds.anim{transition:opacity .4s ease}
+.sjdw .in{height:100%;overflow:auto;padding:calc(env(safe-area-inset-top,0px) + 16px) 14px calc(env(safe-area-inset-bottom,0px) + 90px);overscroll-behavior:contain}
+.sjdw .hd{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.sjdw .hd b{flex:1;font-size:20px}
+.sjdw .hd button{width:40px;height:40px;border-radius:50%;border:0;background:var(--sj-s2)!important;color:var(--sj-tx)!important;display:grid;place-items:center;padding:0}
+.sjdw .hd button.on{background:var(--sj-btn)!important;color:var(--sj-btnt)!important}
+.sjdw .gr{display:grid;grid-template-columns:1fr 1fr;gap:14px 10px}
+.sjdw .dt{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;background:none!important;border:0!important;color:var(--sj-tx)!important;font:600 13px/1.35 var(--sj-fa);text-align:center;padding:0!important;width:auto!important;height:auto!important;box-shadow:none!important}
+.sjdw .dt .fi{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;background:var(--sj-s2);border:1.5px solid var(--sj-ln);transition:transform .15s ease}
+.sjdw .dt:active .fi{transform:scale(.94)}
+.sjdw .dt .fi .ico{width:30px;height:30px}
+.sjdw .dt.add .fi{border-style:dashed}
+.sjdw .dt .dx{position:absolute;top:-6px;inset-inline-end:calc(50% - 40px);width:24px;height:24px;border-radius:50%;background:#ef4444;color:#fff;display:grid;place-items:center;border:2px solid var(--sj-s1)}
+.sjdw .dt .dx .ico{width:13px;height:13px}
+.sjdw .dt .dx.pl{background:var(--sj-ok)}
+.sjdw .mv{display:flex;gap:6px}
+.sjdw .mv button{width:30px;height:26px;border-radius:9px;border:0;background:var(--sj-s2)!important;color:var(--sj-tx)!important;display:grid;place-items:center;padding:0}
+.sjdw .mv .ico{width:14px;height:14px}
+.sjdw .hint{color:var(--sj-mu);font-size:13px;margin:-6px 0 14px}
+.sjdh{position:absolute;left:100%;top:36%;width:28px;height:92px;margin:0;padding:0;border:0;border-radius:0 20px 20px 0;background:var(--sj-btn)!important;color:var(--sj-btnt)!important;display:grid;place-items:center;box-shadow:2px 0 14px rgba(0,0,0,.35);touch-action:none}
+.sjdh .ico{width:20px;height:20px;transform:rotate(calc(180deg*var(--p,0)));transition:none}
+.sjdh:after{content:"";position:absolute;inset:-14px -10px -14px 0}
+body.sjnodw .sjdw,body.sjnodw .sjds{display:none!important}
+@media (prefers-reduced-motion:reduce){.sjdw.anim,.sjds.anim{transition:none}}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -5518,6 +5549,41 @@ document.addEventListener('toggle',ev=>{const d=ev.target;if(d&&d.classList&&d.c
  document.addEventListener('pointerdown',e=>{const t=e.target;if(t&&(t.id==='wk-w'||t.id==='wk-r')&&e.pointerType!=='mouse-skip'){t.setAttribute('inputmode','none');open(t);return}
   if(np&&np.classList.contains('on')&&!np.contains(t))hide()},true);
  new MutationObserver(()=>{if(np&&np.classList.contains('on')&&!document.getElementById('wk-w'))hide()}).observe(document.body,{childList:true,subtree:true});
+})();
+
+
+/* ===== اختصاراتي: لوحة جانبية تُسحب من اليسار ===== */
+(()=>{
+ let W=300,x=0,drag=null,sup=0;const q=a=>document.querySelector(a);
+ const mk=()=>{let d=q('.sjdw');if(d)return d;
+  document.body.insertAdjacentHTML('beforeend','<div class="sjds" aria-hidden="true"></div><aside class="sjdw" role="dialog" aria-label="اختصاراتي"><div class="in"></div><button class="sjdh" type="button" aria-label="فتح اختصاراتي" aria-expanded="false">'+ic('back')+'</button></aside>');
+  const dw=q('.sjdw'),ds=q('.sjds'),h=q('.sjdh');
+  const down=e=>{if(e.button>0)return;W=dw.offsetWidth||300;drag={sx:e.clientX,sy:e.clientY,x0:x,lx:e.clientX,lt:performance.now(),v:0,on:false,id:e.pointerId,src:e.target};if(e.currentTarget===h){try{h.setPointerCapture(e.pointerId)}catch(_){}}};
+  const move=e=>{if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.sx,dy=e.clientY-drag.sy;
+   if(!drag.on){if(Math.abs(dx)<8||Math.abs(dx)<Math.abs(dy)*1.3)return;drag.on=true;dw.classList.remove('anim');ds.classList.remove('anim');try{dw.setPointerCapture(e.pointerId)}catch(_){}}
+   const t=performance.now();drag.v=(e.clientX-drag.lx)/Math.max(1,t-drag.lt);drag.lx=e.clientX;drag.lt=t;set(drag.x0+dx)};
+  const up=e=>{if(!drag||e.pointerId!==drag.id)return;const g=drag;drag=null;
+   if(g.on){sup=Date.now();const open=g.v>.35?true:g.v<-.35?false:x>W*.45;fin(open)}
+   else if(g.src&&g.src.closest('.sjdh'))fin(x<W*.5);};
+  [h,dw,ds].forEach(el=>{el.addEventListener('pointerdown',down);el.addEventListener('pointermove',move);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',()=>{if(drag){const g=drag;drag=null;fin(x>W*.5)}})});
+  ds.addEventListener('click',()=>{if(Date.now()-sup>250)fin(false)});
+  dw.addEventListener('click',e=>{if(Date.now()-sup<250){e.stopPropagation();e.preventDefault();return}
+   if(e.target.closest('.dt:not(.ed):not(.add):not([data-a=dwadd])')||e.target.closest('[data-a=dwx]'))setTimeout(()=>fin(false),0)},true);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&x>0)fin(false)});
+  return dw};
+ function set(v){const dw=mk(),ds=q('.sjds');x=Math.max(0,Math.min(W,v));const pr=W?x/W:0;dw.style.setProperty('--x',x);dw.style.setProperty('--p',pr);ds.style.opacity=(pr*.5).toFixed(3);
+  dw.classList.toggle('show',true);ds.classList.toggle('show',pr>0);q('.sjdh').setAttribute('aria-expanded',pr>.5?'true':'false')}
+ function fin(open){const dw=mk(),ds=q('.sjds');W=dw.offsetWidth||W;dw.classList.add('anim');ds.classList.add('anim');if(open)body();set(open?W:0);if(!open){ds.style.opacity=0;setTimeout(()=>{if(x===0)ds.classList.remove('show')},420)}}
+ function body(){const dw=mk(),ed=!!UI.dwEd,pk=!!UI.dwPick,sc=scList();let b;
+  if(pk){b='<div class="gr">'+FEATS.filter(f=>sc.indexOf(f.id)<0).map(f=>'<button class="dt" data-a="dwadd" data-id="'+f.id+'" type="button">'+fI(f)+'<span>'+f.t+'</span><i class="dx pl">'+ic('plus')+'</i></button>').join('')+'</div>'}
+  else b='<div class="gr">'+sc.map(id=>{const f=FD[id];return ed?'<div class="dt ed">'+fI(f)+'<span>'+f.t+'</span><i class="dx" data-a="scdel" data-id="'+id+'" role="button" aria-label="حذف">'+ic('x')+'</i><span class="mv"><button type="button" data-a="scmv" data-id="'+id+'" data-d="-1" aria-label="تقديم">'+ic('back')+'</button><button type="button" data-a="scmv" data-id="'+id+'" data-d="1" aria-label="تأخير">'+ic('next')+'</button></span></div>':'<button class="dt" type="button" '+fA(f)+'>'+fI(f)+'<span>'+f.t+'</span></button>'}).join('')+(ed?'<button class="dt add" type="button" data-a="dwpick"><span class="fi">'+ic('plus')+'</span><span>إضافة</span></button>':'')+'</div>';
+  dw.querySelector('.in').innerHTML='<div class="hd"><b>'+(pk?'أضف اختصارًا':'اختصاراتي')+'</b>'+(pk?'<button type="button" data-a="dwpick" aria-label="رجوع">'+ic('next')+'</button>':'<button type="button" class="'+(ed?'on':'')+'" data-a="dwed" aria-label="'+(ed?'تم':'تعديل الاختصارات')+'">'+ic(ed?'check':'gear')+'</button>')+'<button type="button" data-a="dwx" aria-label="إغلاق">'+ic('x')+'</button></div>'+(ed&&!pk?'<div class="hint">احذف أو غيّر الترتيب أو أضف.</div>':'')+b}
+ window.dwOpen=ed=>{mk();if(ed){UI.dwEd=true;UI.dwPick=false}W=q('.sjdw').offsetWidth||W;fin(true)};
+ window.dwClose=()=>{if(q('.sjdw'))fin(false)};
+ /* مزامنة المحتوى والإظهار بعد كل رسم */
+ const R=render;render=function(){R.apply(this,arguments);try{const dw=mk(),on=!!q('#nav .pill2')&&!q('.sjwel')&&S.sub!=='wk'&&!locked();document.body.classList.toggle('sjnodw',!on);if(on){if(!dw.classList.contains('show'))set(x);body()}else if(x>0)set(0)}catch(e){lg(e)}};
+ Object.assign(ACT,{drop:b=>{dwOpen(b.dataset.v==='edit');return false},dwed:()=>{UI.dwEd=!UI.dwEd;UI.dwPick=false},dwpick:()=>{UI.dwPick=!UI.dwPick},dwadd:b=>{const a=scList();if(a.indexOf(b.dataset.id)<0)a.push(b.dataset.id);S.sc=a;UI.dwPick=false;save();cmSyncSet()},dwx:()=>false});
+ render();
 })();
 
 (async()=>{
