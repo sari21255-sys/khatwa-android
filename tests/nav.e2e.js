@@ -33,7 +33,7 @@ const MUST=tbl.filter(x=>!INNER.has(x));
   const pg=await p.$$eval('.sjrow[data-v]',a=>a.map(x=>x.dataset.v));ok(pg.includes('arch')&&pg.includes('ach')&&pg.includes('wgt')&&pg.includes('prog'),w+': «التقدّم» يصل إلى الأرشيف والأوسمة والوزن/القياسات والنوم',pg.join());
   await p.click('#nav button[data-v="ex"]');await p.waitForTimeout(100);ok(/المزيد/.test(await p.evaluate(()=>document.querySelector('h1').innerText)),w+': عنوان «المزيد»');
   await p.evaluate(()=>{S.tab='dash';render()});await p.click('#nav .sjplus');await p.waitForTimeout(250);
-  ok(!!await p.$('.sjq')&&await p.evaluate(()=>S.tab==='dash'),w+': «+» يفتح «تسجيل سريع» ويبقى التبويب الحالي');await p.click('.sjq [data-a=qlm][data-v=wo]');await p.waitForTimeout(250);
+  ok(!!await p.$('.sjq')&&await p.evaluate(()=>S.tab==='dash'),w+': «+» يفتح «تسجيل سريع» ويبقى التبويب الحالي');await p.click('.sjq [data-a=qlm][data-v=wo]');await p.waitForTimeout(150);await p.click('.sjq [data-a=qlm][data-v="wo:iron"]');await p.click('.sjq [data-a=tkqs][data-k=iron]');await p.waitForTimeout(250);
   ok(await p.evaluate(()=>S.sub==='wk'&&!!UI.wk&&UI.wk.ks.length===1),w+': «بدء تمرين اليوم» من القائمة يفتح مشغّل حصة اليوم');
   ok(errs.length===0,w+': لا أخطاء صفحة',errs.join('|'));
   await p.evaluate(()=>{S.sub=null;S.tab='dash';render()});await p.screenshot({path:path.join(__dirname,'../docs/ux/evidence/impl/nav-'+w+'.png')});await p.context().close()}
