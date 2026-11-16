@@ -3,6 +3,14 @@
 - نقطة البداية: `9bfbb11` على `ux/sijil-identity`. الفرع: `ux/sijil-android-fixes`.
 - الحالة: نسخة مرشّحة للاختبار على Samsung Galaxy S26 Ultra. لا دمج ولا نشر.
 
+## التسليم
+
+- الالتزام المرشح: `a3b60b7` (يتفرّع من `9bfbb11`). الإصدار: versionName `1.0.83`، versionCode `183`.
+- Build Android ✅: https://github.com/sari21255-sys/khatwa-android/actions/runs/43867740660 (الأرتيفاكت `SIJIL-UX-test-apk` يحوي `SIJIL-UX-a3b60b7-test.apk` وملف sha256).
+- Tests ✅ (مع sync/Postgres): https://github.com/sari21255-sys/khatwa-android/actions/runs/43867740662
+- فحص الـManifest داخل الـAPK يجري في الخطوة نفسها (`check_manifest.py`: الموقع التقريبي فقط، `ACTIVITY_RECOGNITION` مسموح، لا FINE/BACKGROUND).
+- الإضافة `@capacitor/geolocation` 7.1.8 تُثبَّت في CI؛ `package-lock.json` لم يُحدَّث (عائق مسجَّل).
+
 ## ما أُثبت وما لم يُثبت
 
 | البند | اختبار آلي في المتصفح | جهاز Android فعلي |
