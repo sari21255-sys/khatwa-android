@@ -60,11 +60,18 @@ jobs:
           path: |
             manifest-release.txt
             manifest-debug.txt
+      - name: Name the test APK SIJIL-UX-<commit>-test.apk
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk "SIJIL-UX-${GITHUB_SHA::7}-test.apk"
+          sha256sum "SIJIL-UX-${GITHUB_SHA::7}-test.apk" | tee "SIJIL-UX-${GITHUB_SHA::7}-test.apk.sha256"
+          grep -E 'versionCode|versionName' android/app/build.gradle | head -2
       - uses: actions/upload-artifact@v4
         with:
-          name: khatwa-debug-apk-TEST-ONLY
-          retention-days: 7
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: SIJIL-UX-test-apk
+          retention-days: 14
+          path: |
+            SIJIL-UX-*-test.apk
+            SIJIL-UX-*-test.apk.sha256
       - name: Build signed release AAB (for Google Play)
         if: env.HAS_KS == 'true'
         working-directory: android
