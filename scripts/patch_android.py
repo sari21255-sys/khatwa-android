@@ -76,7 +76,7 @@ else:
 # إضافة عدّاد خطوات الهاتف الأصلية (من مصدر المستودع) وتسجيلها في MainActivity
 PJ=A/'app/src/main/java/com/khatwa/app'
 if PJ.exists():
-    shutil.copy2('scripts/android/StepCounterPlugin.java',PJ/'StepCounterPlugin.java')
+    shutil.copy2('scripts/native/StepCounterPlugin.java',PJ/'StepCounterPlugin.java')
     ma=PJ/'MainActivity.java';t=ma.read_text(encoding='utf-8')
     if 'StepCounterPlugin' not in t:
         t=re.sub(r'public class MainActivity extends BridgeActivity\s*\{\s*\}','''public class MainActivity extends BridgeActivity {

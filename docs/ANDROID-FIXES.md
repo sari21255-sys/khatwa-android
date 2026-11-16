@@ -41,7 +41,7 @@
 
 ## الخطوات
 
-- Health Connect أولًا (تجميع النظام لمنع التكرار)، وإلا عدّاد الهاتف (`scripts/android/StepCounterPlugin.java`، يُحقن ويُسجَّل في `MainActivity` عبر `scripts/patch_android.py`، إذن `ACTIVITY_RECOGNITION`).
+- Health Connect أولًا (تجميع النظام لمنع التكرار)، وإلا عدّاد الهاتف (`scripts/native/StepCounterPlugin.java`، يُحقن ويُسجَّل في `MainActivity` عبر `scripts/patch_android.py`، إذن `ACTIVITY_RECOGNITION`).
 - الإجمالي من مصدر واحد دائمًا؛ لا جمع بين الهاتف والساعة. يُخزَّن المصدر والتوقيت. اليوم الجديد يبدأ من الصفر، وإعادة التشغيل تُحتسب دون تكرار. العدّ يبدأ من أول قراءة، والواجهة تعرض «العدّ منذ HH:MM».
 
 ## خطوات تجربة على S26 Ultra
