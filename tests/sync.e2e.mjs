@@ -90,7 +90,7 @@ try{
   const st=await d1.evaluate(()=>JSON.parse(JSON.stringify(S)));st.ts=Date.now()-5000;st.bw={'2026-09-09':91};st.meals={};
   await fetch('http://127.0.0.1:8792/api/state',{method:'PUT',headers:{Authorization:'Bearer '+tk,Origin:'http://127.0.0.1:8790'},body:JSON.stringify(st)});
   wenv.AUTH_MODE='supabase';   // الدخول القديم بالبريد وكلمة المرور يبقى متاحًا للترحيل
-  const n=await device();await n.evaluate(SEED);await up(n,email('nl'));await n.evaluate(()=>{S.tab='me';S.sub='set';render()});
+  const n=await device();await n.evaluate(SEED);await up(n,email('nl'));await n.evaluate(()=>{S.tab='me';S.sub='set';UI.sgo={old:true};render()});
   await n.fill('#olem',lem);await n.fill('#olpw','legacypass123');await n.click('[data-a=lglogin]');await n.waitForFunction(()=>!!SYNC.token);
   await n.click('[data-a=rsmig]');await n.waitForFunction(()=>RSM.migrated===1,null,{timeout:8000});const v=await get(n,"S.bw['2026-09-09']");const frozen=await fetch('http://127.0.0.1:8792/api/state',{method:'PUT',headers:{Authorization:'Bearer '+tk,Origin:'http://127.0.0.1:8790'},body:JSON.stringify(st)});
   rec('MIG-04','حساب مزامنة قديم (بريد وكلمة مرور) على جهاز جديد: الدخول من الإعدادات ثم النقل يجلب بياناته ويجمّد النسخة القديمة',v===91&&frozen.status===410&&!!reg.token,JSON.stringify({v,frozen:frozen.status}));wenv.AUTH_MODE='transition';await n.ctx.close()}
@@ -231,7 +231,7 @@ try{
   rec('CLK-01','ساعة جهاز متقدمة بأيام: يرفضها الخادم (لا تفوز بكل التعارضات) وتظهر رسالة واضحة والبيانات محلية سليمة',r==='err'&&err==='clock'&&(await get(x,"S.bw['2026-11-22']"))===54,JSON.stringify({r,err}));await x.ctx.close()}
  /* ---- واجهة الحذف والمسح: التأكيد المزدوج، والمسح المحلي مستقل عن السحابة ---- */
  {const e8=email('u');const w=await device();await w.evaluate(SEED);await up(w,e8);await edit(w,"S.bw['2026-11-15']=58");await sync(w);const uid=await uidOf(w);
-  await w.evaluate(()=>{S.tab='me';S.sub='set';render()});const html=await w.evaluate(()=>document.body.innerText);
+  await w.evaluate(()=>{S.tab='me';S.sub='set';UI.sgo={old:true};render()});const html=await w.evaluate(()=>document.body.innerText);
   const has=html.includes('حذف نسخة المزامنة السحابية')&&html.includes('مسح بيانات هذا الجهاز')&&html.includes(e8);
   await w.click('[data-a=rsdelq]');const conf=await w.evaluate(()=>document.body.innerText.includes('تأكيد حذف النسخة السحابية'));const rowsBefore=dbq(`select count(*) from public.sync_records where user_id='${uid}'`);
   await w.click('[data-a=rsdelc]');const gone=await w.evaluate(()=>!document.body.innerText.includes('تأكيد حذف النسخة السحابية'));const rowsAfterCancel=dbq(`select count(*) from public.sync_records where user_id='${uid}'`);
