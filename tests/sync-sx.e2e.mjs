@@ -23,8 +23,10 @@ const edit=async(p,js)=>{await p.evaluate(js+';save();0');await p.waitForTimeout
 /* ينتظر انتهاء أي مزامنة جارية (مثل مزامنة الإقلاع بعد إعادة التحميل) قبل أن يشغّل مزامنته، وإلا ردّ rsSync بـ«busy» دون عمل */
 const sync=p=>p.evaluate(async()=>{const idle=async()=>{for(let i=0;i<100&&RS.busy;i++)await new Promise(r=>setTimeout(r,100))};await idle();const o=await rsSync();await idle();return o});
 const get=(p,expr)=>p.evaluate(expr);
-const up=(p,e)=>p.evaluate(e=>SB.up(e,'password123','t').then(()=>1),e);
-const login=(p,e)=>p.evaluate(e=>SB.in(e,'password123').then(()=>1),e);
+/* بعد الدخول يُنقل الجهاز إلى مساحة الحساب (مساحة الزائر لا تزامن أبدًا) ثم يُعاد التحميل كما يفعل التطبيق */
+const toAcct=async p=>{const had=await p.evaluate(()=>!!window.H);await p.evaluate(()=>{save();localStorage.setItem('fit_space',JSON.stringify({a:'u_'+SB.uid()}))});await p.reload();await p.waitForFunction(()=>typeof rsSync==='function'&&typeof S!=='undefined');await p.waitForTimeout(250);if(had)await p.evaluate(HELP);return 1};
+const up=async(p,e)=>{await p.evaluate(e=>SB.up(e,'password123','t').then(()=>1),e);return toAcct(p)};
+const login=async(p,e)=>{await p.evaluate(e=>SB.in(e,'password123').then(()=>1),e);return toAcct(p)};
 const uidOf=p=>p.evaluate(()=>SB.uid());
 
 /* ---- أدوات داخل الصفحة ---- */

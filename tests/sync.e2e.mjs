@@ -22,8 +22,10 @@ const edit=async(p,js)=>{await p.evaluate(js+';save();0');await p.waitForTimeout
 /* ينتظر انتهاء أي مزامنة جارية (مثل مزامنة الإقلاع بعد إعادة التحميل) قبل أن يشغّل مزامنته، وإلا ردّ rsSync بـ«busy» دون عمل */
 const sync=p=>p.evaluate(async()=>{const idle=async()=>{for(let i=0;i<100&&RS.busy;i++)await new Promise(r=>setTimeout(r,100))};await idle();const o=await rsSync();await idle();return o});
 const get=(p,expr)=>p.evaluate(expr);
-const up=(p,e)=>p.evaluate(e=>SB.up(e,'password123','t').then(()=>1),e);
-const login=(p,e)=>p.evaluate(e=>SB.in(e,'password123').then(()=>1),e);
+/* بعد الدخول يُنقل الجهاز إلى مساحة الحساب (مساحة الزائر لا تزامن أبدًا) ثم يُعاد التحميل كما يفعل التطبيق */
+const toAcct=async(p,quiet)=>{await p.evaluate(q=>{localStorage.setItem('fit_space',JSON.stringify({a:'u_'+SB.uid()}));if(q)localStorage.setItem('fit_rs_off','1')},quiet);await p.reload();await p.waitForFunction(()=>typeof rsSync==='function'&&typeof S!=='undefined');await p.waitForTimeout(250);if(quiet)await p.evaluate(()=>{RS.pause=0;localStorage.removeItem('fit_rs_off');clearTimeout(RST)});return 1};
+const up=async(p,e,quiet)=>{await p.evaluate(e=>SB.up(e,'password123','t').then(()=>1),e);return toAcct(p,quiet)};
+const login=async(p,e)=>{await p.evaluate(e=>SB.in(e,'password123').then(()=>1),e);return toAcct(p)};
 const uidOf=p=>p.evaluate(()=>SB.uid());
 try{
  /* ---- تفكيك الحالة وإعادة تركيبها بلا فقد ---- */
@@ -73,7 +75,7 @@ try{
   const old=JSON.parse(JSON.stringify(snapState));old.ts=Date.now()-86400000;old.bw={'2026-10-01':99,'2026-11-01':1};old.meals={'2026-10-02':[{n:'قديمة',kcal:7}]};old.lib=[{id:'old_lib',n:'وجبة قديمة',kcal:1,p:1,c:1,f:1}];
   await fetch('http://127.0.0.1:8792/api/state',{method:'PUT',headers:{Authorization:'Bearer '+lt,Origin:'http://127.0.0.1:8790'},body:JSON.stringify(old)});
   wenv.AUTH_MODE='supabase';   // النشر الموصى به: القراءة والترحيل والتجميد فقط، لا كتابة قديمة
-  const m=await device();await m.evaluate(SEED);await m.evaluate(t=>{SYNC.token=t},lt);await up(m,email('m'));
+  const m=await device();await m.evaluate(SEED);await up(m,email('m'));await m.evaluate(t=>{SYNC.token=t},lt);
   await edit(m,"S.bw['2026-11-01']=82");   // محلي أحدث من اللقطة القديمة لنفس السجل
   const r1=await m.evaluate(()=>rsLegacyImport());await sync(m);const s1=await get(m,"JSON.stringify([S.bw,S.meals['2026-10-02'],S.lib.filter(x=>x.id==='old_lib').length,S.lib.length])");
   const r2=await m.evaluate(()=>rsLegacyImport());await sync(m);const s2=await get(m,"JSON.stringify([S.bw,S.meals['2026-10-02'],S.lib.filter(x=>x.id==='old_lib').length,S.lib.length])");
@@ -90,7 +92,7 @@ try{
   const st=await d1.evaluate(()=>JSON.parse(JSON.stringify(S)));st.ts=Date.now()-5000;st.bw={'2026-09-09':91};st.meals={};
   await fetch('http://127.0.0.1:8792/api/state',{method:'PUT',headers:{Authorization:'Bearer '+tk,Origin:'http://127.0.0.1:8790'},body:JSON.stringify(st)});
   wenv.AUTH_MODE='supabase';   // الدخول القديم بالبريد وكلمة المرور يبقى متاحًا للترحيل
-  const n=await device();await n.evaluate(SEED);await up(n,email('nl'));await n.evaluate(()=>{S.tab='me';S.sub='set';UI.sgo={acc:true,dat:true};render()});
+  const n=await device();await n.evaluate(SEED);await up(n,email('nl'));await n.evaluate(()=>{S.tab='dash';S.sub='pf';render()});
   await n.fill('#olem',lem);await n.fill('#olpw','legacypass123');await n.click('[data-a=lglogin]');await n.waitForFunction(()=>!!SYNC.token);
   await n.click('[data-a=rsmig]');await n.waitForFunction(()=>RSM.migrated===1,null,{timeout:8000});const v=await get(n,"S.bw['2026-09-09']");const frozen=await fetch('http://127.0.0.1:8792/api/state',{method:'PUT',headers:{Authorization:'Bearer '+tk,Origin:'http://127.0.0.1:8790'},body:JSON.stringify(st)});
   rec('MIG-04','حساب مزامنة قديم (بريد وكلمة مرور) على جهاز جديد: الدخول من الإعدادات ثم النقل يجلب بياناته ويجمّد النسخة القديمة',v===91&&frozen.status===410&&!!reg.token,JSON.stringify({v,frozen:frozen.status}));wenv.AUTH_MODE='transition';await n.ctx.close()}
@@ -133,10 +135,10 @@ try{
    await fetch(LT+'/api/state',{method:'PUT',headers:{Authorization:'Bearer '+tk,...O},body:JSON.stringify(st)});return tk};
   const cnt=u=>Number(dbq(`select count(*) from public.sync_records where user_id='${u}'`));
   const tk=await mkLegacy('a');const em=email('f1u');
-  const m1=await device();await m1.evaluate(SEED);await m1.evaluate(t=>{SYNC.token=t;localStorage.setItem('fit_sync',t)},tk);await up(m1,em);const u1=await uidOf(m1);
+  const m1=await device();await m1.evaluate(SEED);await up(m1,em,1);await m1.evaluate(t=>{SYNC.token=t;localStorage.setItem('fit_sync',t)},tk);const u1=await uidOf(m1);
   await edit(m1,"S.bw['2026-08-02']=69");  // تعديل محلي أحدث من اللقطة
   // (أ) استيراد ثم انقطاع الشبكة: لا تأكيد، المرحلة محفوظة، السجلات معلّقة
-  await m1.evaluate(()=>rsLegacyImport());const pend0=await get(m1,"Object.values(RSM.rec).filter(e=>e.p).length");
+  await m1.evaluate(()=>{const r=rsLegacyImport();return r.then?r.then(x=>{save();return x}):r});const pend0=await get(m1,"Object.values(RSM.rec).filter(e=>e.p).length");
   await m1.route('**/127.0.0.1:8791/**',r=>r.abort());const off=await m1.evaluate(()=>ACT.rsmig());const stOff=await get(m1,"({stage:RSM.mig&&RSM.mig.stage,mig:RSM.migrated||0,p:Object.values(RSM.rec).filter(e=>e.p).length,msg:UI.msg})");const srvOff=cnt(u1);
   rec('F1-01','بعد الاستيراد وانقطاع الشبكة: لا يُعلَن اكتمال، تبقى المرحلة «imported» والسجلات معلّقة، ولا شيء على الخادم',stOff.stage==='imported'&&!stOff.mig&&stOff.p>=pend0&&pend0>3&&srvOff===0&&/رفع/.test(stOff.msg),JSON.stringify({pend0,stOff,srvOff}));
   // (ب) إعادة التحميل بلا شبكة: الحالة تبقى
@@ -231,7 +233,7 @@ try{
   rec('CLK-01','ساعة جهاز متقدمة بأيام: يرفضها الخادم (لا تفوز بكل التعارضات) وتظهر رسالة واضحة والبيانات محلية سليمة',r==='err'&&err==='clock'&&(await get(x,"S.bw['2026-11-22']"))===54,JSON.stringify({r,err}));await x.ctx.close()}
  /* ---- واجهة الحذف والمسح: التأكيد المزدوج، والمسح المحلي مستقل عن السحابة ---- */
  {const e8=email('u');const w=await device();await w.evaluate(SEED);await up(w,e8);await edit(w,"S.bw['2026-11-15']=58");await sync(w);const uid=await uidOf(w);
-  await w.evaluate(()=>{S.tab='me';S.sub='set';UI.sgo={acc:true,dat:true};render()});const html=await w.evaluate(()=>document.body.innerText);
+  await w.evaluate(()=>{S.tab='dash';S.sub='pf';render()});const html=await w.evaluate(()=>document.body.innerText);
   const has=html.includes('حذف نسخة المزامنة السحابية')&&html.includes('مسح بيانات هذا الجهاز')&&html.includes(e8);
   await w.click('[data-a=rsdelq]');const conf=await w.evaluate(()=>document.body.innerText.includes('تأكيد حذف النسخة السحابية'));const rowsBefore=dbq(`select count(*) from public.sync_records where user_id='${uid}'`);
   await w.click('[data-a=rsdelc]');const gone=await w.evaluate(()=>!document.body.innerText.includes('تأكيد حذف النسخة السحابية'));const rowsAfterCancel=dbq(`select count(*) from public.sync_records where user_id='${uid}'`);
