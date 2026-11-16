@@ -33,7 +33,7 @@ let pass=0,fail=0;const ok=(c,m,x)=>{if(c){pass++;console.log('  ok   '+m)}else{
  await p.evaluate(()=>{window.R3=aiJson('سؤال ثانٍ').then(v=>({v}),e=>({e:e&&e.code}))});await p.waitForTimeout(300);
  ok(!await p.$('#ai-consent')&&calls.length===2,'الطلب التالي لا يسأل مجددًا');
  /* 4) سحب الموافقة من الإعدادات */
- await p.evaluate(()=>{S.tab='me';S.sub='set';UI.sgo={old:true};render()});await p.waitForTimeout(200);
+ await p.evaluate(()=>{S.tab='me';S.sub='set';UI.sgo={acc:true,dat:true};render()});await p.waitForTimeout(200);
 await p.evaluate(()=>{UI.sgo=Object.assign({},UI.sgo,{dat:true});render()});
  ok(!!await p.$('#ai-row [data-a=aiwd]'),'صف «الذكاء الاصطناعي» في الإعدادات مع «سحب الموافقة»');
  await p.click('#ai-row [data-a=aiwd]');await p.waitForTimeout(200);
