@@ -37,7 +37,7 @@ const IND=/[٠-٩]/;
   await p.screenshot({path:'/tmp/pl-'+th+'.png'});
   /* إعادة الفتح */
   const pre=await p.evaluate(()=>Object.keys(JSON.parse(localStorage.getItem('fit1')).sx||{}).length);
-  await p.reload();await p.waitForFunction(()=>typeof fxEnhance==='function'&&document.querySelector('#app')&&document.querySelector('#app').innerHTML.length>50);await p.waitForTimeout(400);
+  await p.reload();await p.waitForFunction(()=>typeof fxEnhance==='function'&&typeof S!=='undefined'&&S.prof&&S.prof.ob===1&&document.querySelector('#app')&&document.querySelector('#app').innerHTML.length>50);await p.waitForTimeout(400);
   const saved=await p.evaluate(()=>Object.values(S.sx||{}).some(x=>x.ex&&x.ex.some(e=>e.sets&&e.sets.length&&e.sets[0].w==40&&e.sets[0].r==10)));
   ok(saved,th+': المجموعة محفوظة بعد إعادة الفتح (الوزن والتكرارات)',await p.evaluate(pre=>JSON.stringify(Object.values(S.sx||{}).map(x=>({st:x.st,ex:(x.ex||[]).slice(0,2).map(e=>e.sets)})))+' pre='+pre+' now='+Object.keys(S.sx||{}).length+' ob='+S.prof.ob+' date='+TD(),pre));
   const resume=await p.evaluate(()=>{const e=document.querySelector('#sx-go');return e?e.innerText:''});
