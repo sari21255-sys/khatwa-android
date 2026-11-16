@@ -7,7 +7,7 @@ async function open(b){const p=await(await b.newContext({viewport:{width:390,hei
  await p.clock.install({time:WED});await p.goto('file://'+file);await p.waitForTimeout(500);await p.clock.resume();
  await p.evaluate(()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=30;S.prof.ht=175;S.prof.startW=82;S.prof.goal=75;S.bw={};S.bw['2026-11-10']=82;S.meals={};S.tab='dash';S.sub=null;save();render()});await p.waitForTimeout(150);return p}
 const click=async(p,s)=>{await p.click(s);await p.waitForTimeout(80)};
-const goto=(p,tab,sub)=>p.evaluate(([t,s])=>{S.tab=t;S.sub=s||null;render()},[tab,sub]);
+const goto=(p,tab,sub)=>p.evaluate(([t,s])=>{S.tab=t;S.sub=s||null;render();document.querySelectorAll('details.sjmore').forEach(d=>{d.open=true})},[tab,sub]);
 const reload=async p=>{await p.reload();await p.waitForTimeout(500)};
 (async()=>{const b=await chromium.launch();
  console.log('1) الوزن: نموذج واحد في اليوم والتقدّم ومراقبة الوزن');

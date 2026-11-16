@@ -11,7 +11,7 @@ async function ctxOf(b,w,init){const ctx=await b.newContext({viewport:{width:w||
  if(init)await ctx.addInitScript(init);await p.goto('file://'+file);await p.waitForTimeout(600);await p.clock.resume();return{ctx,p}}
 const setup=p=>p.evaluate(plan=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=30;S.prof.ht=175;S.prof.startW=80;S.prof.dpw=3;S.prof.goalType='lose';S.bw[TD()]=80;S.plan=eval(plan);S.tab='dash';S.sub=null;save();render()},PLAN);
 const txt=p=>p.evaluate(()=>document.body.innerText);
-const click=async(p,sel)=>{await p.click(sel);await p.waitForTimeout(60)};
+const click=async(p,sel)=>{await p.evaluate(()=>document.querySelectorAll('details.sjmore').forEach(d=>{d.open=true}));await p.click(sel);await p.waitForTimeout(60)};
 const sx=p=>p.evaluate(()=>JSON.parse(JSON.stringify(S.sx)));
 const ovf=p=>p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
 (async()=>{const b=await chromium.launch();
@@ -39,7 +39,7 @@ const ovf=p=>p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
   await click(p,'[data-a="wkend"]');t=await txt(p);
   ok(/تمرين جزئي محفوظ · 1 من 7 مجموعة/.test(t.replace(/\s+/g,' '))||/تمرين جزئي محفوظ · 1 من 9 مجموعة/.test(t.replace(/\s+/g,' ')),'اليوم يعرض «تمرين جزئي محفوظ · 1 من 9 مجموعة»',t.match(/تمرين جزئي[^\n]*/));
   ok(/أكمل التمرين/.test(t)&&/هدف الأسبوع: 0 من 3/.test(t),'الزر «أكمل التمرين» والهدف ما زال 0 من 3');
-  await click(p,'[data-a="go"][data-v="train"]');await click(p,'.sjtk[data-v="iron"]');ok(/أكمل التمرين/.test(await txt(p)),'تبويب التمرين يعرض «أكمل» أيضًا');
+  await click(p,'#nav [data-a="go"][data-v="train"]');await click(p,'.sjtk[data-v="iron"]');ok(/أكمل التمرين/.test(await txt(p)),'تبويب التمرين يعرض «أكمل» أيضًا');
   await click(p,'[data-a="go"][data-v="dash"]').catch(()=>{});
   await p.reload();await p.waitForTimeout(500);
   t=await txt(p);ok(/أكمل التمرين/.test(t)&&/1 من 9 مجموعة/.test(t.replace(/\s+/g,' ')),'بعد تحديث الصفحة: الجلسة الجزئية محفوظة');

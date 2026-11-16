@@ -10,7 +10,7 @@ async function open(b,time){const ctx=await b.newContext({viewport:{width:390,he
  await p.clock.install({time:time||WED});await p.goto('file://'+file);await p.waitForTimeout(500);await p.clock.resume();
  await p.evaluate(plan=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=30;S.prof.ht=175;S.prof.startW=80;S.prof.dpw=3;S.prof.goalType='lose';S.bw[TD()]=80;S.plan=eval(plan);S.tab='dash';S.sub=null;save();render()},PLAN);return{ctx,p}}
 const txt=p=>p.evaluate(()=>document.body.innerText);
-const click=async(p,sel)=>{await p.click(sel);await p.waitForTimeout(60)};
+const click=async(p,sel)=>{await p.evaluate(()=>document.querySelectorAll('details.sjmore').forEach(d=>{d.open=true}));await p.click(sel);await p.waitForTimeout(60)};
 const reload=async p=>{await p.reload();await p.waitForTimeout(500)};
 const sxs=p=>p.evaluate(()=>Object.values(S.sx));
 const goal=async p=>{const t=await txt(p);const m=t.match(/هدف الأسبوع:\s*(\d+) من (\d+)/);return m?m[1]+'/'+m[2]:null};
