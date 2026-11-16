@@ -1341,6 +1341,7 @@ html[data-sj=white] .sji{filter:drop-shadow(0 0 3px color-mix(in srgb,var(--c,cu
 .fxul{margin:6px 0;padding-inline-start:20px}.fxul li{margin:3px 0}
 .fxacc .tag.bad{background:#fee2e2;color:#7f1d1d}
 .fxacc .note{background:var(--soft,#f1f5f9);padding:10px 12px;border-radius:12px;font-size:13px}
+.wkt{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.wkt .chip{min-height:44px}.wkt .wkclock{margin-inline-start:auto}
 /*TRK-CSS-END*/
 </style>
 <script src="config.js"></script>
@@ -5914,7 +5915,7 @@ function tkManualForm(k){const unit=k==='run'?'كم':k==='swim'?swU(swCfg().u):'
 /* ======================= الشاشة الحيّة والملخّص ======================= */
 function vSes(){const s=tkFind(UI.ses);if(!s){UI.ses=null;return trkHub()}
  const k=s.k,ft=k==='fn'?fnTimerTxt(s):null,pau=s.st==='pau';
- let h='<div class="sjses"><div class="row" style="gap:8px"><button class="chip" data-a="tkmin" aria-label="تصغير">'+ic('next')+'</button><b style="flex:1;font-size:18px">'+TKN(k)+(s.plan?' · '+esc(s.plan.n):'')+'</b><button class="chip" data-a="tkend" data-id="'+s.id+'">إنهاء</button></div>';
+ let h='<div class="sjses"><div class="row" style="gap:8px"><button class="chip" data-a="tkmin" id="tk-back">'+ic('next')+'العودة إلى اليوم</button><b style="flex:1;font-size:18px">'+TKN(k)+(s.plan?' · '+esc(s.plan.n):'')+'</b><button class="chip" data-a="tkend" data-id="'+s.id+'">إنهاء</button></div>';
  h+='<div class="sjclock'+(pau?' pau':'')+'"><b class="num" data-tk="main">'+(ft?ft.main:tkT(tkAct(s)))+'</b><small class="mu">'+(pau?'متوقفة مؤقتًا':ft?ft.sub:'الزمن النشط')+'</small></div>';
  h+='<div class="row" style="gap:8px;margin:0 0 12px"><button class="btn" data-a="tkpause" data-id="'+s.id+'">'+(pau?'استئناف':'إيقاف مؤقت')+'</button></div>';
  h+=({run:runBody,swim:swBody,cali:caBody,fn:fnBody}[k])(s);
@@ -5984,7 +5985,7 @@ Object.assign(ACT,{
  trk:b=>{const v=b.dataset.v;if(v!==UI.trk){UI.ttab='ov';UI.cask=null}UI.trk=v;UI.ses=null;UI.sum=null;window.scrollTo(0,0)},
  trkhub:()=>{UI.trk='hub';UI.ses=null;UI.sum=null;window.scrollTo(0,0)},
  tkopen:b=>{const s=tkFind(b.dataset.id);if(!s)return false;UI.ses=s.id;UI.sum=null;S.tab='train';UI.trk=s.k;if(s.st==='pau'){}window.scrollTo(0,0)},
- tkmin:()=>{UI.ses=null},
+ tkmin:()=>{UI.ses=null;UI.sum=null;S.tab='dash';S.sub=null;window.scrollTo(0,0)},
  tkpause:b=>{const s=tkFind(b.dataset.id);if(!s)return false;s.st==='pau'?tkResume(s):tkPause(s)},
  tkend:b=>{const s=tkFind(b.dataset.id);if(!s)return false;const par=s.k==='fn'?(s.res&&0):0;tkFinish(s,tkPartial(s));S.tab='train';UI.trk=s.k},
  tkdisc:b=>{if(UI.disc!==b.dataset.id){UI.disc=b.dataset.id;return}const a=SJ().ss,i=a.findIndex(x=>x.id===b.dataset.id);if(i>=0)a.splice(i,1);UI.disc=null;UI.ses=null},
@@ -6410,7 +6411,7 @@ Object.assign(ENT,{"صافٍ":"Clear","غائم جزئيًا":"Partly cloudy","�
 const FXMARK='<svg class="sjmk" viewBox="0 0 56 56" role="img" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="9" stroke-linejoin="miter"><g transform="translate(13 7) skewX(-12)"><path d="M33 5H5V21H33V37H5"/></g></svg>';
 /* 1) الشريط السفلي: التمرين · التغذية · اليوم (الشعار) · التقدّم · المزيد. في RTL أول عنصر على اليمين. */
 sjNav=function(){
- if(UI.ses)return '';
+ if(UI.ses||(S.sub==='wk'&&UI.wk))return '';
  const it=[['train','dumbbell','التمرين'],['food','fork','التغذية'],['dash',0,'اليوم'],['pg','chart','التقدّم'],['ex','grid','المزيد']];
  return '<div class="pill2">'+it.map(n=>{const on=n[0]===S.tab||(n[0]==='dash'&&S.tab==='home');
   return '<button class="'+(n[1]?'':'sjplus sjhome ')+(on?'on cur':'')+'" data-a="go" data-v="'+n[0]+'" aria-label="'+n[2]+'"'+(on?' aria-current="page"':'')+'>'+(n[1]?ic(n[1])+'<span>'+n[2]+'</span>':FXMARK+'<span class="sr">'+n[2]+'</span>')+'</button>'}).join('')+'</div>'};
@@ -6664,6 +6665,7 @@ setTimeout(fxAutoSync,1500);
     fxSheet('إنهاء التمرين؟',body,function(){UI.fxfin=1;try{const r=V(b);save();render();return r}finally{UI.fxfin=0}},{ok:'إنهاء وحفظ'});return false}}
   return V(b)}})();
 (function(){const V=vWk;vWk=function(){let h=V.apply(this,arguments);if(typeof h!=='string'||h.indexOf('class="wkt"')<0)return h;
+  h=h.replace('<div class="wkt">','<div class="wkt"><button class="chip" data-a="wkback" id="wk-back">'+ic('next')+'العودة إلى اليوم</button>');
   const U=UI.wk;let src='';try{if(U&&U.ks&&U.i<U.ks.length){const t=tasks().find(x=>x.k===U.ks[U.i]);if(t){const e=t.e;
     src=U.w!=null?'القيمة الحالية: آخر ما أدخلته في هذه الجلسة':(sugg(e)?'القيمة الابتدائية: اقتراح التدرّج من جلساتك السابقة':(S.base[e.n]||lastW(e.n))?'القيمة الابتدائية: من آخر جلسة لهذا التمرين':'القيمة الابتدائية: من الخطة')}}}catch(x){}
   return src?h.replace('<div class="bar"','<div class="mu" id="wk-src" style="text-align:center;font-size:12px">'+src+'</div><div class="bar"'):h}})();
@@ -6682,6 +6684,9 @@ Object.assign(ENT,{'تذكير التمرين اليومي':'Daily workout remin
  'اختر مدينة':'Choose a city','ابحث عن مدينة':'Search for a city','استخدم موقعي':'Use my location','إغلاق':'Close','إلغاء':'Cancel','التمرين':'Workout','التغذية':'Nutrition','اليوم':'Today','التقدّم':'Progress','المزيد':'More',
  'الماء':'Water','كمية مخصّصة':'Custom amount','إنهاء التمرين؟':'End workout?','إنهاء وحفظ':'End & save','خطط ومكتبات':'Plans & libraries','خطة التمارين':'Workout plan','الأجهزة الرياضية':'Gym equipment','مصادر البيانات':'Data sources','ربط الساعات والخطوات':'Watches & steps','خطوات الهاتف':'Phone steps','حدّث الآن':'Refresh now','تفعيل عدّاد الهاتف':'Enable phone step counter',
  'جدول زيارتي للنادي':'My gym visit schedule','منبه الذهاب والغياب':'Visit & absence alarm','النادي':'Gym','الأندية القريبة':'Nearby gyms'});
+
+/* العودة إلى «اليوم» من التمرين النشط: لا تُنهي الحصة؛ كل مجموعة محفوظة لحظة تسجيلها، والاستئناف من «اليوم» يفتح الجلسة نفسها */
+ACT.wkback=function(){S.sub=null;S.tab='dash';window.scrollTo(0,0)};
 /* ===== الحسابات ووضع الزائر: مساحات محلية معزولة داخل تثبيت واحد =====
    المساحة النشطة تعيش في المفاتيح المعتادة (fit1, fit_rs, fit_sb ...)؛ المساحات الأخرى محفوظة تحت fit_sp_<id>_<key>.
    التبديل = حفظ + نقل المفاتيح + إعادة تحميل الصفحة، فلا يبقى طلب أو مؤقّت من الحساب السابق يمسّ الشاشة الحالية.
@@ -6872,6 +6877,19 @@ authCard=function(){return '<div class="card"><h2>'+ic('users')+'تسجيل ال
 (function(){const O=setSyncHtml;setSyncHtml=function(){return '<div class="mu">إدارة الحساب والمزامنة وتسجيل الخروج في «الملف الشخصي ← الحساب».</div><button class="chip" data-a="sub" data-v="pf">افتح الملف الشخصي</button>'+(typeof INST!=='undefined'&&INST?'<div class="card hl"><button class="btn" data-a="install">تثبيت التطبيق على الشاشة الرئيسية</button></div>':'')};})();
 /* بعد إعادة التحميل: اسأل عن نقل بيانات الزائر مرة في الجلسة */
 (function(){const R=render;render=function(){const r=R.apply(this,arguments);try{const m=spMeta();if(m.xfer&&m.xfer.st==='ask'&&!UI.fxxs&&S.prof&&!document.getElementById('fx-sheet'))setTimeout(fxXferSheet,60)}catch(e){lg(e)}return r}})();
+/* ترجمات الإنجليزية لنصوص الحسابات */
+Object.assign(ENT,{
+'إدارة الحساب والمزامنة وتسجيل الخروج في «الملف الشخصي ← الحساب».':'Manage your account, sync and sign-out in Profile → Account.',
+'افتح الملف الشخصي':'Open profile','تسجيل الدخول':'Sign in','إنشاء حساب':'Create account','المتابعة كزائر':'Continue as guest','أهلًا بك':'Welcome',
+'الحساب':'Account','وضع الزائر':'Guest mode','محفوظ على الجهاز':'Saved on this device','تسجيل الخروج':'Sign out','دخول':'Sign in',
+'استعادة كلمة المرور':'Reset password','كلمة مرور جديدة':'New password','إعادة إرسال رابط التأكيد':'Resend confirmation link','أعد إرسال رابط التأكيد':'Resend confirmation link',
+'نسيت كلمة المرور؟':'Forgot password?','لديّ حساب':'I have an account','رجوع لتسجيل الدخول':'Back to sign in','لم يصلني الرابط؟ أعد الإرسال':"Didn't get the link? Resend",
+'البريد الإلكتروني':'Email','كلمة المرور':'Password','الاسم الظاهر':'Display name','أرسل رابط الاستعادة':'Send reset link','حفظ كلمة المرور':'Save password','أعد إرسال الرابط':'Resend link',
+'أضف بيانات هذا الجهاز إلى حسابي':'Add this device’s data to my account','اتركها في وضع الزائر':'Leave it in guest mode','تعديلات تنتظر المزامنة':'Edits waiting to sync','خروج رغم ذلك':'Sign out anyway',
+'احتفظ بنسخة الزائر':'Keep the guest copy','احذف المنقول من الزائر':'Delete transferred data from guest','قرّر بشأن بيانات الزائر':'Decide about guest data','سجّل الدخول من جديد':'Sign in again',
+'جارٍ استعادة بياناتك…':'Restoring your data…','ابدأ إعدادًا جديدًا':'Start a fresh setup','أعد المحاولة':'Try again','تعذّرت الاستعادة':'Restore failed',
+'ينتظر المزامنة':'Waiting to sync','تمت المزامنة':'Synced','تسجيل الدخول أو إنشاء حساب':'Sign in or create account','أضفها إلى وضع الزائر':'Add it to guest mode',
+'العودة إلى اليوم':'Back to Today'});
 /*TRK-JS-END*/
 render();
 if(document.fonts){document.fonts.ready.then(fitLogos);document.fonts.addEventListener&&document.fonts.addEventListener('loadingdone',fitLogos)}

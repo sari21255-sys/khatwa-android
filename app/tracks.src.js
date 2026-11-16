@@ -238,7 +238,7 @@ function tkManualForm(k){const unit=k==='run'?'كم':k==='swim'?swU(swCfg().u):'
 /* ======================= الشاشة الحيّة والملخّص ======================= */
 function vSes(){const s=tkFind(UI.ses);if(!s){UI.ses=null;return trkHub()}
  const k=s.k,ft=k==='fn'?fnTimerTxt(s):null,pau=s.st==='pau';
- let h='<div class="sjses"><div class="row" style="gap:8px"><button class="chip" data-a="tkmin" aria-label="تصغير">'+ic('next')+'</button><b style="flex:1;font-size:18px">'+TKN(k)+(s.plan?' · '+esc(s.plan.n):'')+'</b><button class="chip" data-a="tkend" data-id="'+s.id+'">إنهاء</button></div>';
+ let h='<div class="sjses"><div class="row" style="gap:8px"><button class="chip" data-a="tkmin" id="tk-back">'+ic('next')+'العودة إلى اليوم</button><b style="flex:1;font-size:18px">'+TKN(k)+(s.plan?' · '+esc(s.plan.n):'')+'</b><button class="chip" data-a="tkend" data-id="'+s.id+'">إنهاء</button></div>';
  h+='<div class="sjclock'+(pau?' pau':'')+'"><b class="num" data-tk="main">'+(ft?ft.main:tkT(tkAct(s)))+'</b><small class="mu">'+(pau?'متوقفة مؤقتًا':ft?ft.sub:'الزمن النشط')+'</small></div>';
  h+='<div class="row" style="gap:8px;margin:0 0 12px"><button class="btn" data-a="tkpause" data-id="'+s.id+'">'+(pau?'استئناف':'إيقاف مؤقت')+'</button></div>';
  h+=({run:runBody,swim:swBody,cali:caBody,fn:fnBody}[k])(s);
@@ -308,7 +308,7 @@ Object.assign(ACT,{
  trk:b=>{const v=b.dataset.v;if(v!==UI.trk){UI.ttab='ov';UI.cask=null}UI.trk=v;UI.ses=null;UI.sum=null;window.scrollTo(0,0)},
  trkhub:()=>{UI.trk='hub';UI.ses=null;UI.sum=null;window.scrollTo(0,0)},
  tkopen:b=>{const s=tkFind(b.dataset.id);if(!s)return false;UI.ses=s.id;UI.sum=null;S.tab='train';UI.trk=s.k;if(s.st==='pau'){}window.scrollTo(0,0)},
- tkmin:()=>{UI.ses=null},
+ tkmin:()=>{UI.ses=null;UI.sum=null;S.tab='dash';S.sub=null;window.scrollTo(0,0)},
  tkpause:b=>{const s=tkFind(b.dataset.id);if(!s)return false;s.st==='pau'?tkResume(s):tkPause(s)},
  tkend:b=>{const s=tkFind(b.dataset.id);if(!s)return false;const par=s.k==='fn'?(s.res&&0):0;tkFinish(s,tkPartial(s));S.tab='train';UI.trk=s.k},
  tkdisc:b=>{if(UI.disc!==b.dataset.id){UI.disc=b.dataset.id;return}const a=SJ().ss,i=a.findIndex(x=>x.id===b.dataset.id);if(i>=0)a.splice(i,1);UI.disc=null;UI.ses=null},

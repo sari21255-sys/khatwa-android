@@ -2,7 +2,7 @@
 const FXMARK='<svg class="sjmk" viewBox="0 0 56 56" role="img" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="9" stroke-linejoin="miter"><g transform="translate(13 7) skewX(-12)"><path d="M33 5H5V21H33V37H5"/></g></svg>';
 /* 1) الشريط السفلي: التمرين · التغذية · اليوم (الشعار) · التقدّم · المزيد. في RTL أول عنصر على اليمين. */
 sjNav=function(){
- if(UI.ses)return '';
+ if(UI.ses||(S.sub==='wk'&&UI.wk))return '';
  const it=[['train','dumbbell','التمرين'],['food','fork','التغذية'],['dash',0,'اليوم'],['pg','chart','التقدّم'],['ex','grid','المزيد']];
  return '<div class="pill2">'+it.map(n=>{const on=n[0]===S.tab||(n[0]==='dash'&&S.tab==='home');
   return '<button class="'+(n[1]?'':'sjplus sjhome ')+(on?'on cur':'')+'" data-a="go" data-v="'+n[0]+'" aria-label="'+n[2]+'"'+(on?' aria-current="page"':'')+'>'+(n[1]?ic(n[1])+'<span>'+n[2]+'</span>':FXMARK+'<span class="sr">'+n[2]+'</span>')+'</button>'}).join('')+'</div>'};
@@ -256,6 +256,7 @@ setTimeout(fxAutoSync,1500);
     fxSheet('إنهاء التمرين؟',body,function(){UI.fxfin=1;try{const r=V(b);save();render();return r}finally{UI.fxfin=0}},{ok:'إنهاء وحفظ'});return false}}
   return V(b)}})();
 (function(){const V=vWk;vWk=function(){let h=V.apply(this,arguments);if(typeof h!=='string'||h.indexOf('class="wkt"')<0)return h;
+  h=h.replace('<div class="wkt">','<div class="wkt"><button class="chip" data-a="wkback" id="wk-back">'+ic('next')+'العودة إلى اليوم</button>');
   const U=UI.wk;let src='';try{if(U&&U.ks&&U.i<U.ks.length){const t=tasks().find(x=>x.k===U.ks[U.i]);if(t){const e=t.e;
     src=U.w!=null?'القيمة الحالية: آخر ما أدخلته في هذه الجلسة':(sugg(e)?'القيمة الابتدائية: اقتراح التدرّج من جلساتك السابقة':(S.base[e.n]||lastW(e.n))?'القيمة الابتدائية: من آخر جلسة لهذا التمرين':'القيمة الابتدائية: من الخطة')}}}catch(x){}
   return src?h.replace('<div class="bar"','<div class="mu" id="wk-src" style="text-align:center;font-size:12px">'+src+'</div><div class="bar"'):h}})();
@@ -274,3 +275,6 @@ Object.assign(ENT,{'تذكير التمرين اليومي':'Daily workout remin
  'اختر مدينة':'Choose a city','ابحث عن مدينة':'Search for a city','استخدم موقعي':'Use my location','إغلاق':'Close','إلغاء':'Cancel','التمرين':'Workout','التغذية':'Nutrition','اليوم':'Today','التقدّم':'Progress','المزيد':'More',
  'الماء':'Water','كمية مخصّصة':'Custom amount','إنهاء التمرين؟':'End workout?','إنهاء وحفظ':'End & save','خطط ومكتبات':'Plans & libraries','خطة التمارين':'Workout plan','الأجهزة الرياضية':'Gym equipment','مصادر البيانات':'Data sources','ربط الساعات والخطوات':'Watches & steps','خطوات الهاتف':'Phone steps','حدّث الآن':'Refresh now','تفعيل عدّاد الهاتف':'Enable phone step counter',
  'جدول زيارتي للنادي':'My gym visit schedule','منبه الذهاب والغياب':'Visit & absence alarm','النادي':'Gym','الأندية القريبة':'Nearby gyms'});
+
+/* العودة إلى «اليوم» من التمرين النشط: لا تُنهي الحصة؛ كل مجموعة محفوظة لحظة تسجيلها، والاستئناف من «اليوم» يفتح الجلسة نفسها */
+ACT.wkback=function(){S.sub=null;S.tab='dash';window.scrollTo(0,0)};

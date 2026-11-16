@@ -23,6 +23,10 @@ jobs:
           npm ci
           npm install --save --no-audit --no-fund @capacitor/geolocation@^7   # موقع تقريبي لـ«استخدم موقعي»؛ يُحدَّث package-lock لاحقًا من جهاز متصل
           pip install pillow
+      - name: Lock candidate (geolocation) for committing from a connected machine
+        run: cp package-lock.json package-lock.candidate.json
+      - uses: actions/upload-artifact@v4
+        with: { name: package-lock-candidate, path: package-lock.candidate.json, retention-days: 14 }
       - name: Generate Android project
         run: |
           npx cap add android

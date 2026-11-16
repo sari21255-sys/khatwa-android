@@ -81,8 +81,14 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   const hd=await p.evaluate(()=>{const e=document.querySelector('.wkt');const r=e.getBoundingClientRect();return{top:Math.round(r.top),pos:getComputedStyle(e).position,end:!!e.querySelector('[data-a=wkend]'),clk:!!e.querySelector('#tmv')}});
   ok(hd.top<=12&&hd.pos==='sticky'&&hd.end&&hd.clk,'المؤقت و«إنهاء» في رأس ثابت أعلى الشاشة',JSON.stringify(hd));
   ok(!!await p.$('#wk-src'),'سطر مصدر القيمة الابتدائية ظاهر');
+  ok(await p.evaluate(()=>{const n=document.querySelector('#nav');return !n||n.innerHTML.trim()===''||!n.offsetHeight}),'الشريط السفلي مخفي أثناء التمرين النشط');
+  ok(!!await p.$('#wk-back')&&!!await p.$('.wkt [data-a=wkend]'),'رأس التمرين: «العودة إلى اليوم» و«إنهاء» زران مستقلان');
   await p.fill('#wk-w','60');await p.click('[data-a=wkset]');await p.waitForTimeout(250);
   const n1=await p.evaluate(()=>{const sx=Object.values(S.sx)[0];return sx?sxProg(sx).d:-1});ok(n1>=1,'المجموعة الأولى حُفظت فورًا في الجلسة',String(n1));
+  await p.click('#wk-back');await p.waitForTimeout(250);
+  ok(await p.evaluate(()=>S.sub===null&&S.tab==='dash'&&Object.keys(S.sx).length===1&&!!sxOpen()&&sxProg(Object.values(S.sx)[0]).d===1),'العودة إلى اليوم تحفظ الجلسة والمجموعة مرة واحدة');
+  await p.click('[data-a=wkstart]');await p.waitForTimeout(300);
+  ok(await p.evaluate(()=>S.sub==='wk'&&Object.keys(S.sx).length===1&&sxProg(Object.values(S.sx)[0]).d===1),'الاستئناف بعد العودة يفتح الجلسة نفسها بالمجموعة المحفوظة');
   await p.reload();await p.waitForTimeout(500);
   const res=await p.evaluate(()=>{S.tab='dash';S.sub=null;render();return !!sxOpen()});ok(res,'الجلسة قابلة للاستئناف بعد إعادة التحميل (إغلاق/قتل التطبيق)');
   await p.click('[data-a=wkstart]');await p.waitForTimeout(300);

@@ -188,3 +188,16 @@ authCard=function(){return '<div class="card"><h2>'+ic('users')+'تسجيل ال
 (function(){const O=setSyncHtml;setSyncHtml=function(){return '<div class="mu">إدارة الحساب والمزامنة وتسجيل الخروج في «الملف الشخصي ← الحساب».</div><button class="chip" data-a="sub" data-v="pf">افتح الملف الشخصي</button>'+(typeof INST!=='undefined'&&INST?'<div class="card hl"><button class="btn" data-a="install">تثبيت التطبيق على الشاشة الرئيسية</button></div>':'')};})();
 /* بعد إعادة التحميل: اسأل عن نقل بيانات الزائر مرة في الجلسة */
 (function(){const R=render;render=function(){const r=R.apply(this,arguments);try{const m=spMeta();if(m.xfer&&m.xfer.st==='ask'&&!UI.fxxs&&S.prof&&!document.getElementById('fx-sheet'))setTimeout(fxXferSheet,60)}catch(e){lg(e)}return r}})();
+/* ترجمات الإنجليزية لنصوص الحسابات */
+Object.assign(ENT,{
+'إدارة الحساب والمزامنة وتسجيل الخروج في «الملف الشخصي ← الحساب».':'Manage your account, sync and sign-out in Profile → Account.',
+'افتح الملف الشخصي':'Open profile','تسجيل الدخول':'Sign in','إنشاء حساب':'Create account','المتابعة كزائر':'Continue as guest','أهلًا بك':'Welcome',
+'الحساب':'Account','وضع الزائر':'Guest mode','محفوظ على الجهاز':'Saved on this device','تسجيل الخروج':'Sign out','دخول':'Sign in',
+'استعادة كلمة المرور':'Reset password','كلمة مرور جديدة':'New password','إعادة إرسال رابط التأكيد':'Resend confirmation link','أعد إرسال رابط التأكيد':'Resend confirmation link',
+'نسيت كلمة المرور؟':'Forgot password?','لديّ حساب':'I have an account','رجوع لتسجيل الدخول':'Back to sign in','لم يصلني الرابط؟ أعد الإرسال':"Didn't get the link? Resend",
+'البريد الإلكتروني':'Email','كلمة المرور':'Password','الاسم الظاهر':'Display name','أرسل رابط الاستعادة':'Send reset link','حفظ كلمة المرور':'Save password','أعد إرسال الرابط':'Resend link',
+'أضف بيانات هذا الجهاز إلى حسابي':'Add this device’s data to my account','اتركها في وضع الزائر':'Leave it in guest mode','تعديلات تنتظر المزامنة':'Edits waiting to sync','خروج رغم ذلك':'Sign out anyway',
+'احتفظ بنسخة الزائر':'Keep the guest copy','احذف المنقول من الزائر':'Delete transferred data from guest','قرّر بشأن بيانات الزائر':'Decide about guest data','سجّل الدخول من جديد':'Sign in again',
+'جارٍ استعادة بياناتك…':'Restoring your data…','ابدأ إعدادًا جديدًا':'Start a fresh setup','أعد المحاولة':'Try again','تعذّرت الاستعادة':'Restore failed',
+'ينتظر المزامنة':'Waiting to sync','تمت المزامنة':'Synced','تسجيل الدخول أو إنشاء حساب':'Sign in or create account','أضفها إلى وضع الزائر':'Add it to guest mode',
+'العودة إلى اليوم':'Back to Today'});

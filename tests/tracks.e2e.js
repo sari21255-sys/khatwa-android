@@ -15,6 +15,14 @@ let fail=0,pass=0;const ok=(c,m,x)=>{if(c){pass++;console.log('  ok   '+m)}else{
  await click('.sjtk[data-v=run]');await click('[data-a=runst][data-m=free]');
  ok(await E(()=>!!UI.ses&&tkOpen().k==='run'),'بدء جلسة جري');
  ok(await E(()=>document.querySelector('#nav').innerHTML.trim()===''),'الشريط السفلي مخفي أثناء الجلسة');
+ /* العودة إلى «اليوم» من داخل الجلسة: تُحفظ وتُستأنف مرة واحدة */
+ {const hd=await E(()=>{const b=document.querySelector('#tk-back'),e=document.querySelector('.sjses [data-a=tkend]');if(!b||!e)return null;const r=b.getBoundingClientRect(),q=e.getBoundingClientRect(),c=document.querySelector('[data-tk=main]').getBoundingClientRect();return{back:/العودة إلى اليوم/.test(b.textContent),sep:b!==e,top:Math.round(r.top),h:Math.round(r.height),noOverlap:r.right<=q.left||q.right<=r.left||r.bottom<=q.top,clk:c.height>0}});
+  ok(hd&&hd.back&&hd.sep&&hd.h>=40&&hd.noOverlap&&hd.clk,'رأس الجلسة: «العودة إلى اليوم» و«إنهاء» منفصلان والمؤقت ظاهر',JSON.stringify(hd));
+  const id0=await E(()=>tkOpen().id),n0=await E(()=>SJ().ss.length);await click('#tk-back');
+  ok(await E(()=>S.tab==='dash'&&!UI.ses&&document.querySelector('#nav').innerHTML.trim()!==''),'«العودة إلى اليوم» تخرج من الجلسة وتُظهر الشريط');
+  ok(await E(()=>!!document.querySelector('.sjact [data-a=tkopen]')),'«اليوم» يعرض بطاقة الجلسة الجارية للاستئناف');
+  await click('.sjact [data-a=tkopen]');
+  ok(await E(`UI.ses==='${id0}'&&SJ().ss.length===${n0}&&tkOpen().id==='${id0}'`),'الاستئناف يفتح الجلسة نفسها دون نسخة ثانية');}
  await p.waitForTimeout(1200);
  await p.fill('[data-a=rundist]','2.5');await p.dispatchEvent('[data-a=rundist]','change');
  await click('[data-a=tkpause]');const a1=await E(()=>tkAct(tkOpen()));await p.waitForTimeout(700);const a2=await E(()=>tkAct(tkOpen()));ok(a1>=1000&&Math.abs(a2-a1)<50,'الإيقاف المؤقت يجمّد الزمن',a1+'/'+a2);

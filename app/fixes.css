@@ -89,3 +89,4 @@ html[data-sj=white] .sji{filter:drop-shadow(0 0 3px color-mix(in srgb,var(--c,cu
 .fxul{margin:6px 0;padding-inline-start:20px}.fxul li{margin:3px 0}
 .fxacc .tag.bad{background:#fee2e2;color:#7f1d1d}
 .fxacc .note{background:var(--soft,#f1f5f9);padding:10px 12px;border-radius:12px;font-size:13px}
+.wkt{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.wkt .chip{min-height:44px}.wkt .wkclock{margin-inline-start:auto}
