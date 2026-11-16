@@ -9,13 +9,13 @@ m=M.read_text(encoding='utf-8')
 # RECEIVE_BOOT_COMPLETED تضيفه إضافة الإشعارات المحلية لإعادة جدولة التذكيرات بعد إعادة التشغيل.
 PERMS=['android.permission.health.READ_STEPS','android.permission.health.READ_HEART_RATE','android.permission.health.READ_DISTANCE',
  'android.permission.health.READ_ACTIVE_CALORIES_BURNED',
- 'android.permission.POST_NOTIFICATIONS']
-# أذونات تُزال من الملف المدموج (تأتي من الإضافات أو غير مستعملة). لا كتابة إلى Health Connect، ولا كاميرا/ميكروفون/موقع
+ 'android.permission.POST_NOTIFICATIONS','android.permission.ACCESS_COARSE_LOCATION']
+# أذونات تُزال من الملف المدموج (تأتي من الإضافات أو غير مستعملة). لا كتابة إلى Health Connect، ولا كاميرا/ميكروفون/موقع دقيق (الموقع التقريبي COARSE مسموح لـ«استخدم موقعي» أثناء الاستخدام فقط)
 # لأن الميزات المقابلة (مسح الباركود، الإملاء الصوتي، تحديد الموقع) غير مختبرة على جهاز فتُعطَّل في نسخة أندرويد.
 REMOVE=['android.permission.health.WRITE_STEPS','android.permission.health.WRITE_DISTANCE','android.permission.health.WRITE_ACTIVE_CALORIES_BURNED',
  'android.permission.health.WRITE_HEART_RATE','android.permission.health.READ_WEIGHT','android.permission.health.WRITE_WEIGHT',
  'android.permission.health.READ_TOTAL_CALORIES_BURNED','android.permission.health.READ_SLEEP','android.permission.SCHEDULE_EXACT_ALARM','android.permission.USE_EXACT_ALARM','android.permission.CAMERA','android.permission.RECORD_AUDIO',
- 'android.permission.ACCESS_FINE_LOCATION','android.permission.ACCESS_COARSE_LOCATION','android.permission.READ_EXTERNAL_STORAGE','android.permission.WRITE_EXTERNAL_STORAGE']
+ 'android.permission.ACCESS_FINE_LOCATION','android.permission.READ_EXTERNAL_STORAGE','android.permission.WRITE_EXTERNAL_STORAGE']
 if 'xmlns:tools' not in m: m=m.replace('<manifest ','<manifest xmlns:tools="http://schemas.android.com/tools" ',1)
 add=''
 for p in PERMS:

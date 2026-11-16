@@ -14,7 +14,7 @@ tm=re.search(r"targetSdkVersion:'(\d+)'",bad);tsdk=int(tm.group(1)) if tm else 0
 mm=re.search(r"(?:^|\n)(?:min)?[sS]dkVersion:'(\d+)'",bad);msdk=int(mm.group(1)) if mm else None
 debuggable='application-debuggable' in bad
 m=re.search(r'android:allowBackup\([^)]*\)=(\S+)',xml);backup=m.group(1) if m else 'غير مذكور (الافتراضي true)'
-ALLOWED={'android.permission.INTERNET','android.permission.POST_NOTIFICATIONS','android.permission.RECEIVE_BOOT_COMPLETED','android.permission.WAKE_LOCK',
+ALLOWED={'android.permission.INTERNET','android.permission.POST_NOTIFICATIONS','android.permission.RECEIVE_BOOT_COMPLETED','android.permission.WAKE_LOCK','android.permission.ACCESS_COARSE_LOCATION',
  'android.permission.health.READ_STEPS','android.permission.health.READ_HEART_RATE','android.permission.health.READ_DISTANCE',
  'android.permission.health.READ_ACTIVE_CALORIES_BURNED'}
 print('ملف:',apk);print('minSdk',msdk,'targetSdk',tsdk,'debuggable',debuggable,'allowBackup',backup)
@@ -26,6 +26,8 @@ if tsdk<36: errs.append('targetSdk أقل من 36')
 if msdk is not None and msdk<26: errs.append('minSdk أقل من 26 (Health Connect)')
 if backup not in ('false','0x0'): errs.append('allowBackup ليس false: '+backup)
 if mode=='release' and debuggable: errs.append('نسخة Release قابلة للتصحيح')
+if 'android.permission.ACCESS_FINE_LOCATION' in perms: errs.append('الموقع الدقيق موجود (المسموح التقريبي فقط)')
+if any('ACCESS_BACKGROUND_LOCATION' in p for p in perms): errs.append('موقع الخلفية موجود')
 if any('WRITE' in p and 'health' in p for p in perms): errs.append('إذن كتابة Health Connect موجود')
 if errs: print('FAIL:');[print('  -',e) for e in errs];sys.exit(1)
 print('PASS: الأذونات متوافقة مع الوظائف وسياسة الخصوصية')

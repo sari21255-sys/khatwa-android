@@ -1,0 +1,64 @@
+/* ===== جولة إصلاح Android ===== */
+.sjhome svg.sjmk{width:30px;height:30px}
+.sjhome.on{transform:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* شاشة الدخول: الشعار في منتصف المساحة، واللغة أعلى الزاوية، والإجراءات أسفل */
+.sjwel .lgw{position:absolute;inset:0;display:grid;place-items:center;margin:0;pointer-events:none;z-index:0}
+.sjwel .lgw svg{height:64px;width:auto}
+.sjwel .in{z-index:1}
+.sjwel .lang{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));inset-inline-end:20px;align-self:auto}
+.sjwel .in .sp{flex:1}
+.sjwel .in h1,.sjwel .in .btn,.sjwel .in .sec{position:relative}
+/* بلا مقبض اختصاراتي: كل شيء في الشريط السفلي و«المزيد» */
+.sjdw,.sjds,.sjdh{display:none!important}
+/* لوحة المفاتيح مفتوحة: يختفي الشريط السفلي ويبقى الحقل ظاهرًا */
+body.kbd #nav{display:none}
+body.kbd .sjwel .in{padding-bottom:12px}
+.sjwel .art{opacity:.22}
+/* ===== أدوات الإدخال ===== */
+.fxs{position:fixed;inset:0;z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.fxb{position:absolute;inset:0;background:rgba(0,0,0,.6)}
+.fxp{position:relative;width:100%;max-width:560px;background:var(--sj-s1,#181818);color:var(--sj-tx,#fff);border-radius:22px 22px 0 0;padding:10px 18px calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px rgba(0,0,0,.5);max-height:92vh;overflow:auto}
+.fxg{width:42px;height:4px;border-radius:2px;background:var(--sj-ln,rgba(255,255,255,.2));margin:0 auto 10px}
+.fxh{font-size:17px;margin-bottom:10px;text-align:center}
+.fxa{display:flex;gap:10px;margin-top:14px}.fxa .btn{flex:1}.fxa .fxdel{color:#ef4444}
+.fxr{display:flex;align-items:center;justify-content:center;gap:6px;direction:ltr}
+.fxu{font-size:18px;color:var(--sj-mu,#b8b8b8);min-width:34px}
+.fxw{position:relative;width:96px;height:176px;border-radius:14px;background:var(--sj-s2,#222);overflow:hidden;direction:ltr}
+.fxl{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;padding:66px 0;scrollbar-width:none;overscroll-behavior:contain}
+.fxl::-webkit-scrollbar{display:none}
+.fxi{height:44px;line-height:44px;text-align:center;font-size:20px;color:var(--sj-mu,#b8b8b8);scroll-snap-align:center;font-variant-numeric:tabular-nums;cursor:pointer}
+.fxi.on{color:var(--sj-tx,#fff);font-size:28px;font-weight:700}
+.fxm{position:absolute;left:6px;right:6px;top:66px;height:44px;border-top:1px solid var(--sj-ln,rgba(255,255,255,.3));border-bottom:1px solid var(--sj-ln,rgba(255,255,255,.3));pointer-events:none}
+.fxn .fxv{text-align:center;font-size:40px;margin:4px 0 10px}
+.fxk{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;direction:ltr}
+.fxk button{min-height:52px;border-radius:14px;background:var(--sj-s2,#222);color:inherit;font-size:22px}
+.fxage{text-align:center;font-size:36px;margin:10px 0}
+input.fxpick{cursor:pointer;caret-color:transparent}
+body.fxopen{overflow:hidden}
+body.fxopen #nav{display:none}
+.fxq{display:flex;flex-wrap:wrap;gap:8px}
+.fxq .chip{min-height:44px}
+.fxlog{display:grid;gap:4px;margin-top:10px;max-height:190px;overflow:auto}
+.fxle{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 12px;border-radius:12px;background:var(--sj-s2,rgba(255,255,255,.05));color:inherit;text-align:start}
+.fxle b{margin-inline-start:auto}
+.fxcrop{display:grid;gap:12px;justify-items:center}
+.fxcv{position:relative;border-radius:50%;overflow:hidden;touch-action:none;background:#000}
+.fxcv canvas{display:block;width:100%;height:100%}
+.fxring{position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 2px #fff inset,0 0 0 999px rgba(0,0,0,.0);pointer-events:none}
+.fxz{display:flex;align-items:center;gap:10px;width:100%}.fxz input{flex:1}
+/* بطاقة المشهد */
+.fxscene{position:relative;overflow:hidden;color:#fff;padding:0;border:0;background:linear-gradient(160deg,var(--g1),var(--g2))}
+.fximg,.fxtint{position:absolute;inset:0;pointer-events:none}.fximg{background-size:cover;background-position:center;opacity:.9}
+.fxtint{background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.38))}
+.fxk-rain .fxtint,.fxk-storm .fxtint{background:linear-gradient(180deg,rgba(20,30,50,.35),rgba(10,15,30,.55))}.fxk-cloud .fxtint,.fxk-fog .fxtint{background:linear-gradient(180deg,rgba(60,70,90,.3),rgba(20,25,40,.45))}
+.fxin{position:relative;padding:14px;text-shadow:0 1px 3px rgba(0,0,0,.55)}.fxin .mu,.fxs2{color:rgba(255,255,255,.88);font-size:13px}.fxwarn{color:#ffd9a0}
+.fxcity{background:rgba(0,0,0,.28);color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:6px 12px;min-height:40px;font:inherit;display:inline-flex;gap:6px;align-items:center}
+.fxclk{font-size:20px;font-weight:700}.fxtemp{font-size:40px;line-height:1}
+.fxarc{width:100%;height:70px;display:block;margin:4px 0}.fxarcp{fill:none;stroke:rgba(255,255,255,.55);stroke-width:1.5;stroke-dasharray:4 4}.fxhor{stroke:rgba(255,255,255,.4);stroke-width:1}
+.fxsun{fill:#ffd45a;filter:drop-shadow(0 0 6px #ffd45a)}.fxmoon{fill:#f3f1e4;filter:drop-shadow(0 0 5px #fff8)}.fxmoon2{fill:var(--g1)}
+.fxscene .fxmore{position:relative;background:rgba(0,0,0,.35);color:#fff;padding:8px 14px 12px;text-shadow:none}.fxscene .fxmore .mu{color:rgba(255,255,255,.8)}
+@media(prefers-reduced-motion:no-preference){.fximg{animation:fxdrift 40s linear infinite alternate}}
+@keyframes fxdrift{from{background-position:0 50%}to{background-position:30px 50%}}
+.fxsearch{width:100%;padding:12px;border-radius:12px;border:1px solid var(--bd,#444);background:var(--in,transparent);color:inherit;font:inherit;margin-bottom:8px}
+.fxcl{max-height:46vh;overflow:auto}.fxcr{display:flex;width:100%;justify-content:space-between;align-items:center;min-height:48px;padding:8px 12px;background:none;border:0;border-bottom:1px solid rgba(128,128,128,.25);color:inherit;font:inherit}.fxcr.on{font-weight:700;color:var(--ac,#7ef)}

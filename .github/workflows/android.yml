@@ -21,6 +21,7 @@ jobs:
       - name: Install (locked)
         run: |
           npm ci
+          npm install --save --no-audit --no-fund @capacitor/geolocation@^7   # موقع تقريبي لـ«استخدم موقعي»؛ يُحدَّث package-lock لاحقًا من جهاز متصل
           pip install pillow
       - name: Generate Android project
         run: |

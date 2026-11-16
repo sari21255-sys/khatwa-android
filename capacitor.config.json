@@ -3,9 +3,20 @@
   "appName": "SIJIL",
   "webDir": "www",
   "backgroundColor": "#000000",
-  "android": { "allowMixedContent": false },
+  "android": {
+    "allowMixedContent": false,
+    "adjustMarginsForEdgeToEdge": "force"
+  },
   "plugins": {
-    "SplashScreen": { "launchShowDuration": 1200, "backgroundColor": "#000000", "showSpinner": false, "launchAutoHide": false },
-    "StatusBar": { "style": "DARK", "backgroundColor": "#000000" }
+    "SplashScreen": {
+      "launchShowDuration": 1200,
+      "backgroundColor": "#000000",
+      "showSpinner": false,
+      "launchAutoHide": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#000000"
+    }
   }
 }
