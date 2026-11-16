@@ -29,7 +29,7 @@ const IND=/[٠-٩]/;
   ok(await p.evaluate(()=>S.bw[TD()]===80.5),'حفظ الوزن من «+» يخزّن 80.5 رقمًا عاديًا',await p.evaluate(()=>JSON.stringify(S.bw[TD()])));
   ok(await p.evaluate(()=>!document.querySelector('.sjq')&&S.tab==='dash'),'بعد حفظ الوزن يُغلق الدرج ويبقى اليوم');
   /* التمرين */
-  await p.click('#nav .sjplus');await p.waitForTimeout(200);await p.click('.sjq [data-a=qlm][data-v=wo]');await p.waitForTimeout(300);
+  await p.click('#nav .sjplus');await p.waitForTimeout(200);await p.click('.sjq [data-a=qlm][data-v=wo]');await p.waitForTimeout(200);await p.click('.sjq [data-a=qlm][data-v="wo:iron"]');await p.waitForTimeout(150);await p.click('.sjq [data-a=tkqs][data-k=iron]');await p.waitForTimeout(300);
   ok(await p.evaluate(()=>S.sub==='wk'&&!!UI.wk),'خيار التمرين يفتح مسار البدء/الاستئناف');
   ok(await p.evaluate(()=>{const n=document.querySelector('#nav');return !n||getComputedStyle(n).display==='none'||n.offsetHeight===0}),'الشريط السفلي مخفي داخل مشغّل التمرين');
   ok(p.errs.length===0,'لا أخطاء سكربت',p.errs.join('|'));await ctx.close()}
@@ -82,15 +82,15 @@ const IND=/[٠-٩]/;
   ok(p.errs.length===0,'لا أخطاء سكربت',p.errs.join('|'));await ctx.close()}
  /* 6) مسارات التمرين الكبرى */
  {const {ctx,p}=await mk(390);await p.evaluate(seed);await p.click('#nav button[data-v=train]');await p.waitForTimeout(200);
-  const ks=await p.$$eval('.sjtk',a=>a.map(x=>x.dataset.v));ok(JSON.stringify(ks)===JSON.stringify(['iron','cardio','cali','lift','swim','run']),'ستة مسارات: الحديد، الكارديو، الكاليسثنكس، رفع الأوزان، السباحة، الركض',ks.join());
+  const ks=await p.$$eval('.sjtk',a=>a.map(x=>x.dataset.v));ok(JSON.stringify(ks)===JSON.stringify(['iron','run','swim','cali','fn']),'خمسة مسارات: الحديد، الجري، السباحة، الكالسثينكس، التدريب الوظيفي',ks.join());
   await p.click('.sjtk[data-v=iron]');await p.waitForTimeout(150);
   const segs=await p.$$eval('.seg [data-a=seg]',a=>a.map(x=>x.dataset.v));ok(segs.join()==='today,plan,disc','مسار الحديد: اليوم، الخطة، اكتشف فقط (بلا الأسبوع ولا لم تتحقق ولا الكارديو)',segs.join());
   ok(!await p.$('.tm')&&!await p.$('[data-k=machine]'),'لا بطاقة مؤقت منفصلة ولا زر تصوير الجهاز');
   ok(!!await p.$('#sx-go,[data-a=wkstart],[data-a=sxgo]')||/ابدأ|أكمل/.test(await p.evaluate(()=>document.body.innerText)),'مسار الحديد يعرض بدء التمرين');
   await p.click('[data-a=seg][data-v=disc]');await p.waitForTimeout(150);const dv=await p.$$eval('[data-a=sub]',a=>a.map(x=>x.dataset.v));ok(['exl','nau','prg'].every(x=>dv.includes(x))&&!dv.includes('aip')&&!await p.$('#bld-n,[data-a=bldsave]'),'«اكتشف» في الحديد يضم المكتبة والأجهزة والبرامج دون الذكاء الاصطناعي ومولّد الجلسات',dv.join());
   await p.click('[data-a=trkhub]');await p.click('#nav button[data-v=pg]');ok(/جاهزية العضلات/.test(await p.evaluate(()=>document.body.textContent)),'جاهزية العضلات انتقلت إلى «التقدّم»');await p.click('#nav button[data-v=train]');await p.click('.sjtk[data-v=iron]');
-  await p.click('[data-a=trkhub]');await p.click('.sjtk[data-v=cardio]');await p.waitForTimeout(150);ok(/الكارديو/.test(await p.evaluate(()=>document.querySelector('h1').innerText))&&!!await p.$('[data-a=ss]'),'مسار الكارديو يضم تسجيل الجلسات والبيانات');
-  for(const k of ['cali','lift','swim','run']){await p.click('[data-a=trkhub]');await p.click('.sjtk[data-v='+k+']');await p.waitForTimeout(100);ok(!!await p.$('.sjemp')&&(await p.$$('.card')).length===1,'مسار '+k+' فارغ بانتظار التكوين')}
+  await p.click('[data-a=trkhub]');await p.click('.sjtk[data-v=run]');await p.click('[data-a=trk][data-v=cardio]');await p.waitForTimeout(150);ok(/الكارديو/.test(await p.evaluate(()=>document.querySelector('h1').innerText))&&!!await p.$('[data-a=ss]'),'مسار الكارديو يضم تسجيل الجلسات والبيانات');
+  for(const k of ['cali','swim','run','fn']){await p.click('[data-a=trkhub]');await p.click('.sjtk[data-v='+k+']');await p.waitForTimeout(100);ok(!await p.$('.sjemp')&&!!await p.$('.sjtabs'),'مسار '+k+' يعرض تبويباته')}
   await p.click('#nav button[data-v=train]');ok(!!await p.$('.sjtk'),'زر التمرين في الشريط يعيد إلى قائمة المسارات');
   ok(p.errs.length===0,'لا أخطاء سكربت',p.errs.join('|'));await ctx.close()}
  await b.close();console.log('\n'+pass+' ناجح، '+fail+' فاشل');process.exit(fail?1:0)})();

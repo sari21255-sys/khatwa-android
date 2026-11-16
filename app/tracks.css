@@ -1,0 +1,15 @@
+.sji.ir{--c:#FF8659}.sji.ru{--c:#FFB84A}
+.sjtabs{display:flex;gap:6px;overflow-x:auto;margin:0 0 12px;padding-bottom:2px}
+.sjtabs button{flex:1 0 auto;min-height:44px;padding:0 14px;border-radius:12px;border:1px solid var(--sj-line,rgba(255,255,255,.12));background:transparent;color:inherit;font:inherit;font-weight:700}
+.sjtabs button.on{background:var(--sj-acc,#2dd4a8);color:#04130e;border-color:transparent}
+.sjkv{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.sjkv small{display:block;opacity:.7;font-size:12px}.sjkv b{font-size:20px}
+.sjflt{display:flex;gap:6px;overflow-x:auto;margin:6px 0}.sjflt .chip{flex:0 0 auto}
+.sjli{align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--sj-line,rgba(255,255,255,.08))}
+.sjact{border:1px solid var(--sj-acc,#2dd4a8)}
+.sjses{padding:calc(14px + env(safe-area-inset-top,0px)) 0 40px}.sjclock{text-align:center;margin:10px 0}.sjclock b{font-size:56px;letter-spacing:1px;display:block}.sjclock.pau b{opacity:.5}
+.sjfn b,.sjseg b{display:block}
+.sjwi{gap:8px;padding:6px 0}
+.sjst.cur{border:1px solid var(--sj-acc,#2dd4a8)}.sjst.past{opacity:.75}
+.sjsw.ok{border:1px solid var(--sj-acc,#2dd4a8)}
+.sjdt2{min-height:44px;border-radius:12px;padding:0 8px;background:transparent;color:inherit;border:1px solid var(--sj-line,rgba(255,255,255,.2));font:inherit}
+.sjses .btn,.sjses .chip,.sjtabs button{min-height:44px}
