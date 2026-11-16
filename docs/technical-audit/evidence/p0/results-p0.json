@@ -10,7 +10,7 @@
   "id": "T22b-csp",
   "name": "CSP: لا unsafe-eval ولا unsafe-inline في script-src، frame-ancestors/object-src none، سكربتات مضمّنة بالتجزئة",
   "result": "PASS",
-  "evidence": "script-src: 'self' 'sha256-9ZlDhewZ3o68lOiXhPQFaINZjs3dNmfBdZF9H41PH3E=' 'sha256-7K5ZAeaKu9qOSZ1TDIeUj… | style-src: 'self' 'unsafe-inline'",
+  "evidence": "script-src: 'self' 'sha256-3ub2Vnatt1ZMxKiZnxzbJNJmtm0Ej8fHPuEzdWXJlvs=' 'sha256-7K5ZAeaKu9qOSZ1TDIeUj… | style-src: 'self' 'unsafe-inline'",
   "severity": ""
  },
  {

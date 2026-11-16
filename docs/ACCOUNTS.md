@@ -46,3 +46,10 @@
 2. **مرشح الـintent:** تأكّد أن `patch_android.py` يضيف intent-filter للمخطط `sijil://auth` (انظر الالتزام).
 3. فتح الرابط من تطبيق البريد على جهاز حقيقي، وسلوك التطبيق عند قتله ومعالجة الرابط البارد.
 4. صلاحية الجلسة الحقيقية (انتهاء الرمز بعد ساعة وتجديده).
+
+## التسليم (الالتزام المرشح `d22be52`)
+- الاختبارات ✅ https://github.com/sari21255-sys/khatwa-android/actions/runs/43874650184
+- Build Android ✅ https://github.com/sari21255-sys/khatwa-android/actions/runs/43874650117 — الملف `SIJIL-UX-d22be52-test.apk` في الـartifact `SIJIL-UX-test-apk`، الإصدار 1.0.88 (versionCode 188). فحص المانيفست داخل الـAPK: ACCESS_COARSE_LOCATION وACTIVITY_RECOGNITION موجودان، لا موقع دقيق ولا خلفي، والمخطط `sijil://auth` موجود.
+- الحزمة المحلية الكاملة (مع Postgres) EXIT 0 على الالتزام نفسه.
+- التحليل: `6a17284` فشل في Tests لأن اختبارات المزامنة كانت تسجّل الدخول داخل مساحة الزائر (ممنوعة من المزامنة بالتصميم)؛ عُدّلت لتدخل مساحة حساب كما يفعل التطبيق. فشل سابق لمرة واحدة في `sijil.e2e` (white بعد إعادة التحميل) سببه سباق إقلاع؛ ثُبّت الانتظار ونجح 3 مرات منفردًا ثم في الحزمة.
+- `package-lock.json`: لم يُحدَّث (الصندوق الرملي لا يصل إلى registry.npmjs.org). أثر ذلك: البناء يثبّت `@capacitor/geolocation@^7` وقت CI فالنسخة الفرعية قد تتغير بين بناءين. CI يرفع الآن artifact باسم `package-lock-candidate` لتُثبَّته من جهاز متصل.
