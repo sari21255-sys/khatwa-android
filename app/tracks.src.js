@@ -2,7 +2,12 @@
 /* البيانات: S.sj = {ss:[جلسات], tw:{يوم:[{k,t}]}, cal:{مهارة:{i,h}}, cfg:{}, ft:[قوالب وظيفي]}. جلسات الحديد تبقى في S.sx دون تكرار. */
 const TK=[['iron','الحديد','Iron','ir','dumbbell'],['run','الجري','Running','ru','step'],['swim','السباحة','Swimming','wt','drop'],['cali','الكالسثينكس','Calisthenics','wm','target'],['fn','التدريب الوظيفي','Functional training','rp','timer']];
 const TKN=k=>(TK.find(a=>a[0]===k)||[k,k])[1];
-const SJ=()=>{if(!S.sj||typeof S.sj!=='object')S.sj={};const o=S.sj;if(!Array.isArray(o.ss))o.ss=[];['tw','cal','cfg'].forEach(k=>{if(!o[k]||typeof o[k]!=='object'||Array.isArray(o[k]))o[k]={}});if(!Array.isArray(o.ft))o.ft=[];return o};
+let tkWC=0;const tkWid=()=>'w'+Date.now().toString(36)+(tkWC++).toString(36)+Math.random().toString(36).slice(2,5);
+const SJ=()=>{if(!S.sj||typeof S.sj!=='object')S.sj={};const o=S.sj;if(!Array.isArray(o.ss))o.ss=[];['tw','cal','cfg'].forEach(k=>{if(!o[k]||typeof o[k]!=='object'||Array.isArray(o[k]))o[k]={}});if(!Array.isArray(o.ft))o.ft=[];if(!Array.isArray(o.one))o.one=[];
+ Object.keys(o.tw).forEach(d=>{if(!Array.isArray(o.tw[d]))o.tw[d]=[];o.tw[d].forEach(e=>{if(e&&!e.id)e.id=tkWid()})});return o};
+const tkWd=ds=>(new Date(ds+'T12:00:00Z').getUTCDay()+1)%7;
+function tkOcc(ds){const o=SJ(),r=[];(o.tw[tkWd(ds)]||[]).forEach(e=>{if(!(e.skip||[]).includes(ds))r.push(Object.assign({},e,{ds:ds}))});o.one.forEach(e=>{if(e.date===ds)r.push(Object.assign({},e,{ds:ds,once:1}))});return r}
+function tkEntry(id){const o=SJ();for(const d of Object.keys(o.tw)){const e=o.tw[d].find(x=>x.id===id);if(e)return{e:e,wd:+d,arr:o.tw[d]}}const e=o.one.find(x=>x.id===id);return e?{e:e,one:1,arr:o.one}:null}
 const tkNow=()=>Date.now();
 const tkAct=s=>(s.acc||0)+(s.ra?tkNow()-s.ra:0);
 const tkT=ms=>{const t=Math.max(0,Math.round(ms/1000)),h=Math.floor(t/3600),m=Math.floor(t%3600/60),c=t%60;return (h?h+':'+String(m).padStart(2,'0'):String(m))+':'+String(c).padStart(2,'0')};
@@ -72,7 +77,7 @@ function tkCalc(s){s.res=s.res||{};const d=s.d||{};
 /* ----- مداخل المسارات ----- */
 function trkSub(k){if(k==='iron'){const T=tasks(),ti=TI(),pw=S.plan[ti];const now=T.filter(t=>t.d===ti);return pw.ex.length?esc(pw.t)+' · '+now.filter(t=>t.r).length+'/'+now.length:'يوم راحة'}
  const o=tkOpen();if(o&&o.k===k)return 'جلسة جارية · '+tkT(tkAct(o));
- const pl=(SJ().tw[TI()]||[]).filter(e=>e.k===k)[0];if(pl)return 'اليوم: '+esc(tkTplName(k,pl.t));
+ const pl=tkOcc(TD()).filter(e=>e.k===k)[0];if(pl)return 'اليوم: '+esc(tkTplName(k,pl.t));
  const l=tkDone(k)[0];return l?'آخر نشاط: '+tkDay(l.day):'ابدأ أول حصة'}
 function trkHub(){let h='<h1>التمرين</h1><div class="mu" style="margin-bottom:12px">اختر المسار</div>'+tkConf()+tkBanner(0)+'<div class="sjtrk">';
  h+=TK.map(x=>'<button class="sjtk" data-a="trk" data-v="'+x[0]+'">'+sjI(x[3],x[4])+'<b>'+x[1]+'</b><small>'+x[2]+'</small><span class="mu">'+trkSub(x[0])+'</span></button>').join('');
@@ -92,8 +97,8 @@ function tkView(k){if(UI.ses)return vSes();if(UI.sum)return vSum();
 const tkBackH=()=>'<button class="back" data-a="trk" data-v="iron">'+ic('next')+'الحديد</button>';
 
 /* ----- خطط الأسبوع ----- */
-function tkAddWk(k,t){return '<select class="sjdt2" data-twsel data-k="'+k+'" data-t="'+t+'" aria-label="أضف إلى أسبوعي"><option value="">أضف إلى أسبوعي</option>'+DAYS.map((d,i)=>'<option value="'+i+'">'+d+'</option>').join('')+'</select>'}
-function tkWkList(k){const tw=SJ().tw;let r='';Object.keys(tw).forEach(d=>(tw[d]||[]).forEach((e,i)=>{if(e.k===k)r+='<div class="row sjwi"><span>'+DAYS[+d]+' · '+esc(tkTplName(k,e.t))+'</span><span class="sp"></span><button class="x" data-a="tkwdel" data-d="'+d+'" data-i="'+i+'" aria-label="حذف من الأسبوع">حذف</button></div>'}));
+function tkAddWk(k,t){return '<select class="sjdt2" data-twsel data-k="'+k+'" data-t="'+t+'" aria-label="أضف إلى أسبوعي"><option value="">'+(document.body.classList.contains('en1')?'Add to my week':'أضف إلى أسبوعي')+'</option>'+DAYS.map((d,i)=>'<option value="'+i+'">'+d+'</option>').join('')+'</select>'}
+function tkWkList(k){const tw=SJ().tw;let r='';Object.keys(tw).forEach(d=>(tw[d]||[]).forEach((e,i)=>{if(e.k===k)r+='<div class="row sjwi"><span>'+DAYS[+d]+(e.at?' · '+esc(e.at):'')+' · '+esc(tkTplName(k,e.t))+'</span><span class="sp"></span><button class="x" data-a="tkwdel" data-d="'+d+'" data-i="'+i+'" aria-label="حذف من الأسبوع">حذف</button></div>'}));
  return r?'<div class="card"><h2>'+ic('cal')+' حصصي هذا الأسبوع</h2>'+r+'</div>':''}
 
 /* ======================= الجري ======================= */
@@ -285,7 +290,7 @@ function tkDeadlift(){const D=dlData(),vs=['تقليدي','سومو','رومان
  h+='<div class="card"><h2>آخر المجموعات</h2>'+L.slice(-8).reverse().map(x=>'<div class="row"><span>'+tkDay(x.day)+'</span><span class="sp"></span><span class="num">'+F(toU(x.w),1)+' '+uL()+' × '+F(x.r)+'</span></div>').join('')+'</div>';return h}
 
 /* ======================= اليوم و«+» ======================= */
-function tkTodayBlock(){let h=tkBanner(0);const pl=(SJ().tw[TI()]||[]);
+function tkTodayBlock(){let h=tkBanner(0);const pl=tkOcc(TD());
  if(pl.length){const D=tkDone();h+='<div class="card"><h2>'+ic('cal')+' حصص اليوم</h2>'+pl.map(e=>{const dn=D.some(s=>s.day===TD()&&s.plan&&s.plan.id===e.t&&s.k===e.k),o=tkOpen(),res=o&&o.k===e.k&&o.plan&&o.plan.id===e.t;
   return '<div class="row sjli"><span class="tag">'+TKN(e.k)+'</span><span style="flex:1">'+esc(tkTplName(e.k,e.t))+'</span>'+(dn?'<span class="tag ok">تمّت</span>':res?'<button class="btn sm" data-a="tkopen" data-id="'+o.id+'">استكمل</button>':'<button class="btn sm" data-a="tkplan" data-k="'+e.k+'" data-t="'+e.t+'">ابدأ</button>')+'</div>'}).join('')+'</div>'}
  return h}
@@ -362,7 +367,7 @@ Object.assign(ACT,{
 function tkPartial(s){if(s.k==='fn'){const p=s.plan,d=s.d;if(p.fmt==='emom')return d.iv.length<p.cap;if(p.fmt==='amrap')return false;return d.r<p.rounds}return false}
 /* حقول بلا إعادة رسم: تُحدَّث القيمة مباشرة في الجلسة */
 document.addEventListener('change',ev=>{const t=ev.target,a=t&&t.dataset&&t.dataset.a;let s=tkFind(UI.ses),n=tkNum(t&&t.value);
- if(t&&t.dataset&&t.dataset.twsel!==undefined){const d=t.value;if(d==='')return;const o=SJ().tw;(o[d]=o[d]||[]);if(!o[d].some(e=>e.k===t.dataset.k&&e.t===t.dataset.t))o[d].push({k:t.dataset.k,t:t.dataset.t});t.value='';save();render();toast('أُضيفت إلى أسبوعك');return}
+ if(t&&t.dataset&&t.dataset.twsel!==undefined){const d=t.value;if(d==='')return;const o=SJ().tw;(o[d]=o[d]||[]);if(!o[d].some(e=>e.k===t.dataset.k&&e.t===t.dataset.t))o[d].push({id:tkWid(),k:t.dataset.k,t:t.dataset.t});t.value='';save();render();toast('أُضيفت إلى أسبوعك');return}
  if(!a)return;
  if(a==='rundist'&&s){s.d.dist=t.value;save()}
  if(a==='swopen'&&s){s.d.open.dist=t.value;save()}

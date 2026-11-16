@@ -47,7 +47,7 @@ let fail=0,pass=0;const ok=(c,m,x)=>{if(c){pass++;console.log('  ok   '+m)}else{
  /* مقارنة الأوقات */
  await E(()=>{window.__H=window.__H.map(h=>{const p=rdP(h.t,rdCity().tz).h;return Object.assign({},h,{feels:p>=19||p<8?24:41,uv:p>=19||p<8?0:8})});rdS().pa.asr=0;rdS().pa.maghrib=0;rdPlanState('run').dur=40;return rdFetch(1)});
  await click('[data-a=rdcmp][data-v=run]');const wn=await E(()=>document.querySelectorAll('.sjwin').length);ok(wn>=1&&wn<=3,w+': نوافذ مقترحة (1–3)',wn);
- await click('.sjwin [data-a=rdmove]');ok(await E(()=>rdPlanState('run').at!==''&&!document.querySelector('.sjwin')),w+': «غيّر وقت الحصة» يحفظ الوقت');
+ await click('.sjwin [data-a=rdmove]');ok(await E(()=>!!UI.rdmv&&!!document.querySelector('.sjmv')&&/المدينة/.test(document.querySelector('.sjmv').textContent)),w+': «غيّر وقت الحصة» يعرض اليوم والوقت والمدينة قبل الحفظ');await click('[data-a=rdmvok]');await p.waitForTimeout(100);ok(await E(()=>SJ().one.length===1&&!UI.rdmv),w+': تأكيد النقل يحفظ الحصة');
  /* صاعقة في السباحة الخارجية */
  await mk(0,28,95,3,70);await E(async()=>{rdPlanState('swim').io='out';rdPlanState('swim').at='10:00';rdPlanState('swim').dur=45;await rdFetch(1)});
  const sw=await E(()=>rdSummary('swim').adv[0]);ok(sw&&sw.id==='lightning'&&/اخرج من الماء/.test(sw.t)&&/ليس تحذيرًا رسميًا/.test(sw.t),w+': سباحة خارجية: البرق في المقدمة وميّز التوقع من الرسمي');
@@ -59,22 +59,22 @@ let fail=0,pass=0;const ok=(c,m,x)=>{if(c){pass++;console.log('  ok   '+m)}else{
  await E(()=>{rdPlanState('iron').io='in';rdPlanState('iron').at='18:00'});
  ok(await E(()=>{const a=rdSummary('iron').adv.map(x=>x.id);return a.includes('water')&&!a.includes('heat-high')&&!a.includes('uv')}),w+': الحديد الداخلي: ماء فقط بلا نصائح طقس');
  /* توقع قديم بلا شبكة */
- await E(async()=>{SJ().wx.at=window.__now-4*36e5;WXP.fn=async()=>{throw new Error('offline')};await rdFetch(1)});
+ await E(async()=>{rdWx().at=window.__now-4*36e5;WXP.fn=async()=>{throw new Error('offline')};await rdFetch(1)});
  ok(await E(()=>rdStale()==='stale'&&!!rdWx()),w+': فشل الشبكة يُبقي التوقع المخزّن ويُعلّمه قديمًا');
  await E(()=>{S.tab='dash';S.sub=null;render()});ok(await E(()=>/التوقع قديم/.test(document.querySelector('.sjwx').textContent)),w+': بطاقة اليوم تُظهر أن التوقع قديم');
- await E(()=>{SJ().wx.at=window.__now-30*36e5;render()});ok(await E(()=>rdStale()==='expired'&&/انتهت صلاحية/.test(document.querySelector('.sjwx').textContent)),w+': انتهاء الصلاحية واضح');
+ await E(()=>{rdWx().at=window.__now-30*36e5;render()});ok(await E(()=>rdStale()==='expired'&&/انتهت صلاحية/.test(document.querySelector('.sjwx').textContent)),w+': انتهاء الصلاحية واضح');
  /* تغيير المدينة أثناء السفر */
  await E(()=>{WXP.fn=async c=>({src:'محاكاة',hours:[]});const t0=rdF(window.__now,'Asia/Riyadh');window.__t0=t0;rdSetPath('city','london');UI._rdf=undefined});
- ok(await E(()=>rdCity().tz==='Europe/London'&&rdF(window.__now,'Europe/London')!==window.__t0&&rdWx()===null),w+': تغيير المدينة يغيّر المنطقة الزمنية ويمسح التوقع القديم');
+ ok(await E(()=>rdCity().tz==='Europe/London'&&rdF(window.__now,'Europe/London')!==window.__t0&&rdWx()===null),w+': تغيير المدينة يغيّر المنطقة الزمنية ولا يستخدم توقع مدينة أخرى');
  await E(()=>{rdSetPath('city','madinah')});
  /* الإشعارات: معرّفات ثابتة، لا تكرار، إلغاء عند النقل */
- await E(()=>{window.__P=[];window.__C=[];NTS.impl={async perm(){return'granted'},async cancel(ids){window.__C.push(ids.slice())},async schedule(l){window.__P=l.slice()}};rdS().nt.on=1;rdS().nt.wo=1;rdS().nt.prep=1;rdS().pref.water=0;
-  const wd=(new Date('2026-11-16T12:00:00Z').getUTCDay()+1)%7;SJ().tw[wd]=[{k:'run',t:'ez',at:'16:00'}];rdPlanState('run').at='16:00';rdPlanState('run').io='out';rdPlanState('run').dur=40;rdS().pa.dhuhr=0;rdS().pa.asr=0;rdS().pa.maghrib=0;rdS().pa.fajr=0;rdS().pa.isha=0});
+ await E(()=>{window.__M={};window.__P=[];window.__C=[];localStorage.removeItem('sijil_ntst');NTS.impl={async perm(){return'granted'},async cancel(ids){window.__C.push(ids.slice());ids.forEach(i=>delete window.__M[i]);window.__P=Object.values(window.__M)},async schedule(l){l.forEach(x=>window.__M[x.id]=x);window.__P=Object.values(window.__M)}};rdS().nt.on=1;rdS().nt.wo=1;rdS().nt.prep=1;rdS().pref.water=0;
+  const wd=(new Date('2026-11-16T12:00:00Z').getUTCDay()+1)%7;SJ().one=[];SJ().tw[wd]=[{id:'wA',k:'run',t:'ez',at:'16:00'}];rdPlanState('run').at='16:00';rdPlanState('run').io='out';rdPlanState('run').dur=40;rdS().pa.dhuhr=0;rdS().pa.asr=0;rdS().pa.maghrib=0;rdS().pa.fajr=0;rdS().pa.isha=0});
  await mk(0,36,1,5,10);await E(async()=>{await rdFetch(1);window.__A=await rdNtSync(1);window.__ids1=window.__P.map(x=>x.id)});
  const n1=await E(()=>window.__P.length);ok(n1===1,w+': تنبيه واحد مدمج للحصة الخارجية (طقس + حصة)',n1);
  ok(await E(()=>window.__P[0].cat==='prep'&&/ماء|الحرارة/.test(window.__P[0].body)),w+': فئة «الطقس والاستعداد»');
  await E(async()=>{await rdNtSync(1)});ok(await E(()=>window.__P.length===1&&window.__P[0].id===window.__ids1[0]),w+': إعادة الجدولة لا تُكرّر والمعرّف ثابت');
- await E(async()=>{const wd=(new Date('2026-11-16T12:00:00Z').getUTCDay()+1)%7;ACT.rdmove({dataset:{k:'run',at:rdAt('2026-11-16',17*60,rdCity().tz),p:'ez'}});await rdNtSync(1)});
+ await E(async()=>{ACT.rdmove({dataset:{k:'run',at:rdAt('2026-11-16',17*60,rdCity().tz),id:'wA',ds:'2026-11-16'}});UI.rdmv.scope='all';ACT.rdmvok();await rdNtSync(1)});
  ok(await E(()=>window.__P.length===1&&window.__P[0].id===window.__ids1[0]&&window.__P[0].at!==window.__A[0].at&&window.__C.some(c=>c.includes(window.__ids1[0]))),w+': نقل الحصة: المعرّف ثابت، يُلغى القديم ويُجدول الوقت الجديد');
  await E(async()=>{rdS().nt.quiet={on:1,from:'15:00',to:'18:00'};await rdNtSync(1)});ok(await E(()=>window.__P.length===0),w+': ساعات الهدوء تُسقط التنبيه');
  await E(async()=>{rdS().nt.quiet.on=0;rdS().nt.on=0;await rdNtSync(1)});ok(await E(()=>window.__P.length===0),w+': المفتاح العام يوقف الجدولة');
