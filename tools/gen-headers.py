@@ -26,6 +26,7 @@ for k in ('aiUrl','syncUrl','sbUrl'):
             o=u.scheme+'://'+u.netloc
             if o not in conn: conn.append(o)
             if k=='sbUrl': conn.append('wss://'+u.netloc)
+conn.append('https://api.open-meteo.com')  # مزوّد الطقس (Open-Meteo)
 # أصول افتراضية عند عدم ضبط config.js بعد: نطاقات Cloudflare Workers وSupabase
 if not configured: conn+= ['https://*.workers.dev','https://*.supabase.co','wss://*.supabase.co']
 csp="; ".join([

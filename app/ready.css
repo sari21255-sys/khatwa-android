@@ -1,0 +1,22 @@
+
+.sjpc .avbig{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:var(--sj-card2,#222);font-weight:800}
+.sjpc .avbig img{width:100%;height:100%;object-fit:cover}
+.sjgrp{background:var(--sj-card,rgba(255,255,255,.04));border:1px solid var(--sj-line,rgba(255,255,255,.1));border-radius:16px;margin:0 0 10px;overflow:hidden}
+.sjgrp>summary{list-style:none;display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 14px;cursor:pointer}
+.sjgrp>summary::-webkit-details-marker{display:none}
+.sjgrp>summary .fi{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;color:var(--c);background:color-mix(in srgb,var(--c) 16%,transparent);box-shadow:0 0 12px color-mix(in srgb,var(--c) 28%,transparent)}
+.sjgrp>summary .fi svg{width:19px;height:19px}
+.sjgrp>summary>svg{width:16px;height:16px;transition:transform .25s}
+.sjgrp[open]>summary>svg{transform:rotate(90deg)}
+.sjgrp .v{font-size:13px}
+.sjgb{padding:4px 14px 14px;animation:sjgin .25s ease}
+@keyframes sjgin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.sjgb{animation:none}.sjgrp>summary>svg{transition:none}}
+.sjgb select,.sjgb input[type=time],.sjgb input[type=number],.sjgb input:not([type]){min-height:44px}
+.sjwx .sjhrs{display:flex;gap:10px;overflow-x:auto;margin:8px 0}.sjhrs>div{flex:0 0 auto;text-align:center}.sjhrs small,.sjhrs b{display:block}
+.sjpt{padding:6px 0;border-bottom:1px solid var(--sj-line,rgba(255,255,255,.08))}.sjpt.nx{color:var(--sj-acc,#2dd4a8);font-weight:700}.sjpt.sr{opacity:.7;font-size:.92em}
+.sjwarn{background:rgba(245,158,11,.14);border:1px solid rgba(245,158,11,.4);border-radius:12px;padding:8px 12px;margin:6px 0}
+.sjpr{margin:6px 0;color:#F6CF64}
+.sjadv{padding:6px 0;border-bottom:1px solid var(--sj-line,rgba(255,255,255,.08))}.sjadv.s3,.sjadv.s4,.sjadv.s5{font-weight:700}
+.sjwin{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0}.sjwin .mu{flex:1 1 140px}
+.sjrd select,.sjrd input{min-height:44px}

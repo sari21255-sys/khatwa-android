@@ -13,7 +13,7 @@ const info=p=>p.evaluate(()=>({t:document.documentElement.getAttribute('data-sj'
   await p.goto('file://'+file);await p.waitForTimeout(400);await p.evaluate(seed);
   const i=await info(p);ok(i.t==='black'&&i.d==='dark'&&i.bg==='rgb(16, 16, 16)','تثبيت جديد: الأسود افتراضي حتى مع نظام فاتح',JSON.stringify(i));
   /* 2) المظهر في الإعدادات: ست معاينات */
-  await p.evaluate(()=>{S.tab='ex';S.sub='set';render()});await p.waitForTimeout(200);
+  await p.evaluate(()=>{S.tab='ex';S.sub='set';UI.sgo={ap:true};render()});await p.waitForTimeout(200);
   const n=await p.$$eval('#sj-theme [data-a=thset]',a=>a.map(x=>x.dataset.v));ok(JSON.stringify(n)===JSON.stringify(T),'ست معاينات في المظهر بالترتيب',n.join(','));
   /* 3) التبديل الفوري، الحفظ، وبقاء الصفحة والتمرير */
   await p.evaluate(()=>{window.scrollTo(0,200)});
