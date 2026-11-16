@@ -29,5 +29,6 @@ if mode=='release' and debuggable: errs.append('نسخة Release قابلة لل
 if 'android.permission.ACCESS_FINE_LOCATION' in perms: errs.append('الموقع الدقيق موجود (المسموح التقريبي فقط)')
 if any('ACCESS_BACKGROUND_LOCATION' in p for p in perms): errs.append('موقع الخلفية موجود')
 if any('WRITE' in p and 'health' in p for p in perms): errs.append('إذن كتابة Health Connect موجود')
+if not re.search(r'android:scheme\([^)]*\)="sijil"',xml): errs.append('مخطط روابط البريد sijil://auth غير موجود في المانيفست')
 if errs: print('FAIL:');[print('  -',e) for e in errs];sys.exit(1)
 print('PASS: الأذونات متوافقة مع الوظائف وسياسة الخصوصية')

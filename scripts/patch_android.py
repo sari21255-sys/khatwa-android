@@ -33,6 +33,17 @@ IF='''
 '''
 if 'ACTION_SHOW_PERMISSIONS_RATIONALE' not in m:
     m=re.sub(r'(<activity[^>]*MainActivity[^>]*>)',r'\1'+IF.replace('\\','\\\\'),m,count=1)
+# روابط تأكيد البريد واستعادة كلمة المرور: sijil://auth (تُفتح في التطبيق وتصل إلى appUrlOpen)
+IF2='''
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="sijil" android:host="auth" />
+            </intent-filter>
+'''
+if 'android:scheme="sijil"' not in m:
+    m=re.sub(r'(<activity[^>]*MainActivity[^>]*>)',r'\1'+IF2.replace('\\','\\\\'),m,count=1)
 # اتجاه RTL
 if 'android:supportsRtl' not in m: m=m.replace('<application','<application android:supportsRtl="true"',1)
 # لا نسخ احتياطي تلقائي إلى Google Drive: بيانات الصحة تُنقل بآليتي التصدير/الاستيراد والمزامنة المعتمدتين في التطبيق فقط

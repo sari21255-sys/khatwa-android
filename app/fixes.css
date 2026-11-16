@@ -74,3 +74,18 @@ html[data-sj=white] .sji{filter:drop-shadow(0 0 3px color-mix(in srgb,var(--c,cu
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 /* رأس الجلسة: داخل المساحة الآمنة وثابت فوق لوحة المفاتيح */
 .wkt,.sjses>.row:first-child{position:sticky;top:0;z-index:6;background:var(--sj-bg,#101010);padding-top:max(8px,env(safe-area-inset-top,0px));padding-bottom:8px}
+/* ===== الحسابات ووضع الزائر ===== */
+.sjwel.fxauth{position:fixed;inset:0;z-index:300;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.sjwel.fxauth .in{min-height:100%;justify-content:center;gap:12px;padding-block:calc(24px + env(safe-area-inset-top,0px)) calc(24px + env(safe-area-inset-bottom,0px))}
+.sjwel .fxalg{display:flex;justify-content:center;margin-bottom:4px}.sjwel .fxalg svg{max-width:150px;height:auto}
+.sjwel.fxauth h1{margin:0 0 4px;text-align:center}
+.sjwel.fxauth label.f{display:block;color:#fff;font-size:13px;text-align:start}
+.sjwel.fxauth label.f input{display:block;width:100%;margin-top:4px;min-height:48px;font-size:16px}
+.sjwel .fxamsg{padding:10px 12px;border-radius:12px;font-size:14px;line-height:1.5;text-align:start;background:rgba(255,255,255,.14);color:#fff}
+.sjwel .fxamsg.err{background:#7f1d1d;color:#fff}.sjwel .fxamsg.ok{background:#14532d;color:#fff}
+.sjwel .fxalinks{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;margin-top:4px}
+.sjwel .fxalinks .sec{min-height:44px}
+.sjwel .fxw2{background:transparent;border:1.5px solid rgba(255,255,255,.7);color:#fff;margin-top:10px}
+.fxul{margin:6px 0;padding-inline-start:20px}.fxul li{margin:3px 0}
+.fxacc .tag.bad{background:#fee2e2;color:#7f1d1d}
+.fxacc .note{background:var(--soft,#f1f5f9);padding:10px 12px;border-radius:12px;font-size:13px}
