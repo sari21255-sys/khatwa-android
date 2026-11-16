@@ -1099,6 +1099,27 @@ html[data-sj] body .dgrid .dt{min-width:0;width:auto;padding:8px 2px!important;b
 html[data-sj] body .dgrid .dt.on{border-color:var(--sj-tx)!important;box-shadow:inset 0 0 0 1px var(--sj-tx)!important}
 html[data-sj] body .dgrid .dt b{font-size:12px}html[data-sj] body .dgrid .dt small,html[data-sj] body .dgrid .dt em{font-size:10px}
 html[data-sj] body .dgrid .dt .ck{border-color:var(--sj-mu)!important}html[data-sj] body .dgrid .dt .ck.ok{background:var(--sj-ok)!important;border-color:var(--sj-ok)!important;color:#fff!important}
+.ex.nb{position:relative;padding-inline-start:46px}
+.exn{position:absolute;inset-block:12px;inset-inline-start:2px;width:30px;border-radius:12px;display:grid;place-items:center;font-weight:700;font-size:16px;background:var(--sj-s2);color:var(--sj-mu);transition:background .6s ease,color .6s ease,box-shadow .6s ease}
+.exn i{font-style:normal;grid-area:1/1;transition:opacity .35s ease,transform .45s cubic-bezier(.2,.9,.3,1.3)}
+.exn .c{opacity:0;transform:scale(.3)}.exn .c svg{width:18px;height:18px}
+.ex.ok .exn{background:#1f7a3a;color:#fff;box-shadow:0 0 0 1px rgba(60,200,100,.35)}
+.ex.ok .exn .n{opacity:0;transform:scale(.3)}.ex.ok .exn .c{opacity:1;transform:scale(1)}
+html[data-sj] body .ex.ok .nm{text-decoration:none;color:var(--sj-tx)}
+@keyframes sjokbg{from{background-color:var(--sj-s2);color:var(--sj-mu)}}
+.ex.ok.fresh .exn{animation:sjokbg .7s ease}
+@keyframes sjoktint{from{background-color:transparent}60%{background-color:rgba(46,160,80,.14)}to{background-color:rgba(46,160,80,.06)}}
+.ex.ok{background:rgba(46,160,80,.06);border-radius:16px;transition:background-color .6s ease}
+.ex.ok.fresh{animation:sjoktint .9s ease}
+.sjlate{margin:0 0 12px;border:1px solid color-mix(in srgb,#f15b64 55%,transparent);border-radius:18px;background:color-mix(in srgb,#f15b64 12%,var(--sj-s1));overflow:hidden}
+.sjlate>summary{display:flex;align-items:center;gap:10px;min-height:52px;padding:10px 14px;list-style:none;cursor:pointer;color:#f15b64;font-size:17px}
+html[data-sj="white"] .sjlate>summary{color:#c0272f}
+.sjlate>summary::-webkit-details-marker{display:none}
+.sjlate>summary svg{width:24px;height:24px}
+.sjlate .cnt{background:#f15b64;color:#fff;border-radius:999px;min-width:26px;height:26px;display:grid;place-items:center;font-size:14px;padding:0 6px}
+.sjlate .chev{margin-inline-start:auto;width:10px;height:10px;border-inline-end:2px solid currentColor;border-block-end:2px solid currentColor;transform:rotate(45deg);transition:transform .3s}
+.sjlate[open] .chev{transform:rotate(-135deg)}
+.sjlb{padding:0 12px 8px;color:var(--sj-tx)}
 </style>
 <script src="config.js"></script>
 
@@ -1442,9 +1463,9 @@ function vToday(){
 const fmtT=s=>{s=Math.max(0,Math.floor(s));const m=Math.floor(s/60);return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
 const tmEl=()=>TM.acc+(TM.run?(Date.now()-TM.t0)/1000:0);
 const restLeft=()=>TM.rest?Math.max(0,Math.ceil((TM.rest-Date.now())/1000)):0;
-function taskRow(t,late){
+function taskRow(t,late,n){
  const e=t.e,r=t.r,bs=S.base[e.n]||0,w=r?r.w:pfW(e),rp=r?r.r:e.r;
- let h='<div class="ex'+(r?' ok':'')+'"><div class="row">'+pic(poseFor(e.n),'xp')+'<span class="nm">'+esc(e.n)+'</span>'+(late?'<span class="tag bad">متأخر من '+DAYS[t.d]+'</span>':'')+'<span class="sp"></span><button class="chip" style="padding:3px 10px;font-size:12px" data-a="exg" data-n="'+esc(e.n)+'">كيف؟</button><span class="mu num" style="font-size:16px">'+e.s+' × '+e.r+'</span></div>'+(UI.exg===e.n?exNote(e.n):'');
+ let h='<div class="ex nb'+(r?' ok':'')+(r&&UI.fresh===t.k?' fresh':'')+'">'+(n?'<span class="exn" aria-label="التمرين '+n+(r?' منجز':'')+'"><i class="n">'+n+'</i><i class="c">'+ic('check')+'</i></span>':'')+'<div class="row">'+pic(poseFor(e.n),'xp')+'<span class="nm">'+esc(e.n)+'</span>'+(late?'<span class="tag bad">متأخر من '+DAYS[t.d]+'</span>':'')+'<span class="sp"></span><button class="chip" style="padding:3px 10px;font-size:12px" data-a="exg" data-n="'+esc(e.n)+'">كيف؟</button><span class="mu num" style="font-size:16px">'+e.s+' × '+e.r+'</span></div>'+(UI.exg===e.n?exNote(e.n):'');
  if(r)h+='<div class="donerow"><span class="tag">تم</span><span class="mu">'+F(r.w,1)+' كغ × '+r.r+' تكرار</span><span class="sp"></span><button class="x" data-a="undo" data-k="'+t.k+'">تراجع</button></div>'+rpeChips(t.k,r);
  else h+='<div class="wrow"><div class="cur"><small>الحالي</small><b>'+F(bs,1)+'</b></div><label><small>وزن هذا الأسبوع</small><input type="number" inputmode="decimal" min="'+bs+'" data-wk="'+t.k+'" value="'+w+'" aria-label="وزن هذا الأسبوع"></label><label><small>التكرار</small><input type="number" inputmode="numeric" data-rk="'+t.k+'" value="'+rp+'" aria-label="التكرار"></label><button class="btn sm" data-a="done" data-k="'+t.k+'">تم</button></div>'+suggLine(t);
  return h+'</div>'}
@@ -1458,8 +1479,9 @@ function vTrain(){
  if(UI.tw==='plan')return h+vPlan().replace(/^<button class="back"[^>]*>.*?<\/button>/,'').replace(/<h1>.*?<\/h1>/,'');
  if(UI.tw==='disc')return h+vDisc();
  if(UI.tw==='today')h+=planHead()+sxHero(0,0).note+'<div class="row" style="margin:10px 0 12px">'+sxHero(0,0).btn+'</div>'+sxHero(0,0).mk+(isDl()?deloadCard():'');
- if(late.length)h+='<div class="card"><h2>'+ic('flame')+'مرحّل من الأيام السابقة ('+late.length+')</h2>'+late.map(t=>taskRow(t,1)).join('')+'</div>';
- h+='<div class="card"><h2>'+ic('dumbbell')+'تمارين اليوم'+(now.length?' ('+now.filter(t=>t.r).length+'/'+now.length+')':'')+'</h2>'+(now.length?now.map(t=>taskRow(t)).join(''):'<div class="mu">يوم راحة. التمارين المرحّلة، إن وُجدت، في البطاقة أعلاه.</div>')+'</div>';
+ const nIdx=t=>T.filter(x=>x.d===t.d).indexOf(t)+1;
+ if(late.length)h+='<details class="sjlate"'+(UI.lateOpen?' open':'')+'><summary>'+ic('timer')+'<b>تمارين فائتة</b><span class="cnt num">'+late.length+'</span><span class="chev"></span></summary><div class="sjlb">'+late.map(t=>taskRow(t,1,nIdx(t))).join('')+'</div></details>';
+ h+='<div class="card"><h2>'+ic('dumbbell')+'تمارين اليوم'+(now.length?' ('+now.filter(t=>t.r).length+'/'+now.length+')':'')+'</h2>'+(now.length?now.map(t=>taskRow(t,0,nIdx(t))).join(''):'<div class="mu">يوم راحة. التمارين المرحّلة، إن وُجدت، في البطاقة أعلاه.</div>')+'</div>';
   return h}
 
 /* ---------- views: cardio ---------- */
@@ -5317,6 +5339,9 @@ function vEx(){
  [['التدريب',['wk','plan','prog','ach','arch','rpt']],['الصحة والتغذية',['meal','wgt','tools','link','rem']],['النادي والمعرفة',['gyms','nau','vis','cul','coach']],['المجتمع والحساب',['comm','nc','set','me']]].forEach(g=>{h+='<div class="sechead"><h2>'+g[0]+'</h2></div>'+rail(g[1].map(i=>chipF(FD[i])))});
  return h}
 Object.assign(ENT,{'اليوم':'Today','التمرين':'Workout','التقدّم':'Progress','المزيد':'More','المظهر':'Appearance','تسجيل سريع':'Quick log','تسجيل الماء':'Log water','تسجيل الوزن':'Log weight','تسجيل وجبة':'Log meal','تسجيل تمرين':'Log workout','أهلًا بك':'Welcome','ابدأ الآن':'Start now','تسجيل الدخول':'Sign in','تمرين اليوم':'Today\'s workout','يوم راحة':'Rest day','سجلاتي':'My records','الصحة والجسم':'Health & body','النادي':'Gym','تعلّم':'Learn','التطبيق وحسابي':'App & account','الأسود':'Black','الأبيض':'White','الأزرق':'Blue','الزمردي':'Emerald','الزيتوني':'Olive','البنفسجي':'Purple','الملف الشخصي':'Profile','النبض':'Pulse','الماء':'Water','التغذية':'Nutrition','التقارير':'Reports','الأرشيف':'Archive','الأوسمة':'Medals','مراقبة الوزن':'Weight tracking','النوم':'Sleep','الإعدادات':'Settings'});
+document.addEventListener('toggle',ev=>{const d=ev.target;if(d&&d.classList&&d.classList.contains('sjlate'))UI.lateOpen=d.open},true);
+(()=>{const dn=ACT.done;ACT.done=function(b){UI.fresh=b.dataset.k;clearTimeout(UI._fr);UI._fr=setTimeout(()=>{UI.fresh=null},900);return dn.apply(this,arguments)}})();
+Object.assign(ENT,{"تمارين فائتة":"Missed workouts"});
 /* ===== مسارات التمرين الكبرى ===== */
 const TRKS=[['iron','الحديد','Iron','tr','dumbbell'],['cardio','الكارديو','Cardio','hr','pulse'],['cali','الكاليسثنكس','Calisthenics','wl','target'],['lift','رفع الأوزان','Weightlifting','wm','trophy'],['swim','السباحة','Swimming','wt','drop'],['run','الركض','Running','nu','step']];
 UI.trk=UI.trk||'hub';
