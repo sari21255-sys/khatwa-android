@@ -18,11 +18,11 @@ let fail=0,pass=0;const ok=(c,m,x)=>{if(c){pass++;console.log('  ok   '+m)}else{
  await E(()=>{S.tab='dash';S.sub='set';render()});
  ok(await E(()=>/ضيف/.test(document.querySelector('.sjpc').textContent)&&!!document.querySelector('.sjpc [data-a=sub][data-v=pf]')),w+': بطاقة «ضيف» وزر ملفي الشخصي');
  const gs=await E(()=>[...document.querySelectorAll('.sjgrp>summary b')].map(x=>x.textContent));
- ok(['المظهر واللغة','التدريب والوحدات','الوقت والطقس','مواقيت الصلاة','الإشعارات','بياناتي والخصوصية'].every(x=>gs.includes(x)),w+': ست مجموعات',gs.join());
+ ok(['المظهر واللغة','التدريب والوحدات','الوقت والطقس','مواقيت الصلاة','الإشعارات','تذكير التمرين اليومي','الحساب والمزامنة','البيانات والنسخ والخصوصية'].every(x=>gs.includes(x)),w+': ثماني مجموعات نهائية',gs.join());
  ok(await E(()=>/المدينة المنورة/.test(document.querySelector('.sjgrp[data-g=wx] .v').textContent)),w+': القيمة الحالية بجانب الاسم');
  await click('.sjgrp[data-g=wx]>summary');ok(await E(()=>document.querySelector('.sjgrp[data-g=wx]').open&&UI.sgo.wx===true),w+': فتح القسم وحفظ حالته');
  await E(()=>{render()});ok(await E(()=>document.querySelector('.sjgrp[data-g=wx]').open),w+': حالة الفتح تبقى بعد إعادة الرسم');
- ok(await E(()=>!!document.querySelector('#set-old')&&/إعدادات سابقة/.test(document.querySelector('#set-old summary').textContent)),w+': الإعدادات السابقة محفوظة');
+ ok(await E(()=>!document.querySelector('#set-old')&&!/إعدادات سابقة/.test(document.body.innerText)),w+': قسم «إعدادات سابقة» أُزيل بعد نقل كل إعداد إلى مكانه');
  /* اختيار مدينة دون إذن موقع */
  await E(()=>{const s=document.querySelector('select[data-rd=city]');s.value='riyadh';s.dispatchEvent(new Event('change',{bubbles:true}))});await p.waitForTimeout(150);
  ok(await E(()=>rdS().city==='riyadh'&&rdCity().n==='الرياض'),w+': ضيف يختار مدينة بلا إذن موقع');

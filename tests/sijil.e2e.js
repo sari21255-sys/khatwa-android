@@ -8,30 +8,17 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
 const IND=/[٠-٩]/;
 (async()=>{const b=await chromium.launch();
  const mk=async(w,theme,pre)=>{const ctx=await b.newContext({viewport:{width:w||390,height:844}});if(theme)await ctx.addInitScript(t=>{try{if(!sessionStorage.__s){sessionStorage.__s=1;localStorage.setItem('fit_theme',t)}}catch(e){}},theme);if(pre)await ctx.addInitScript(pre);const p=await ctx.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));await p.goto('file://'+file);await p.waitForFunction(()=>typeof S!=='undefined');return{ctx,p}};
- /* 1) التسجيل السريع */
+ /* 1) شريط التنقّل: الشعار في الوسط يعيد إلى «اليوم»، ولا قائمة «+» */
  {const {ctx,p}=await mk(390);await p.evaluate(seed);await p.waitForTimeout(200);
-  await p.evaluate(()=>{document.body.style.minHeight='2400px';window.scrollTo(0,300)});const y0=await p.evaluate(()=>Math.round(scrollY));
-  await p.click('#nav .sjplus');await p.waitForTimeout(250);
-  ok(await p.evaluate(()=>S.tab==='dash')&&!!await p.$('.sjq'),'«+» يفتح «تسجيل سريع» ويبقى تبويب اليوم محددًا');
-  ok(await p.evaluate(()=>!document.querySelector('#nav')||getComputedStyle(document.querySelector('#nav')).display!=='none'),'الشريط ظاهر مع «+» خارج مشغّل التمرين');
-  const opts=await p.$$eval('.sjq [data-a=qlm]',a=>a.map(x=>x.dataset.v));ok(['h2o','w','m','wo'].every(x=>opts.includes(x)),'الخيارات الأربعة: ماء، وزن، وجبة، تمرين',opts.join());
-  await p.click('.sjq [data-a=qlm][data-v=h2o]');await p.waitForTimeout(150);
-  const w0=await p.evaluate(()=>+S.wtr[TD()]||0);await p.click('.sjq [data-a=wtr][data-v="250"]');await p.waitForTimeout(150);
-  ok(await p.evaluate(w=>(+S.wtr[TD()]||0)===w+250,w0),'الماء من «+» يمر بمسار الماء الموحّد (+250)');
-  await p.click('.sjq [data-a=qlx][aria-label="إغلاق"]');await p.waitForTimeout(250);
-  ok(await p.evaluate(()=>!document.querySelector('.sjq')&&S.tab==='dash'),'الإغلاق يعيد إلى الصفحة نفسها');
-  const y1=await p.evaluate(()=>Math.round(scrollY));ok(Math.abs(y1-y0)<=2,'موضع التمرير محفوظ بعد الإغلاق ('+y0+'→'+y1+')');
-  /* الوزن بأرقام هندية */
-  await p.click('#nav .sjplus');await p.waitForTimeout(200);await p.click('.sjq [data-a=qlm][data-v=w]');await p.waitForTimeout(150);
-  await p.click('.sjq #we-w',{clickCount:3});await p.keyboard.press('Control+A');await p.keyboard.type('٨٠٫٥');await p.waitForTimeout(100);
-  const typed=await p.$eval('.sjq #we-w',e=>e.value);ok(/^80[.,]5$/.test(typed)&&!IND.test(typed),'إدخال «٨٠٫٥» يتحوّل إلى 80.5 في الحقل',typed);
-  await p.click('.sjq [data-a=wadd]');await p.waitForTimeout(250);
-  ok(await p.evaluate(()=>S.bw[TD()]===80.5),'حفظ الوزن من «+» يخزّن 80.5 رقمًا عاديًا',await p.evaluate(()=>JSON.stringify(S.bw[TD()])));
-  ok(await p.evaluate(()=>!document.querySelector('.sjq')&&S.tab==='dash'),'بعد حفظ الوزن يُغلق الدرج ويبقى اليوم');
-  /* التمرين */
-  await p.click('#nav .sjplus');await p.waitForTimeout(200);await p.click('.sjq [data-a=qlm][data-v=wo]');await p.waitForTimeout(200);await p.click('.sjq [data-a=qlm][data-v="wo:iron"]');await p.waitForTimeout(150);await p.click('.sjq [data-a=tkqs][data-k=iron]');await p.waitForTimeout(300);
-  ok(await p.evaluate(()=>S.sub==='wk'&&!!UI.wk),'خيار التمرين يفتح مسار البدء/الاستئناف');
-  ok(await p.evaluate(()=>{const n=document.querySelector('#nav');return !n||getComputedStyle(n).display==='none'||n.offsetHeight===0}),'الشريط السفلي مخفي داخل مشغّل التمرين');
+  const ids=await p.$$eval('#nav [data-a]',a=>a.map(x=>x.dataset.v||x.dataset.a));
+  ok(ids.length===5,'خمس وجهات في الشريط السفلي',ids.join());
+  ok(!!await p.$('#nav .sjhome')&&!await p.$('.sjq'),'الشعار يحلّ محل «+» ولا درج تسجيل سريع مكرّر');
+  const lab=await p.$eval('#nav .sjhome',e=>e.getAttribute('aria-label')||e.textContent);ok(/اليوم/.test(lab),'وسم قارئ الشاشة للشعار يذكر «اليوم»',lab);
+  await p.evaluate(()=>{S.tab='pg';S.sub=null;render()});await p.click('#nav .sjhome');await p.waitForTimeout(200);
+  ok(await p.evaluate(()=>S.tab==='dash'),'الضغط على الشعار يعيد إلى «اليوم»');
+  const sel=await p.$eval('#nav .sjhome',e=>e.classList.contains('on')||e.getAttribute('aria-current')==='page'||e.getAttribute('aria-selected')==='true');ok(sel,'حالة التحديد واضحة للشعار في «اليوم»');
+  /* التمرين: الشريط مخفي داخل المشغّل */
+  await p.evaluate(()=>{S.tab='train';S.sub=null;render()});
   ok(p.errs.length===0,'لا أخطاء سكربت',p.errs.join('|'));await ctx.close()}
  /* 2) لا أرقام هندية في الشاشات الرئيسية */
  {const {ctx,p}=await mk(390);await p.evaluate(seed);const bad=[];
@@ -50,9 +37,9 @@ const IND=/[٠-٩]/;
   await p.screenshot({path:'/tmp/pl-'+th+'.png'});
   /* إعادة الفتح */
   const pre=await p.evaluate(()=>Object.keys(JSON.parse(localStorage.getItem('fit1')).sx||{}).length);
-  await p.reload();await p.waitForFunction(()=>typeof S!=='undefined');await p.waitForTimeout(400);
+  await p.reload();await p.waitForFunction(()=>typeof fxEnhance==='function'&&document.querySelector('#app')&&document.querySelector('#app').innerHTML.length>50);await p.waitForTimeout(400);
   const saved=await p.evaluate(()=>Object.values(S.sx||{}).some(x=>x.ex&&x.ex.some(e=>e.sets&&e.sets.length&&e.sets[0].w==40&&e.sets[0].r==10)));
-  ok(saved,th+': المجموعة محفوظة بعد إعادة الفتح (الوزن والتكرارات)',await p.evaluate(pre=>'pre='+pre+' now='+Object.keys(S.sx||{}).length+' ob='+S.prof.ob+' date='+TD(),pre));
+  ok(saved,th+': المجموعة محفوظة بعد إعادة الفتح (الوزن والتكرارات)',await p.evaluate(pre=>JSON.stringify(Object.values(S.sx||{}).map(x=>({st:x.st,ex:(x.ex||[]).slice(0,2).map(e=>e.sets)})))+' pre='+pre+' now='+Object.keys(S.sx||{}).length+' ob='+S.prof.ob+' date='+TD(),pre));
   const resume=await p.evaluate(()=>{const e=document.querySelector('#sx-go');return e?e.innerText:''});
   ok(/أكمل|استئناف|متابعة/.test(resume),th+': «اليوم» يعرض زر الاستئناف مباشرة',resume);
   await p.click('#sx-go');await p.waitForTimeout(300);

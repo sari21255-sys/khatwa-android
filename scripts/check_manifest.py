@@ -14,7 +14,7 @@ tm=re.search(r"targetSdkVersion:'(\d+)'",bad);tsdk=int(tm.group(1)) if tm else 0
 mm=re.search(r"(?:^|\n)(?:min)?[sS]dkVersion:'(\d+)'",bad);msdk=int(mm.group(1)) if mm else None
 debuggable='application-debuggable' in bad
 m=re.search(r'android:allowBackup\([^)]*\)=(\S+)',xml);backup=m.group(1) if m else 'غير مذكور (الافتراضي true)'
-ALLOWED={'android.permission.INTERNET','android.permission.POST_NOTIFICATIONS','android.permission.RECEIVE_BOOT_COMPLETED','android.permission.WAKE_LOCK','android.permission.ACCESS_COARSE_LOCATION',
+ALLOWED={'android.permission.INTERNET','android.permission.POST_NOTIFICATIONS','android.permission.RECEIVE_BOOT_COMPLETED','android.permission.WAKE_LOCK','android.permission.ACCESS_COARSE_LOCATION','android.permission.ACTIVITY_RECOGNITION',
  'android.permission.health.READ_STEPS','android.permission.health.READ_HEART_RATE','android.permission.health.READ_DISTANCE',
  'android.permission.health.READ_ACTIVE_CALORIES_BURNED'}
 print('ملف:',apk);print('minSdk',msdk,'targetSdk',tsdk,'debuggable',debuggable,'allowBackup',backup)

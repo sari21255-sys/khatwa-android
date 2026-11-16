@@ -13,10 +13,12 @@ echo "== التقارير (الفترة والعوامل) =="; NODE_PATH="$(npm 
 echo "== التفاف الأسماء الطويلة 320/390 =="; NODE_PATH="$(npm root -g)" node tests/wrap.e2e.js
 echo "== السمات الست =="; NODE_PATH="$(npm root -g)" node tests/theme.e2e.js
 echo "== هوية SIJIL (تسجيل سريع، أرقام، مشغّل، ترقية) =="; NODE_PATH="$(npm root -g)" node tests/sijil.e2e.js
+echo "== إصلاحات SIJIL بعد اختبار Android =="; NODE_PATH="$(npm root -g)" node tests/fixes.e2e.js
 echo "== الوزن والوجبات (مسار واحد) =="; NODE_PATH="$(npm root -g)" node tests/wm.e2e.js
 echo "== حصة اليوم والتعويض (UX2) =="; NODE_PATH="$(npm root -g)" node tests/ux2.e2e.js
 echo "== موافقة الذكاء الاصطناعي =="; NODE_PATH="$(npm root -g)" node tests/consent.e2e.js
-echo "== لوحة الاختصارات الجانبية =="; NODE_PATH="$(npm root -g)" node tests/drawer.e2e.js
+# أُزيلت لوحة الاختصارات الجانبية عمدًا في إصلاحات Android (روابط مكررة؛ كل خدمة لها مكان واحد). اختبارها القديم: tests/drawer.e2e.js
+# echo "== لوحة الاختصارات الجانبية =="; NODE_PATH="$(npm root -g)" node tests/drawer.e2e.js
 echo "== المسارات الخمسة =="; NODE_PATH="$(npm root -g)" node tests/tracks.e2e.js
 echo "== الإعدادات والطقس والصلاة والإشعارات =="; NODE_PATH="$(npm root -g)" node tests/ready.e2e.js
 echo "== قبول إغلاق ملاحظات «جهّز تمرينك» =="; NODE_PATH="$(npm root -g)" node tests/ready-accept.e2e.js

@@ -15,7 +15,7 @@ const PLAN=`(()=>{const r={t:'راحة',ex:[]};return[0,1,2,3,4,5,6].map(i=>i===
    ok(!o.page,`${w} ${n}: لا تمرير أفقي`);ok(o.clip.length===0,`${w} ${n}: لا نص مقصوص داخل الأزرار والحقول`,o.clip.join(' | '));await p.screenshot({path:`${OUT}/${n}-${w}.png`})};
   await check('today');
   await p.click('#sx-go');await p.waitForTimeout(150);await check('player');
-  await p.fill('#wk-w','137.5');await p.click('[data-a=wkty][data-v=d]');await p.click('[data-a=wkset]');await p.waitForTimeout(150);await check('player-set');
+  await p.fill('#wk-w','137.5');await p.evaluate(()=>{const d=document.querySelector('#wk-det');if(d)d.open=true});await p.click('[data-a=wkty][data-v=d]');await p.click('[data-a=wkset]');await p.waitForTimeout(150);await check('player-set');
   const t=await p.evaluate(()=>document.body.innerText);ok(/137[.٫]5/.test(t)&&/12/.test(t),`${w} الأرقام (137.5 و12) ظاهرة بجانب العربية`);
   await p.evaluate(()=>{S.sub=null;S.tab='dash';UI.wk=null;render()});
   await p.evaluate(m=>{S.meals[TD()]=[{id:'a',n:m,kcal:1234,p:98.5,c:100,f:45,slot:'l'}];S.wn[TD()]='ملاحظة طويلة جدًا عن الوزن بعد التمرين الصباحي وقبل الإفطار بساعة';save();S.tab='food';S.sub=null;render()},LONGM);await check('food');

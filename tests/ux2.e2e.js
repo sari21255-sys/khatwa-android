@@ -15,6 +15,7 @@ const reload=async p=>{await p.reload();await p.waitForTimeout(500)};
 const sxs=p=>p.evaluate(()=>Object.values(S.sx));
 const goal=async p=>{const t=await txt(p);const m=t.match(/هدف الأسبوع:\s*(\d+) من (\d+)/);return m?m[1]+'/'+m[2]:null};
 const finish=async p=>{for(let i=0;i<40&&await p.$('[data-a=wkset]');i++)await click(p,'[data-a=wkset]');if(await p.$('[data-a=wkfin]'))await click(p,'[data-a=wkfin]')};
+const endWk=async p=>{await click(p,'[data-a=wkend]');if(await p.$('#fx-sheet [data-fxs]')){await p.click('#fx-sheet [data-fxs]');await p.waitForTimeout(250)}};
 const logOne=async p=>{await click(p,'[data-a=wkty][data-v=d]');await click(p,'[data-a=wkrp][data-v="9"]');await p.fill('#wk-w','55');await click(p,'[data-a=wkset]')};
 (async()=>{const b=await chromium.launch();
 
@@ -42,9 +43,9 @@ const logOne=async p=>{await click(p,'[data-a=wkty][data-v=d]');await click(p,'[
   ok(p.errs.length===0,'لا أخطاء صفحة',p.errs.join('|'))}
 
  console.log('2) الاستكمال من الأرشيف (اختبار مستقل)');
- {const {p}=await open(b);await click(p,'#sx-go');await logOne(p);const id=(await sxs(p))[0].id;await click(p,'[data-a=wkend]');
+ {const {p}=await open(b);await click(p,'#sx-go');await logOne(p);const id=(await sxs(p))[0].id;await endWk(p);
   ok(/dash/.test(await p.evaluate(()=>S.tab))&&!await p.evaluate(()=>UI.wk),'«إنهاء» يحفظ ويعود إلى اليوم');
-  await reload(p);await click(p,'[data-a="sub"][data-v="arch"]');
+  await reload(p);await click(p,'#nav [data-a="go"][data-v="pg"]');await click(p,'[data-a="sub"][data-v="arch"]');
   ok(/جزئية/.test(await txt(p)),'الجلسة الجزئية في سجل الأرشيف');
   await click(p,'.sxr');ok(/RPE 9/.test(await txt(p))&&/دروب/.test(await txt(p)),'التفاصيل تعرض RPE 9 والنوع دروب');
   await click(p,'#ar-resume');ok(await p.evaluate(i=>UI.wk&&UI.wk.sid===i&&S.sub==='wk',id),'«أكمل التمرين» من الأرشيف يفتح الجلسة نفسها');
@@ -69,19 +70,19 @@ const logOne=async p=>{await click(p,'[data-a=wkty][data-v=d]');await click(p,'[
   ok(await p.evaluate(()=>Object.keys(S.done).length===4),'S.done فيه 4 تمارين بلا تكرار')}
 
  console.log('4) جلستان جزئيتان معًا: اليوم وتعويض، كل منهما يُستأنف بمعرّفه');
- {const {p}=await open(b);await click(p,'#sx-go');await logOne(p);const A=(await sxs(p))[0].id;await click(p,'[data-a=wkend]');
-  await click(p,'#mk-go');await click(p,'.mkc[data-day="2"] [data-a=wkmk]');await logOne(p);const all=await sxs(p),B=all.find(x=>x.id!==A).id;await click(p,'[data-a=wkend]');
+ {const {p}=await open(b);await click(p,'#sx-go');await logOne(p);const A=(await sxs(p))[0].id;await endWk(p);
+  await click(p,'#mk-go');await click(p,'.mkc[data-day="2"] [data-a=wkmk]');await logOne(p);const all=await sxs(p),B=all.find(x=>x.id!==A).id;await endWk(p);
   ok(all.length===2&&(await sxs(p)).length===2,'جلستان جزئيتان');
   await reload(p);ok(/أكمل التمرين/.test(await txt(p)),'الزر الرئيسي «أكمل التمرين»');await click(p,'#sx-go');
   ok(await p.evaluate(i=>UI.wk.sid===i&&UI.wk.ks.every(k=>k.split('|')[1]==='4'),A),'الزر الرئيسي يستأنف حصة اليوم (A) لا التعويض');
-  await click(p,'[data-a=wkend]');await click(p,'#mk-go');
+  await endWk(p);await click(p,'#mk-go');
   ok(/أكمل التعويض/.test(await txt(p)),'شاشة التعويض تعرض «أكمل التعويض» للحصة الجزئية');
   await click(p,'.mkc[data-day="2"] [data-a=wkmk]');ok(await p.evaluate(i=>UI.wk.sid===i,B),'تعويض الاثنين يستأنف جلسته (B)');
   await finish(p);await p.evaluate(()=>{S.sub=null;S.tab='dash';render()});ok(await goal(p)==='1/3','إكمال التعويض يحتسب 1 من 3، وحصة اليوم ما زالت جزئية');
   ok((await sxs(p)).find(x=>x.id===A).st==='p','جلسة اليوم A بقيت جزئية')}
 
  console.log('5) أسبوع جديد: ما يُستكمل وما يبقى في السجل');
- {const {ctx,p}=await open(b);await click(p,'#sx-go');await logOne(p);const A=(await sxs(p))[0].id;await click(p,'[data-a=wkend]');
+ {const {ctx,p}=await open(b);await click(p,'#sx-go');await logOne(p);const A=(await sxs(p))[0].id;await endWk(p);
   await p.evaluate(t=>{},0);
   const p2=await ctx.newPage();await p2.clock.install({time:NEXTSAT});await p2.goto('file://'+file);await p2.waitForTimeout(500);await p2.clock.resume();
   const t=await txt(p2);
@@ -109,7 +110,7 @@ const logOne=async p=>{await click(p,'[data-a=wkty][data-v=d]');await click(p,'[
   await click(p,'#wk-undo');ok((await sxs(p)).length===0&&await p.evaluate(()=>!UI.wk.sid),'التراجع عن آخر مجموعة في الجلسة يحذف الجلسة الفارغة');
   await click(p,'[data-a=wkset]');await click(p,'[data-a=wknext]');await click(p,'[data-a=wkset]');await click(p,'[data-a=wkset]');
   s=(await sxs(p))[0];ok(s.ex[0].sk===1&&s.ex[1].dn===1&&s.st==='p','التخطي: التمرين الأول مخطّى والثاني مكتمل والجلسة جزئية');
-  await p.evaluate(()=>{ACT.wkend();render()});await reload(p);await click(p,'#sx-go');
+  await p.evaluate(()=>{UI.fxfin=1;ACT.wkend();UI.fxfin=0;render()});await reload(p);await click(p,'#sx-go');
   ok(await p.evaluate(()=>{const x=S.sx[UI.wk.sid].ex[0];return UI.wk.i===0&&UI.wk.ks[0]===x.k}),'الاستئناف يعيد عرض التمرين المخطّى من مجموعته التالية');
   await finish(p);s=(await sxs(p))[0];ok(s.st==='c'&&s.ex[0].dn===1&&s.ex[1].dn===1,'يمكن إكمال التمرين المخطّى والجلسة تكتمل')}
 

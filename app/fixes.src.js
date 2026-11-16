@@ -2,6 +2,7 @@
 const FXMARK='<svg class="sjmk" viewBox="0 0 56 56" role="img" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="9" stroke-linejoin="miter"><g transform="translate(13 7) skewX(-12)"><path d="M33 5H5V21H33V37H5"/></g></svg>';
 /* 1) الشريط السفلي: التمرين · التغذية · اليوم (الشعار) · التقدّم · المزيد. في RTL أول عنصر على اليمين. */
 sjNav=function(){
+ if(UI.ses)return '';
  const it=[['train','dumbbell','التمرين'],['food','fork','التغذية'],['dash',0,'اليوم'],['pg','chart','التقدّم'],['ex','grid','المزيد']];
  return '<div class="pill2">'+it.map(n=>{const on=n[0]===S.tab||(n[0]==='dash'&&S.tab==='home');
   return '<button class="'+(n[1]?'':'sjplus sjhome ')+(on?'on cur':'')+'" data-a="go" data-v="'+n[0]+'" aria-label="'+n[2]+'"'+(on?' aria-current="page"':'')+'>'+(n[1]?ic(n[1])+'<span>'+n[2]+'</span>':FXMARK+'<span class="sr">'+n[2]+'</span>')+'</button>'}).join('')+'</div>'};
@@ -12,7 +13,7 @@ vEx=function(){
  h+='<button class="sjrow" data-a="go" data-v="me" style="background:var(--sj-btn)!important;color:var(--sj-btnt)!important"><span class="av" style="width:40px;height:40px;display:grid;place-items:center;border-radius:50%;flex:none;overflow:hidden">'+(P.av?'<img alt="" src="'+P.av+'" style="width:100%;height:100%;object-fit:cover">':esc((P.name||'س').charAt(0)))+'</span><span class="t">الملف الشخصي<small style="color:inherit;opacity:.75">بياناتك وأهدافك</small></span>'+ic('next')+'</button>';
  h+='<div class="sjsec">التطبيق</div>'+R('nt','gear','الإعدادات',S2('set'),'المظهر والوقت والصلاة والحساب والبيانات')+R('nt','bell','مركز الإشعارات',S2('nc'),ncUnread()?F(ncUnread())+' غير مقروء':'')+R('nt','users','المجتمع',S2('comm'));
  h+='<div class="sjsec">المعرفة والأدوات</div>'+R('rp','book','الثقافة الرياضية',S2('cul'))+R('wt','calc','الأدوات والحاسبات',S2('tools'),'الأدوات والمنبهات')+R('md','spark','المدرب الذكي',S2('coach'));
- h+='<div class="sjsec">النادي</div>'+R('ar','pin','النادي والزيارات',S2('gyms'),'جدول زياراتي والأجهزة');
+ h+='<div class="sjsec">النادي</div>'+R('ar','pin','النادي',S2('gyms'),'الأندية القريبة')+R('ar','calendar','جدول زيارتي للنادي',S2('vis'))+R('ar','bell','منبه الذهاب والغياب',S2('rem'));
  h+='<div class="sjsec">الدعم</div><a class="sjrow" href="privacy.html">'+sjI('dt','info')+'<span class="t">الخصوصية والدعم<small>سياسة الخصوصية وطرق التواصل</small></span>'+ic('next')+'</a>';
  return h};
 /* 3) الإعدادات: تُنقل كل الإعدادات السابقة إلى مجموعاتها النهائية ويُحذف قسم «إعدادات سابقة» */
@@ -195,3 +196,81 @@ const FX_RDSET=rdSet;
 rdSet=function(){let h=FX_RDSET.apply(this,arguments);if(typeof h!=='string')return h;
  const btn='<div class="row" style="margin-top:10px;gap:8px"><div class="t"><b>اختر مدينة</b><div class="mu">بحث وقائمة مدن.</div></div><span class="sp"></span><button class="chip" data-a="fxcity">اختر مدينة</button></div><div class="row" style="margin-top:10px"><div class="t"><b>استخدم موقعي</b><div class="mu">إذن «أثناء الاستخدام» والموقع التقريبي فقط، ولا يعمل في الخلفية. يُرسَل خطّا العرض والطول لمزوّد الطقس (Open-Meteo) دون هويتك. عند الرفض اختر مدينة يدويًا.</div></div><span class="sp"></span><button class="chip" data-a="rdgeo">استخدم موقعي</button></div>';
  return h.replace(/<div class="mu" style="margin-top:10px">«استخدم موقعي» غير مفعّل[^<]*<\/div>/,btn)};
+
+/* ===== المرحلة 6: الخطوات والنوم والنبض بحسب مصدر فعلي ===== */
+var FXHIDE={};
+function fxStp(){if(!S.stp||typeof S.stp!=='object'||Array.isArray(S.stp))S.stp={};const o=S.stp;if(!o.src)o.src={};return o}
+const FXS={st:'',busy:0};
+/* تقدّم العدّاد: يعالج اليوم الجديد وإعادة تشغيل الجهاز (العدّاد يبدأ من الصفر) دون عدّ مزدوج */
+function fxStepAdv(st,c,day){
+ if(!st||st.day!==day)return{day:day,boot:c.bootAt,last:c.steps,acc:0,from:c.at};
+ if(Math.abs(c.bootAt-st.boot)<=120000&&c.steps>=st.last)return{day:day,boot:c.bootAt,last:c.steps,acc:st.acc+(c.steps-st.last),from:st.from};
+ return{day:day,boot:c.bootAt,last:c.steps,acc:st.acc+c.steps,from:st.from}}
+/* مصدر واحد للإجمالي: Health Connect إن وُجدت قراءته لليوم وإلا عدّاد الهاتف. لا جمع بينهما أبدًا */
+function fxStepResolve(day){const o=fxStp(),r=o.src[day]||{};let v=null,src='';
+ if(r.hc>0){v=r.hc;src='hc'}else if(r.sn!=null){v=r.sn;src='sensor'}
+ if(v==null)return null;const c=S.cd[day]=S.cd[day]||{};c.steps=Math.round(v);c.stsrc=src;c.stat=src==='hc'?r.hat:r.sat;return{v:Math.round(v),src:src}}
+function fxStepHc(day,v){const r=fxStp().src;(r[day]=r[day]||{}).hc=v;r[day].hat=Date.now();fxStepResolve(day)}
+function fxToday(){return iso(new Date())}
+async function fxStepSensor(ask){const P=NAT&&NP('StepCounter');
+ if(!P){FXS.st=NAT?'unavail':'web';return 0}
+ if(FXS.busy)return 0;FXS.busy=1;
+ try{const a=await P.isAvailable();if(!a||!a.available){FXS.st='nosensor';return 0}
+  let pm=await P.checkPermissions();
+  if(pm.activity!=='granted'&&ask)pm=await P.requestPermissions({permissions:['activity']});
+  if(pm.activity!=='granted'){FXS.st=pm.activity==='denied'?'denied':'prompt';fxStp().deny=pm.activity==='denied'?1:0;return 0}
+  fxStp().deny=0;
+  const r=await P.read(),o=fxStp(),day=fxToday();
+  o.st=fxStepAdv(o.st,{steps:+r.steps,bootAt:+r.bootAt,at:+r.at},day);
+  const d=o.src[day]=o.src[day]||{};d.sn=o.st.acc;d.sat=+r.at;d.from=o.st.from;
+  fxStepResolve(day);save();FXS.st='ok';return 1}
+ catch(e){FXS.st=String(e&&e.message||e)==='permission'?'prompt':'err';return 0}
+ finally{FXS.busy=0}}
+function fxStepStatus(){const o=fxStp(),day=fxToday(),r=o.src[day]||{},c=S.cd[day]||{},t=x=>x?rdF(x,Intl.DateTimeFormat().resolvedOptions().timeZone):'';
+ const has=r.hc>0||r.sn!=null;
+ let l;if(has){l='<b class="num">'+F(c.steps||0)+'</b> خطوة اليوم · المصدر: '+(c.stsrc==='hc'?'Health Connect':'عدّاد خطوات الهاتف')+(c.stsrc==='sensor'&&r.from?' · العدّ منذ '+t(r.from):'')+' · آخر قراءة '+t(c.stat)}
+ else l='لا توجد قراءة خطوات اليوم.'+(FXS.st==='denied'||o.deny?' إذن النشاط البدني مرفوض؛ فعّله من إعدادات التطبيق في النظام.':FXS.st==='nosensor'?' الجهاز بلا حساس خطوات.':FXS.st==='web'?' القراءة التلقائية متاحة في تطبيق Android فقط.':'');
+ return '<div class="card" id="fx-stp"><h2>'+ic('step')+'خطوات الهاتف</h2><div class="mu">'+l+'</div><div class="mu" style="margin-top:6px">تُقرأ تلقائيًا من Health Connect عند توفّرها، وإلا من عدّاد الهاتف. لا يُجمع المصدران ولا يوجد إدخال يدوي.</div>'+(NAT?'<div class="row" style="margin-top:8px"><button class="btn sm" data-a="fxstp">'+(has?'حدّث الآن':'تفعيل عدّاد الهاتف')+'</button></div>':'')+'</div>'}
+ACT.fxstp=()=>{fxStepSensor(true).then(()=>{try{S.prof.hcOn&&hcSync(false)}catch(e){}render()});return false};
+(function(){const V=hcCard;hcCard=function(){return fxStepStatus()+V.apply(this,arguments)}})();
+/* لا إدخال يدوي للخطوات أو النوم أو النبض */
+FXHIDE['cd:steps']=function(l,v){const c=S.cd[fxToday()]||{};return '<div class="f">'+l+'<b class="num">'+(c.steps?F(c.steps):'—')+'</b><small class="mu">'+(c.steps?(c.stsrc==='hc'?'Health Connect':c.stsrc==='sensor'?'عدّاد الهاتف':'مستورد'):'لا بيانات')+'</small></div>'};
+FXHIDE['sleep']=FXHIDE['deep']=function(){return ''};
+FXHIDE['cd:hr']=function(l,v){const c=S.cd[fxToday()]||{};return c.hrsrc&&c.hrat&&Date.now()-c.hrat<864e5?'<div class="f">'+l+'<b class="num">'+F(c.hr)+'</b><small class="mu">Health Connect</small></div>':''};
+var fxNoLog=function(){return true};
+(function(){const V=vLink;vLink=function(){let h=V.apply(this,arguments);if(typeof h!=='string')return h;
+ h=h.replace(/<div class="card"><h2>[^]*?نبض لحظي بالبلوتوث[^]*?<\/div><\/div>(?=<)/,'');
+ h=h.replace(/<button class="lnk"[^>]*data-v="watch">[^]*?<\/button>/,'');
+ h=h.replace(/<div style="padding:8px 0;border-top:1px solid var\(--bd\)">(?:(?!<\/div><\/div>)[^])*?(?:بلوتوث|البلوتوث)[^]*?<\/div><\/div>/g,'');
+ h=h.replace(/، أو الصق البيانات كنصٍ?\.?/,'.').replace(/ أو لصق البيانات بصيغة[^.<]*\./,'.');return h}})();
+/* مزامنة تلقائية عند الفتح والعودة، دون طلب إذن */
+function fxAutoSync(){if(!NAT)return;try{fxStepSensor(false).then(()=>{if(S.prof.hcOn)return hcSync(false)}).then(()=>{try{render()}catch(e){}})}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)fxAutoSync()});
+setTimeout(fxAutoSync,1500);
+
+/* ===== المرحلة 4: إنهاء جزئي بتأكيد، ومصدر القيمة الابتدائية ===== */
+(function(){const V=ACT.wkend;
+ ACT.wkend=function(b){const U=UI.wk,sx=U&&U.sid&&S.sx[U.sid];
+  if(sx&&sx.st!=='c'&&!UI.fxfin){const a=sxProg(sx);if(a.d<a.t){const body=document.createElement('div');
+    body.innerHTML='<p style="margin:0 0 6px">أنجزت <b class="num">'+F(a.d)+'</b> من <b class="num">'+F(a.t)+'</b> مجموعة.</p><p class="mu" style="margin:0">سيُحفظ التمرين كحصة جزئية بما أنجزته، وتُحتسب مرة واحدة.</p>';
+    fxSheet('إنهاء التمرين؟',body,function(){UI.fxfin=1;try{const r=V(b);save();render();return r}finally{UI.fxfin=0}},{ok:'إنهاء وحفظ'});return false}}
+  return V(b)}})();
+(function(){const V=vWk;vWk=function(){let h=V.apply(this,arguments);if(typeof h!=='string'||h.indexOf('class="wkt"')<0)return h;
+  const U=UI.wk;let src='';try{if(U&&U.ks&&U.i<U.ks.length){const t=tasks().find(x=>x.k===U.ks[U.i]);if(t){const e=t.e;
+    src=U.w!=null?'القيمة الحالية: آخر ما أدخلته في هذه الجلسة':(sugg(e)?'القيمة الابتدائية: اقتراح التدرّج من جلساتك السابقة':(S.base[e.n]||lastW(e.n))?'القيمة الابتدائية: من آخر جلسة لهذا التمرين':'القيمة الابتدائية: من الخطة')}}}catch(x){}
+  return src?h.replace('<div class="bar"','<div class="mu" id="wk-src" style="text-align:center;font-size:12px">'+src+'</div><div class="bar"'):h}})();
+/* قيم الوزن/التكرارات تُحفظ في حالة الجلسة لحظة الكتابة، فلا يمحوها أي إعادة رسم (مثل انتهاء طلب الطقس أثناء التمرين) */
+document.addEventListener('input',e=>{const t=e.target,U=UI.wk;if(!U||!t||(t.id!=='wk-w'&&t.id!=='wk-r'))return;if(t.value==='')return;const v=+String(t.value).replace(',','.');if(!isFinite(v))return;if(t.id==='wk-w')U.w=v;else U.r=v},true);
+
+/* وجهات الخدمات الفريدة: خطة التمارين والأجهزة داخل «التمرين»، وربط الساعات والخطوات داخل «التقدّم» */
+(function(){const row=(k,n,t,v,d)=>'<button class="sjrow" data-a="sub" data-v="'+v+'">'+sjI(k,n)+'<span class="t">'+t+(d?'<small>'+d+'</small>':'')+'</span>'+ic('next')+'</button>';
+ const VT=vTrain;vTrain=function(){const h=VT.apply(this,arguments);if(typeof h!=='string'||UI.ses||UI.sum||(UI.trk&&UI.trk!=='iron'&&UI.trk!=='hub'))return h;
+  return h+'<div class="sjsec">خطط ومكتبات</div>'+row('tr','list','خطة التمارين','plan','الأسبوع والتعديل')+row('tr','dumbbell','الأجهزة الرياضية','nau','دليل الأجهزة')};
+ const VP=vPg;vPg=function(){const h=VP.apply(this,arguments);if(typeof h!=='string')return h;return h+'<div class="sjsec">مصادر البيانات</div>'+row('wt','watch','ربط الساعات والخطوات','link','Health Connect وعدّاد الهاتف')}})();
+
+/* ترجمات الإنجليزية للنصوص الجديدة */
+Object.assign(ENT,{'تذكير التمرين اليومي':'Daily workout reminder','الحساب والمزامنة':'Account & sync','البيانات والنسخ والخصوصية':'Data, backup & privacy','النسخ الاحتياطي':'Backup',
+ 'الطقس يُخزَّن مؤقتًا على جهازك (تُرسل خطوط الإحداثيات للمدينة فقط إلى مزوّد الطقس). الموقع التقريبي لا يُحفظ إلا إن اخترت.':'Weather is cached on your device (only the city coordinates are sent to the weather provider). Your approximate location is saved only if you choose.',
+ 'اختر مدينة':'Choose a city','ابحث عن مدينة':'Search for a city','استخدم موقعي':'Use my location','إغلاق':'Close','إلغاء':'Cancel','التمرين':'Workout','التغذية':'Nutrition','اليوم':'Today','التقدّم':'Progress','المزيد':'More',
+ 'الماء':'Water','كمية مخصّصة':'Custom amount','إنهاء التمرين؟':'End workout?','إنهاء وحفظ':'End & save','خطط ومكتبات':'Plans & libraries','خطة التمارين':'Workout plan','الأجهزة الرياضية':'Gym equipment','مصادر البيانات':'Data sources','ربط الساعات والخطوات':'Watches & steps','خطوات الهاتف':'Phone steps','حدّث الآن':'Refresh now','تفعيل عدّاد الهاتف':'Enable phone step counter',
+ 'جدول زيارتي للنادي':'My gym visit schedule','منبه الذهاب والغياب':'Visit & absence alarm','النادي':'Gym','الأندية القريبة':'Nearby gyms'});

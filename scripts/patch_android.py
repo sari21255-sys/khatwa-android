@@ -9,7 +9,7 @@ m=M.read_text(encoding='utf-8')
 # RECEIVE_BOOT_COMPLETED تضيفه إضافة الإشعارات المحلية لإعادة جدولة التذكيرات بعد إعادة التشغيل.
 PERMS=['android.permission.health.READ_STEPS','android.permission.health.READ_HEART_RATE','android.permission.health.READ_DISTANCE',
  'android.permission.health.READ_ACTIVE_CALORIES_BURNED',
- 'android.permission.POST_NOTIFICATIONS','android.permission.ACCESS_COARSE_LOCATION']
+ 'android.permission.POST_NOTIFICATIONS','android.permission.ACCESS_COARSE_LOCATION','android.permission.ACTIVITY_RECOGNITION']
 # أذونات تُزال من الملف المدموج (تأتي من الإضافات أو غير مستعملة). لا كتابة إلى Health Connect، ولا كاميرا/ميكروفون/موقع دقيق (الموقع التقريبي COARSE مسموح لـ«استخدم موقعي» أثناء الاستخدام فقط)
 # لأن الميزات المقابلة (مسح الباركود، الإملاء الصوتي، تحديد الموقع) غير مختبرة على جهاز فتُعطَّل في نسخة أندرويد.
 REMOVE=['android.permission.health.WRITE_STEPS','android.permission.health.WRITE_DISTANCE','android.permission.health.WRITE_ACTIVE_CALORIES_BURNED',
@@ -73,6 +73,23 @@ if SRC.exists() and RES.exists():
     print('icons ok (SIJIL adaptive) + splash')
 else:
     print('icons skipped: missing',SRC,RES)
+# إضافة عدّاد خطوات الهاتف الأصلية (من مصدر المستودع) وتسجيلها في MainActivity
+PJ=A/'app/src/main/java/com/khatwa/app'
+if PJ.exists():
+    shutil.copy2('scripts/android/StepCounterPlugin.java',PJ/'StepCounterPlugin.java')
+    ma=PJ/'MainActivity.java';t=ma.read_text(encoding='utf-8')
+    if 'StepCounterPlugin' not in t:
+        t=re.sub(r'public class MainActivity extends BridgeActivity\s*\{\s*\}','''public class MainActivity extends BridgeActivity {
+    @Override
+    public void onCreate(android.os.Bundle savedInstanceState) {
+        registerPlugin(StepCounterPlugin.class);
+        super.onCreate(savedInstanceState);
+    }
+}''',t)
+        assert 'registerPlugin(StepCounterPlugin' in t,'MainActivity لم يُعدَّل'
+        ma.write_text(t,encoding='utf-8')
+    print('StepCounter plugin injected')
+else: print('StepCounter skipped: no',PJ)
 # رقم الإصدار تلقائيًا من رقم تشغيل الـCI (يزداد في كل بناء، وهو شرط Google Play)
 G=A/'app/build.gradle'
 if G.exists():
