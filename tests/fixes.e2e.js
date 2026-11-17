@@ -9,11 +9,11 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
  console.log('1) التنقّل');
  for(const w of [320,390]){const {ctx,p}=await mk(w);
   const xs=await p.$$eval('#nav [data-a]',a=>a.map(x=>({v:x.dataset.v,x:Math.round(x.getBoundingClientRect().left)})));
-  const order=xs.sort((a,c)=>c.x-a.x).map(x=>x.v).join();ok(order==='train,food,dash,pg,ex','الترتيب من اليمين: التمرين · التغذية · اليوم · التقدّم · المزيد ('+w+')',order);
+  const order=xs.sort((a,c)=>c.x-a.x).map(x=>x.v).join();ok(order==='train,food,dash,me,ex','الترتيب من اليمين: التمرين · التغذية · اليوم · التقدّم · المزيد ('+w+')',order);
   const wd=await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1);ok(wd,'لا تمرير أفقي ('+w+')');
   await ctx.close()}
  {const {ctx,p}=await mk(390);
-  const lab=await p.$eval('#nav .sjhome',e=>e.getAttribute('aria-label'));ok(/اليوم/.test(lab||''),'وسم الشعار «اليوم»',lab);
+  const lab=await p.$eval('#nav .sjhome',e=>e.getAttribute('aria-label'));ok(/الرئيسية/.test(lab||''),'وسم الشعار «الرئيسية»',lab);
   await p.evaluate(()=>{S.tab='food';render()});await p.click('#nav .sjhome');ok(await p.evaluate(()=>S.tab==='dash'),'الشعار يعيد إلى اليوم');
   await p.evaluate(()=>{S.tab='dash';render()});const t=await p.evaluate(()=>document.body.innerText);
   ok(!/لصق|بيانات الساعة/.test(t),'لا إدخال ساعة يدوي في اليوم');
@@ -39,27 +39,18 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
  {const {ctx,p}=await mk(390);
   await p.evaluate(()=>{S.tab='dash';render()});
   ok(await p.evaluate(()=>!!document.querySelector('.fxscene')),'بطاقة المشهد ظاهرة');
-  await p.click('.fxcity');await p.fill('.fxsearch','لندن');await p.click('.fxcr');await p.waitForTimeout(250);
-  const c1=await p.evaluate(()=>({n:rdCity().n,tz:rdCity().tz,shown:document.querySelector('.fxcity b').textContent}));
-  ok(c1.tz==='Europe/London'&&c1.shown==='لندن','تغيير المدينة يغيّر المنطقة الزمنية والعرض',JSON.stringify(c1));
-  const clk=await p.evaluate(()=>{const e=document.querySelector('[data-rdclk]');return e.textContent});
-  const exp=await p.evaluate(()=>rdF(rdNow(),'Europe/London'));ok(clk===exp,'ساعة البطاقة بتوقيت المدينة',clk+' / '+exp);
-  /* رد متأخر لمدينة سابقة لا يغيّر البطاقة */
-  const late=await p.evaluate(async()=>{const mk=n=>({src:'t',hours:[{t:Math.floor(rdNow()/36e5)*36e5,temp:n,feels:n,code:0}]});
-   let rel;const g=WXP.get;WXP.get=c=>c.id==='cus'?g(c):new Promise(r=>{rel=()=>r(mk(11))});
-   const s=rdS();s.city='madinah';s.cus=null;S.sj.wxm={};const pr=rdFetch(1,rdCity());
-   s.city='jeddah';render();const before=document.querySelector('.fxtemp')?document.querySelector('.fxtemp').textContent:'';
-   rel();await pr;await new Promise(r=>setTimeout(r,100));const after=document.querySelector('.fxtemp')?document.querySelector('.fxtemp').textContent:'';WXP.get=g;
-   return{before:before,after:after,own:rdKey(rdCity()),stored:Object.keys(rdWxM())}});
-  ok(late.before===late.after,'رد طقس متأخر لمدينة سابقة لا يغيّر بطاقة المدينة الحالية',JSON.stringify(late));
-  const st=await p.evaluate(()=>{const s=rdS();s.city='madinah';S.sj.wxm={};render();return document.querySelector('.fxscene').innerText});
-  ok(/لا يتوفر توقع|تعذّر|انتهت/.test(st),'بلا بيانات: حالة واضحة وليس رقمًا مختلقًا');
+  ok(!await p.$('[data-a=fxcity]')&&!await p.$('button.fxcity'),'لا زر اختيار مدينة يدوي في بطاقة المشهد');
+  ok(/توقيت الجهاز/.test(await p.evaluate(()=>document.querySelector('.fxscene').innerText))&&!!await p.$('.fxscene [data-a=rdgeo]'),'بلا موقع: ساعة الجهاز وزر «استخدم موقعي»');
+  const clk=await p.evaluate(()=>document.querySelector('[data-rdclk]').textContent);
+  const exp=await p.evaluate(()=>rdF(rdNow(),Intl.DateTimeFormat().resolvedOptions().timeZone));ok(clk===exp,'ساعة البطاقة بتوقيت الجهاز',clk+' / '+exp);
+  const st=await p.evaluate(()=>document.querySelector('.fxscene').innerText);
+  ok(/اسمح بالموقع|لم يُمنح|تعذّر/.test(st),'بلا بيانات: حالة واضحة وليس رقمًا مختلقًا');
   const ph=await p.evaluate(()=>{const c=rdCity(),out={};[1,7,12,18,21].forEach(h=>{const ds=rdP(rdNow(),c.tz).d;out[h]=fxPhase(rdAt(ds,h*60,c.tz),c).ph});return out});
   ok(ph[1]==='night'&&ph[12]==='day'&&ph[21]==='night','مراحل المشهد: ليل/نهار بحسب الشروق والغروب',JSON.stringify(ph));
   ok(await p.evaluate(()=>{const s=rdS();return !!s&&NAT===false}),'نسخة الويب: المسار غير الأصلي');
-  /* الرفض: لا إضافة أصلية → يفتح اختيار المدينة اليدوي */
-  await p.evaluate(()=>{ACT.rdgeo()});await p.waitForTimeout(300);
-  ok(!!await p.$('#fx-sheet .fxsearch'),'عند فشل الموقع يظهر اختيار المدينة اليدوي');
+  /* الرفض: رسالة واضحة وزر المحاولة مجددًا، لا اختيار مدينة يدوي */
+  await p.evaluate(()=>{ACT.rdgeo()});await p.waitForTimeout(400);
+  ok(!await p.$('#fx-sheet .fxsearch')&&!!await p.$('.fxscene [data-a=rdgeo]'),'عند فشل الموقع: لا اختيار مدينة يدوي ويبقى زر المحاولة');
   ok(p.errs.length===0,'لا أخطاء سكربت',p.errs.join('|'));await ctx.close()}
  console.log('4) الخطوات والنوم والنبض');
  {const {ctx,p}=await mk(390);
@@ -67,7 +58,7 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
    s=fxStepAdv(s,{steps:200,bootAt:9e6,at:3},'d1');o.push(s.acc);s=fxStepAdv(s,{steps:260,bootAt:9e6,at:4},'d2');o.push(s.acc);
    S.stp=null;fxStepHc('2026-01-01',3000);fxStp().src['2026-01-01'].sn=4000;fxStepResolve('2026-01-01');o.push(S.cd['2026-01-01'].steps+S.cd['2026-01-01'].stsrc);return o});
   ok(r[0]===500&&r[1]===700&&r[2]===0&&r[3]==='3000hc','عدّاد الخطوات: نفس الإقلاع +500، إعادة تشغيل 700، يوم جديد 0، هاتف+ساعة لا يُجمعان ('+r.join()+')');
-  const tx=await p.evaluate(()=>{const o=[];['dash','train','food','pg','ex'].forEach(t=>{S.tab=t;S.sub=null;render();o.push(document.body.innerText)});S.tab='ex';S.sub='set';render();o.push(document.body.innerText);return o.join('\n')});
+  const tx=await p.evaluate(()=>{const o=[];['dash','train','food','me','ex'].forEach(t=>{S.tab=t;S.sub=null;render();o.push(document.body.innerText)});S.tab='ex';S.sub='set';render();o.push(document.body.innerText);return o.join('\n')});
   ok(!/نبض الراحة|النوم \(ساعات\)|سجّل نومك|حزام نبض/.test(tx),'لا إدخال يدوي للنوم أو النبض في الواجهة');
   await p.evaluate(()=>{S.sleep['2026-10-01']=7;S.cd['2026-10-01']={steps:5000,hr:60};save()});
   ok(await p.evaluate(()=>S.sleep['2026-10-01']===7&&S.cd['2026-10-01'].hr===60),'السجلات القديمة محفوظة في البيانات');
@@ -75,11 +66,11 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   ok(p.errs.length===0,'لا أخطاء سكربت',p.errs.join('|'));await ctx.close()}
  console.log('5) إنهاء جزئي واستئناف');
  {const {ctx,p}=await mk(390);
-  await p.evaluate(()=>{S.tab='dash';S.sub=null;render()});
+  await p.evaluate(()=>{S.tab='train';UI.trk='hub';S.sub=null;render()});
   await p.click('[data-a=wkstart]');await p.waitForTimeout(300);
   ok(await p.evaluate(()=>S.sub==='wk'&&!!UI.wk),'بدء الحصة يفتح التمرين الحالي مباشرة');
-  const hd=await p.evaluate(()=>{const e=document.querySelector('.wkt');const r=e.getBoundingClientRect();return{top:Math.round(r.top),pos:getComputedStyle(e).position,end:!!e.querySelector('[data-a=wkend]'),clk:!!e.querySelector('#tmv')}});
-  ok(hd.top<=12&&hd.pos==='sticky'&&hd.end&&hd.clk,'المؤقت و«إنهاء» في رأس ثابت أعلى الشاشة',JSON.stringify(hd));
+  const hd=await p.evaluate(()=>{const e=document.querySelector('.wkt');const r=e.getBoundingClientRect();return{top:Math.round(r.top),pos:getComputedStyle(e).position,end:!!e.querySelector('[data-a=wkend]'),clk:!e.querySelector('#tmv')}});
+  ok(hd.top<=12&&hd.pos==='sticky'&&hd.end&&hd.clk,'«إنهاء» في رأس ثابت أعلى الشاشة بلا مؤقت',JSON.stringify(hd));
   ok(!!await p.$('#wk-src'),'سطر مصدر القيمة الابتدائية ظاهر');
   ok(await p.evaluate(()=>{const n=document.querySelector('#nav');return !n||n.innerHTML.trim()===''||!n.offsetHeight}),'الشريط السفلي مخفي أثناء التمرين النشط');
   ok(!!await p.$('#wk-back')&&!!await p.$('.wkt [data-a=wkend]'),'رأس التمرين: «العودة إلى اليوم» و«إنهاء» زران مستقلان');
@@ -87,11 +78,11 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   const n1=await p.evaluate(()=>{const sx=Object.values(S.sx)[0];return sx?sxProg(sx).d:-1});ok(n1>=1,'المجموعة الأولى حُفظت فورًا في الجلسة',String(n1));
   await p.click('#wk-back');await p.waitForTimeout(250);
   ok(await p.evaluate(()=>S.sub===null&&S.tab==='dash'&&Object.keys(S.sx).length===1&&!!sxOpen()&&sxProg(Object.values(S.sx)[0]).d===1),'العودة إلى اليوم تحفظ الجلسة والمجموعة مرة واحدة');
-  await p.click('[data-a=wkstart]');await p.waitForTimeout(300);
+  await p.evaluate(()=>{S.tab='train';UI.trk='hub';render()});await p.waitForTimeout(150);await p.click('[data-a=wkstart]');await p.waitForTimeout(300);
   ok(await p.evaluate(()=>S.sub==='wk'&&Object.keys(S.sx).length===1&&sxProg(Object.values(S.sx)[0]).d===1),'الاستئناف بعد العودة يفتح الجلسة نفسها بالمجموعة المحفوظة');
   await p.reload();await p.waitForTimeout(500);
-  const res=await p.evaluate(()=>{S.tab='dash';S.sub=null;render();return !!sxOpen()});ok(res,'الجلسة قابلة للاستئناف بعد إعادة التحميل (إغلاق/قتل التطبيق)');
-  await p.click('[data-a=wkstart]');await p.waitForTimeout(300);
+  const res=await p.evaluate(()=>{S.tab='train';UI.trk='hub';S.sub=null;render();return !!sxOpen()});ok(res,'الجلسة قابلة للاستئناف بعد إعادة التحميل (إغلاق/قتل التطبيق)');
+  await p.evaluate(()=>{S.tab='train';UI.trk='hub';render()});await p.waitForTimeout(150);await p.click('[data-a=wkstart]');await p.waitForTimeout(300);
   ok(await p.evaluate(()=>S.sub==='wk'&&Object.keys(S.sx).length===1),'الاستئناف يعيد نفس الجلسة دون نسخة ثانية');
   await p.click('[data-a=wkend]');await p.waitForTimeout(200);
   const msg=await p.evaluate(()=>{const d=document.querySelector('#fx-sheet');return d?d.innerText:''});

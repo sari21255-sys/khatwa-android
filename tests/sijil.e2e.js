@@ -13,7 +13,7 @@ const IND=/[٠-٩]/;
   const ids=await p.$$eval('#nav [data-a]',a=>a.map(x=>x.dataset.v||x.dataset.a));
   ok(ids.length===5,'خمس وجهات في الشريط السفلي',ids.join());
   ok(!!await p.$('#nav .sjhome')&&!await p.$('.sjq'),'الشعار يحلّ محل «+» ولا درج تسجيل سريع مكرّر');
-  const lab=await p.$eval('#nav .sjhome',e=>e.getAttribute('aria-label')||e.textContent);ok(/اليوم/.test(lab),'وسم قارئ الشاشة للشعار يذكر «اليوم»',lab);
+  const lab=await p.$eval('#nav .sjhome',e=>e.getAttribute('aria-label')||e.textContent);ok(/الرئيسية/.test(lab),'وسم قارئ الشاشة للشعار يذكر «الرئيسية»',lab);
   await p.evaluate(()=>{S.tab='pg';S.sub=null;render()});await p.click('#nav .sjhome');await p.waitForTimeout(200);
   ok(await p.evaluate(()=>S.tab==='dash'),'الضغط على الشعار يعيد إلى «اليوم»');
   const sel=await p.$eval('#nav .sjhome',e=>e.classList.contains('on')||e.getAttribute('aria-current')==='page'||e.getAttribute('aria-selected')==='true');ok(sel,'حالة التحديد واضحة للشعار في «اليوم»');
@@ -40,6 +40,7 @@ const IND=/[٠-٩]/;
   await p.reload();await p.waitForFunction(()=>typeof fxEnhance==='function'&&typeof S!=='undefined'&&S.prof&&S.prof.ob===1&&document.querySelector('#app')&&document.querySelector('#app').innerHTML.length>50);await p.waitForTimeout(400);
   const saved=await p.evaluate(()=>Object.values(S.sx||{}).some(x=>x.ex&&x.ex.some(e=>e.sets&&e.sets.length&&e.sets[0].w==40&&e.sets[0].r==10)));
   ok(saved,th+': المجموعة محفوظة بعد إعادة الفتح (الوزن والتكرارات)',await p.evaluate(pre=>JSON.stringify(Object.values(S.sx||{}).map(x=>({st:x.st,ex:(x.ex||[]).slice(0,2).map(e=>e.sets)})))+' pre='+pre+' now='+Object.keys(S.sx||{}).length+' ob='+S.prof.ob+' date='+TD(),pre));
+  await p.evaluate(()=>{S.tab='train';S.sub=null;UI.trk='hub';render()});await p.waitForTimeout(200);
   const resume=await p.evaluate(()=>{const e=document.querySelector('#sx-go');return e?e.innerText:''});
   ok(/أكمل|استئناف|متابعة/.test(resume),th+': «اليوم» يعرض زر الاستئناف مباشرة',resume);
   await p.click('#sx-go');await p.waitForTimeout(300);
@@ -52,7 +53,7 @@ const IND=/[٠-٩]/;
   const r=await q.evaluate(()=>({n:S.prof.name,bw:Object.keys(S.bw).length,th:document.documentElement.getAttribute('data-sj'),home:!!document.querySelector('#nav'),welcome:!!document.querySelector('#wel-go')}));
   ok(r.n==='مختبر'&&r.bw>=2&&r.home&&!r.welcome,'الترقية: المستخدم القديم وبياناته يدخلان «اليوم» مباشرة بلا ترحيب',JSON.stringify(r));
   ok(r.th==='white','الترقية: السمة الفاتحة القديمة تُحوَّل إلى الأبيض',r.th);
-  for(const t of ['dash','train','pg','ex']){await q.click('#nav button[data-v='+t+']');await q.waitForTimeout(100)}
+  for(const t of ['dash','train','me','ex']){await q.click('#nav button[data-v='+t+']');await q.waitForTimeout(100)}
   ok(errs.length===0,'الترقية: التنقل بين التبويبات بلا أخطاء',errs.join('|'));await ctx2.close()}
  /* 5) خطة التمارين: نوع اليوم منسدل، تمارين تناسب اليوم بلغتين وأيقونة، وخيار «أخرى» */
  {const {ctx,p}=await mk(390);await p.evaluate(seed);await p.evaluate(()=>{S.tab='ex';S.sub='plan';render()});await p.waitForTimeout(200);
@@ -70,7 +71,7 @@ const IND=/[٠-٩]/;
  /* 6) مسارات التمرين الكبرى */
  {const {ctx,p}=await mk(390);await p.evaluate(seed);await p.click('#nav button[data-v=train]');await p.waitForTimeout(200);
   const ks=await p.$$eval('.sjtk',a=>a.map(x=>x.dataset.v));ok(JSON.stringify(ks)===JSON.stringify(['iron','run','swim','cali','fn']),'خمسة مسارات: الحديد، الجري، السباحة، الكالسثينكس، التدريب الوظيفي',ks.join());
-  await p.click('.sjtk[data-v=iron]');await p.waitForTimeout(150);
+  await p.click('.sjtk[data-v=irs]');await p.waitForTimeout(100);await p.click('[data-a=trk][data-v=iron]');await p.waitForTimeout(150);
   const segs=await p.$$eval('.seg [data-a=seg]',a=>a.map(x=>x.dataset.v));ok(segs.join()==='today,plan,disc','مسار الحديد: اليوم، الخطة، اكتشف فقط (بلا الأسبوع ولا لم تتحقق ولا الكارديو)',segs.join());
   ok(!await p.$('.tm')&&!await p.$('[data-k=machine]'),'لا بطاقة مؤقت منفصلة ولا زر تصوير الجهاز');
   ok(!!await p.$('#sx-go,[data-a=wkstart],[data-a=sxgo]')||/ابدأ|أكمل/.test(await p.evaluate(()=>document.body.innerText)),'مسار الحديد يعرض بدء التمرين');

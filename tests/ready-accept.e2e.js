@@ -51,7 +51,7 @@ let fail=0,pass=0;const ok=(c,m,x)=>{if(c){pass++;console.log('  ok   '+m)}else{
  const ntn=await E(async()=>{rdS().city='newyork';rdPlanState('run').at='16:00';await rdNtSync(1);return Object.values(window.__M).map(x=>x.body).join('|')});
  ok(!/44/.test(ntn),w+': الإشعارات لا تستخدم توقع المدينة الأولى',ntn);
  /* فشل الثانية */
- m=await E(async()=>{rdS().city='cairo';await rdFetch(1);S.tab='dash';S.sub=null;render();return{wx:rdWx(),err:RDW.err[rdKey(rdCity())],ids:rdSummary('run').adv.map(a=>a.id),card:document.querySelector('.sjwx').textContent}});
+ m=await E(async()=>{rdS().geo=1;rdS().cus={n:'القاهرة',lat:30.04,lon:31.24,tz:'Africa/Cairo'};await rdFetch(1);S.tab='dash';S.sub=null;render();return{wx:rdWx(),err:RDW.err[rdKey(rdCity())],ids:rdSummary('run').adv.map(a=>a.id),card:document.querySelector('.sjwx').textContent}});
  ok(m.wx===null&&!!m.err&&!m.ids.includes('heat-high')&&!m.ids.includes('cold')&&/لا يتوفر توقع|تعذّر/.test(m.card),w+': فشل طلب المدينة الحالية: حالة تعذّر بلا توصية من مدينة أخرى',m.ids.join());
  ok(await E(()=>{rdS().city='cairo';const s=rdSummary('run');return s.adv.every(a=>!/الحرارة المحسوسة/.test(a.t))}),w+': لا نصائح حرارة بلا توقع للمدينة');
  /* توقع قديم أثناء الانقطاع */
@@ -89,8 +89,8 @@ let fail=0,pass=0;const ok=(c,m,x)=>{if(c){pass++;console.log('  ok   '+m)}else{
  ok(c0===0&&c1===0&&c2===1&&c3.n===0&&c3.c===0,w+': إيقاف الفئات وساعات الهدوء والمفتاح العام تُزيل المعلّق وتُحدّث المؤكَّد',JSON.stringify([c0,c1,c2,c3]));
  await E(async()=>{rdS().nt.on=1;await rdNtSync(1)});
  /* واجهة «لدي مشكلة» والتجربة */
- const ui=await E(()=>{S.tab='dash';S.sub='nc';UI.nct='ct';UI.sgo={nhelp:true};render();const t=document.body.textContent;return{st:/مجدول|الجدولة/.test(t),btn:!!document.querySelector('[data-a=rdretry]')}});
- ok(ui.st&&ui.btn,w+': «لدي مشكلة» تعرض الحالة وزر إعادة المحاولة',JSON.stringify(ui));
+ const ui=await E(()=>{S.tab='ex';S.sub='set';UI.sgo={nt:true};render();const t=document.body.innerText;return{diag:/فحص الإذن|إعدادات Android|حالة الجدولة|إرسال إشعار تجريبي/.test(t),away:/منبّه الغياب/.test(t),retry:!!document.querySelector('[data-a=rdretry],[data-a=rdperm],[data-a=rdandset],[data-a=rdtest]')}});
+ ok(!ui.diag&&!ui.retry&&ui.away,w+': الإشعارات في الإعدادات بلا أدوات تشخيص ومعها منبّه الغياب',JSON.stringify(ui));
  await E(async()=>{window.__F.sch=1;ACT.rdtest()});await p.waitForTimeout(200);ok(await E(()=>/تعذّرت الجدولة/.test(UI.rdtst)),w+': التجربة تُظهر فشل الجدولة');
  await E(async()=>{ACT.rdtest()});await p.waitForTimeout(200);ok(await E(()=>/لا يثبت وصول/.test(UI.rdtst)),w+': التجربة تفرّق بين قبول الجدولة ووصول الإشعار');
 

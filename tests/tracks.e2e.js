@@ -20,8 +20,8 @@ let fail=0,pass=0;const ok=(c,m,x)=>{if(c){pass++;console.log('  ok   '+m)}else{
   ok(hd&&hd.back&&hd.sep&&hd.h>=40&&hd.noOverlap&&hd.clk,'رأس الجلسة: «العودة إلى اليوم» و«إنهاء» منفصلان والمؤقت ظاهر',JSON.stringify(hd));
   const id0=await E(()=>tkOpen().id),n0=await E(()=>SJ().ss.length);await click('#tk-back');
   ok(await E(()=>S.tab==='dash'&&!UI.ses&&document.querySelector('#nav').innerHTML.trim()!==''),'«العودة إلى اليوم» تخرج من الجلسة وتُظهر الشريط');
-  ok(await E(()=>!!document.querySelector('.sjact [data-a=tkopen]')),'«اليوم» يعرض بطاقة الجلسة الجارية للاستئناف');
-  await click('.sjact [data-a=tkopen]');
+  ok(await E(()=>!!document.querySelector('[data-a=smres]')),'«اليوم» يعرض بطاقة الجلسة الجارية للاستئناف');
+  await click('[data-a=smres]');
   ok(await E(`UI.ses==='${id0}'&&SJ().ss.length===${n0}&&tkOpen().id==='${id0}'`),'الاستئناف يفتح الجلسة نفسها دون نسخة ثانية');}
  await p.waitForTimeout(1200);
  await p.fill('[data-a=rundist]','2.5');await p.dispatchEvent('[data-a=rundist]','change');
@@ -70,7 +70,7 @@ let fail=0,pass=0;const ok=(c,m,x)=>{if(c){pass++;console.log('  ok   '+m)}else{
  await hub();await click('.sjtk[data-v=fn]');await E(()=>{UI.ttab='pl';ACT.fnedit({dataset:{id:'a12'}});UI.fb.n='اثنتا عشرة معدّلة';render()});
  await E(()=>{ACT.fbsave()});ok(await E(()=>SJ().ft.length===1&&SJ().ft[0].ver===2),'تعديل قالب ينشئ نسخة بإصدار أعلى');
  /* الديدلفت منفصل */
- await hub();await click('.sjtk[data-v=iron]');await click('[data-a=trk][data-v=dl]');
+ await hub();await click('.sjtk[data-v=irs]');await click('[data-a=trk][data-v=iron]');await click('[data-a=trk][data-v=dl]');
  const dl=await E(()=>{const o=dlData();return Object.keys(o).map(k=>k+':'+o[k].length).join(',')});ok(/تقليدي:2/.test(dl)&&/سومو:1/.test(dl)&&/روماني:1/.test(dl),'نسخ الديدلفت منفصلة',dl);
  await E(()=>{UI.dlv='تقليدي';render()});ok(await E(()=>/الحد الأقصى المقدّر/.test(document.querySelector('#app').textContent)&&/\(1 \+/.test(document.querySelector('#app').textContent)),'تقدير 1RM مع ذكر الطريقة');
  /* جلستان في يوم */
@@ -81,7 +81,7 @@ let fail=0,pass=0;const ok=(c,m,x)=>{if(c){pass++;console.log('  ok   '+m)}else{
  await E(()=>{render()});ok(await E(()=>/جلسة جارية في/.test(document.querySelector('#app').textContent)),'بطاقة التعارض ظاهرة');
  await E(()=>{const o=tkOpen();tkFinish(o,1);UI.sum=null;UI.tconf=null;render()});
  /* سجل موحّد بفلتر */
- await E(()=>{S.tab='pg';S.sub='';UI.trk='hub';render()});
+ await E(()=>{S.tab='ex';S.sub='pgs';UI.trk='hub';render()});
  ok(await E(()=>!!document.querySelector('#tk-log')),'السجل الموحّد في التقدّم');
  await click('[data-a=tkflt][data-v=iron]');ok(await E(()=>/ديدلفت|يوم أ/.test(document.querySelector('#tk-log').textContent)||tkAllLog('iron').length>0),'فلتر الحديد يعرض جلسات S.sx');
  /* الحديد لم يُمسّ */

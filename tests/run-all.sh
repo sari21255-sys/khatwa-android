@@ -23,5 +23,8 @@ echo "== المسارات الخمسة =="; NODE_PATH="$(npm root -g)" node test
 echo "== الإعدادات والطقس والصلاة والإشعارات =="; NODE_PATH="$(npm root -g)" node tests/ready.e2e.js
 echo "== قبول إغلاق ملاحظات «جهّز تمرينك» =="; NODE_PATH="$(npm root -g)" node tests/ready-accept.e2e.js
 echo "== التنقل الخماسي ==";  NODE_PATH="$(npm root -g)" node tests/nav.e2e.js
+echo "== تمارين الحديد: المقارنة قبل/بعد =="; NODE_PATH="$(npm root -g)" node tests/iron.compare.mjs
+echo "== تمارين الحديد: الأقسام الأربعة =="; NODE_PATH="$(npm root -g)" node tests/iron.e2e.mjs
+echo "== تبسيط الواجهة: زيارات، تنقّل، موقع، خطوات، بلا مؤقت =="; NODE_PATH="$(npm root -g)" node tests/simplify.e2e.js
 if [ -n "${PSQL:-}" ]; then echo "== مزامنة السجلات (جهازان + Postgres) =="; NODE_PATH="$(npm root -g)" node tests/sync.e2e.mjs; echo "== مزامنة الجلسات + 50 دورة عشوائية =="; NODE_PATH="$(npm root -g)" node tests/sync-sx.e2e.mjs; else echo "(تخطي sync.e2e: عيّن PSQL)"; fi
 if [ -n "${PSQL:-}" ]; then echo "== الحسابات ووضع الزائر (6 رحلات + عزل + حذف) =="; NODE_PATH="$(npm root -g)" node tests/accounts.e2e.mjs; else echo "(تخطي accounts.e2e: عيّن PSQL)"; fi

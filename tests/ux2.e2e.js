@@ -8,7 +8,7 @@ const WED=new Date('2026-11-18T10:00:00+03:00'),NEXTSAT=new Date('2026-11-21T10:
 const PLAN=`(()=>{const rest={t:'راحة',ex:[]};return[{t:'صدر',ex:[E('بنش برس',2,8,40),E('تفتيح دمبل',2,10,12)]},rest,{t:'ظهر',ex:[E('سحب علوي',2,10,30)]},rest,{t:'أرجل',ex:[E('سكوات',2,8,60),E('ضغط أرجل',2,12,90)]},rest,rest]})()`;
 async function open(b,time){const ctx=await b.newContext({viewport:{width:390,height:844}});const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));p.errs=errs;
  await p.clock.install({time:time||WED});await p.goto('file://'+file);await p.waitForTimeout(500);await p.clock.resume();
- await p.evaluate(plan=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=30;S.prof.ht=175;S.prof.startW=80;S.prof.dpw=3;S.prof.goalType='lose';S.bw[TD()]=80;S.plan=eval(plan);S.tab='dash';S.sub=null;save();render()},PLAN);return{ctx,p}}
+ await p.evaluate(plan=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=30;S.prof.ht=175;S.prof.startW=80;S.prof.dpw=3;S.prof.goalType='lose';S.bw[TD()]=80;S.plan=eval(plan);S.tab='train';UI.trk='hub';S.sub=null;save();render()},PLAN);return{ctx,p}}
 const txt=p=>p.evaluate(()=>document.body.innerText);
 const click=async(p,sel)=>{await p.evaluate(()=>document.querySelectorAll('details.sjmore').forEach(d=>{d.open=true}));await p.click(sel);await p.waitForTimeout(60)};
 const reload=async p=>{await p.reload();await p.waitForTimeout(500)};
@@ -38,20 +38,20 @@ const logOne=async p=>{await click(p,'[data-a=wkty][data-v=d]');await click(p,'[
   ok(all.length===1&&s.id===id&&s.st==='c','جلسة واحدة فقط، مكتملة، بالمعرّف نفسه');
   ok(s.ex[0].sets[0].ty==='d'&&s.ex[0].sets[0].rp===9&&s.ex[0].sets[0].w===55,'قيم المجموعة الأولى بقيت بعد الاستكمال');
   ok(await p.evaluate(()=>Object.keys(S.done).every(k=>k.split('|')[1]==='4')&&Object.keys(S.done).length===2),'S.done فيه تمارين اليوم فقط (2) ولم تُمسّ الحصص الفائتة');
-  t=await txt(p);ok(await goal(p)==='1/3','الهدف الأسبوعي 1 من 3 بعد إكمال حصة اليوم فقط، مع بقاء حصتين فائتتين');
+  await p.evaluate(()=>{S.tab='train';S.sub=null;UI.trk='hub';render()});await p.waitForTimeout(200);t=await txt(p);ok(await goal(p)==='1/3','الهدف الأسبوعي 1 من 3 بعد إكمال حصة اليوم فقط، مع بقاء حصتين فائتتين');
   ok(/اعرض تمرينك المحفوظ/.test(t)&&/عوّض تمرينًا فائتًا\s*2/.test(t),'اليوم: «اعرض تمرينك المحفوظ» ويبقى زر التعويض');
   ok(p.errs.length===0,'لا أخطاء صفحة',p.errs.join('|'))}
 
  console.log('2) الاستكمال من الأرشيف (اختبار مستقل)');
  {const {p}=await open(b);await click(p,'#sx-go');await logOne(p);const id=(await sxs(p))[0].id;await endWk(p);
   ok(/dash/.test(await p.evaluate(()=>S.tab))&&!await p.evaluate(()=>UI.wk),'«إنهاء» يحفظ ويعود إلى اليوم');
-  await reload(p);await click(p,'#nav [data-a="go"][data-v="pg"]');await click(p,'[data-a="sub"][data-v="arch"]');
+  await reload(p);await click(p,'#nav [data-a="go"][data-v="ex"]');await click(p,'[data-a="sub"][data-v="arch"]');
   ok(/جزئية/.test(await txt(p)),'الجلسة الجزئية في سجل الأرشيف');
   await click(p,'.sxr');ok(/RPE 9/.test(await txt(p))&&/دروب/.test(await txt(p)),'التفاصيل تعرض RPE 9 والنوع دروب');
   await click(p,'#ar-resume');ok(await p.evaluate(i=>UI.wk&&UI.wk.sid===i&&S.sub==='wk',id),'«أكمل التمرين» من الأرشيف يفتح الجلسة نفسها');
   await finish(p);const all=await sxs(p);
   ok(all.length===1&&all[0].id===id&&all[0].st==='c'&&all[0].ex[0].sets[0].rp===9,'جلسة واحدة مكتملة وقيمها باقية');
-  await click(p,'[data-a="go"][data-v="dash"]').catch(()=>{});await p.evaluate(()=>{S.sub=null;S.tab='dash';render()});ok(await goal(p)==='1/3','الهدف 1 من 3')}
+  await click(p,'[data-a="go"][data-v="dash"]').catch(()=>{});await p.evaluate(()=>{S.sub=null;S.tab='train';UI.trk='hub';render()});ok(await goal(p)==='1/3','الهدف 1 من 3')}
 
  console.log('3) التعويض جلسة مستقلة تُحتسب مرة واحدة');
  {const {p}=await open(b);await click(p,'#mk-go');let t=await txt(p);
@@ -61,12 +61,12 @@ const logOne=async p=>{await click(p,'[data-a=wkty][data-v=d]');await click(p,'[
   ok(/تعويض · السبت · صدر/.test(await txt(p)),'عنوان المشغّل «تعويض · السبت · صدر»');
   await finish(p);let all=await sxs(p);
   ok(all.length===1&&all[0].kd==='m'&&all[0].dy===0&&all[0].st==='c','جلسة تعويض واحدة مكتملة (kd=m, dy=0)');
-  await p.evaluate(()=>{S.sub=null;S.tab='dash';render()});t=await txt(p);
+  await p.evaluate(()=>{S.sub=null;S.tab='train';UI.trk='hub';render()});t=await txt(p);
   ok(await goal(p)==='1/3','التعويض يحتسب يومه مرة واحدة: 1 من 3');
   ok(/ابدأ تمرين اليوم/.test(t)&&/عوّض تمرينًا فائتًا\s*1/.test(t),'حصة اليوم ما زالت غير مبدوءة، وبقي تعويض واحد');
   await click(p,'#sx-go');await finish(p);all=await sxs(p);
   ok(all.length===2&&all.filter(x=>x.kd==='t').length===1&&all.filter(x=>x.kd==='m').length===1,'جلستان مستقلتان: اليوم والتعويض');
-  await p.evaluate(()=>{S.sub=null;S.tab='dash';render()});ok(await goal(p)==='2/3','بعد حصة اليوم: 2 من 3');
+  await p.evaluate(()=>{S.sub=null;S.tab='train';UI.trk='hub';render()});ok(await goal(p)==='2/3','بعد حصة اليوم: 2 من 3');
   ok(await p.evaluate(()=>Object.keys(S.done).length===4),'S.done فيه 4 تمارين بلا تكرار')}
 
  console.log('4) جلستان جزئيتان معًا: اليوم وتعويض، كل منهما يُستأنف بمعرّفه');
@@ -78,7 +78,7 @@ const logOne=async p=>{await click(p,'[data-a=wkty][data-v=d]');await click(p,'[
   await endWk(p);await click(p,'#mk-go');
   ok(/أكمل التعويض/.test(await txt(p)),'شاشة التعويض تعرض «أكمل التعويض» للحصة الجزئية');
   await click(p,'.mkc[data-day="2"] [data-a=wkmk]');ok(await p.evaluate(i=>UI.wk.sid===i,B),'تعويض الاثنين يستأنف جلسته (B)');
-  await finish(p);await p.evaluate(()=>{S.sub=null;S.tab='dash';render()});ok(await goal(p)==='1/3','إكمال التعويض يحتسب 1 من 3، وحصة اليوم ما زالت جزئية');
+  await finish(p);await p.evaluate(()=>{S.sub=null;S.tab='train';UI.trk='hub';render()});ok(await goal(p)==='1/3','إكمال التعويض يحتسب 1 من 3، وحصة اليوم ما زالت جزئية');
   ok((await sxs(p)).find(x=>x.id===A).st==='p','جلسة اليوم A بقيت جزئية')}
 
  console.log('5) أسبوع جديد: ما يُستكمل وما يبقى في السجل');
@@ -124,7 +124,7 @@ const logOne=async p=>{await click(p,'[data-a=wkty][data-v=d]');await click(p,'[
   ok(!!await p.$('[data-a="undo"][data-k="'+k+'"]'),'زر «تراجع» القديم ظاهر');
   await click(p,'[data-a="undo"][data-k="'+k+'"]');ok(await p.evaluate(k=>!S.done[k],k),'التراجع القديم يزيل التسجيل');
   ok(await p.evaluate(()=>typeof vPly==='function'&&typeof ACT.prpe==='function'),'الجلسات الجاهزة (vPly) وRPE فيها باقية');
-  await p.evaluate(k=>{mark(k,50,8);save();S.tab='dash';render()},k);
+  await p.evaluate(k=>{mark(k,50,8);save();S.tab='train';UI.trk='hub';render()},k);
   ok(await p.evaluate(()=>Object.keys(S.sx).length===0),'التسجيل القديم لا ينشئ جلسة في S.sx (يظهر في الأرشيف ضمن «سجلات سابقة»)');
   await p.evaluate(()=>{S.sub='arch';UI.ar='ses';render()});ok(/سجلات سابقة|تمارين مسجّلة/.test(await txt(p)),'ويظهر في سجل الأرشيف')}
  await b.close();console.log(`\n${pass} ناجح، ${fail} فاشل`);process.exit(fail?1:0)})();

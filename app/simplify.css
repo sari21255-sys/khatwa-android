@@ -1,0 +1,20 @@
+.smfpw{display:flex;flex-direction:column;align-items:center;gap:14px;margin:22px 0 26px}
+.smfp{width:168px;height:168px;border-radius:50%;border:2px solid var(--sj-line,rgba(255,255,255,.18));background:var(--card);color:var(--sj-tx,#fff);display:grid;place-items:center;cursor:pointer;box-shadow:0 0 0 10px rgba(255,255,255,.04)}
+.smfp svg{width:92px;height:92px}.smfp.out{background:var(--sj-btn,#fff);color:var(--sj-btnt,#000)}
+.smfl{font-size:20px;font-weight:800}
+.smvh{margin:6px 0 8px}.smvh h2{margin:0}
+.smv{border:1px solid var(--bd);border-radius:16px;padding:12px 14px;margin-bottom:8px;background:var(--card)}
+.smvd{font-weight:800;margin-bottom:6px}.smvt{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.smno{color:#ff8a6b}.smva{margin-top:8px;gap:8px}
+.smsum{text-align:center;padding:14px 0}.smsd{font-size:18px;font-weight:700}.smst{font-size:40px;font-weight:800;margin:4px 0}
+.smedit{width:100%;margin-bottom:8px}.smfld{display:grid;gap:10px}.smfld[hidden]{display:none}
+.smgrp{margin-bottom:12px}.smgrp>b{display:block;margin-bottom:4px}
+.smhm{display:flex;flex-direction:column;gap:14px}
+.smhero{position:relative;overflow:hidden;border-radius:24px;padding:26px 20px 22px;background:#000;color:#fff;text-align:center;min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.smhero .smlg svg{width:150px;height:auto;color:#fff}
+.smhero .smart{position:absolute;inset:0;opacity:.35;pointer-events:none}.smhero .smart svg{width:100%;height:100%}
+.smhero .smtx{position:relative;margin:0;max-width:260px;font-size:17px;line-height:1.7;color:#fff}.smhero .smlg{position:relative}
+.smres{width:100%}
+.smsh{margin-top:14px;padding-top:12px;border-top:1px solid var(--bd)}.smsn{display:flex;align-items:baseline;gap:8px;margin:6px 0}.smsn b{font-size:34px}
+.sjhome{background:#000!important;color:#fff!important}
+#nav .pill2 button[data-v=me] span{display:block;width:100%;max-width:100%;white-space:normal;word-break:keep-all;line-height:1.05;text-align:center;font-size:10px;overflow:hidden}

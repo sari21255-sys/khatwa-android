@@ -19,13 +19,13 @@ let fail=0,pass=0;const ok=(c,m,x)=>{if(c){pass++;console.log('  ok   '+m)}else{
  ok(await E(()=>/ضيف/.test(document.querySelector('.sjpc').textContent)&&!!document.querySelector('.sjpc [data-a=sub][data-v=pf]')),w+': بطاقة «ضيف» وزر ملفي الشخصي');
  const gs=await E(()=>[...document.querySelectorAll('.sjgrp>summary b')].map(x=>x.textContent));
  ok(['المظهر واللغة','التدريب والوحدات','الوقت والطقس','مواقيت الصلاة','الإشعارات','تذكير التمرين اليومي','الحساب والمزامنة','البيانات والنسخ والخصوصية'].every(x=>gs.includes(x)),w+': ثماني مجموعات نهائية',gs.join());
- ok(await E(()=>/المدينة المنورة/.test(document.querySelector('.sjgrp[data-g=wx] .v').textContent)),w+': القيمة الحالية بجانب الاسم');
+ ok(await E(()=>/ساعة الجهاز/.test(document.querySelector('.sjgrp[data-g=wx] .v').textContent)),w+': القيمة الحالية بجانب الاسم');
  await click('.sjgrp[data-g=wx]>summary');ok(await E(()=>document.querySelector('.sjgrp[data-g=wx]').open&&UI.sgo.wx===true),w+': فتح القسم وحفظ حالته');
  await E(()=>{render()});ok(await E(()=>document.querySelector('.sjgrp[data-g=wx]').open),w+': حالة الفتح تبقى بعد إعادة الرسم');
  ok(await E(()=>!document.querySelector('#set-old')&&!/إعدادات سابقة/.test(document.body.innerText)),w+': قسم «إعدادات سابقة» أُزيل بعد نقل كل إعداد إلى مكانه');
- /* اختيار مدينة دون إذن موقع */
- await E(()=>{const s=document.querySelector('select[data-rd=city]');s.value='riyadh';s.dispatchEvent(new Event('change',{bubbles:true}))});await p.waitForTimeout(150);
- ok(await E(()=>rdS().city==='riyadh'&&rdCity().n==='الرياض'),w+': ضيف يختار مدينة بلا إذن موقع');
+ /* لا اختيار مدينة يدوي: الموقع من الهاتف فقط */
+ ok(await E(()=>!document.querySelector('select[data-rd=city],[data-tf=cLat],[data-tf=cLon],[data-a=rdcus]')),w+': لا اختيار مدينة يدوي ولا حقول إحداثيات في الإعدادات');
+ ok(await E(()=>!!document.querySelector('.sjgrp[data-g=wx] [data-a=rdgeo]')),w+': زر «استخدم موقعي» في الإعدادات');
  await E(()=>{rdS().city='madinah';rdS().cus=null;SJ().wx=null;save()});
  /* فيض أفقي */
  for(const [nm,fn] of [['set',()=>{S.tab='dash';S.sub='set';render()}],['pf',()=>{S.sub='pf';render()}],['nc',()=>{S.sub='nc';UI.nct='ct';render()}],['nci',()=>{UI.nct='in';render()}],['today',()=>{S.sub=null;S.tab='dash';render()}]]){await E(fn);await p.waitForTimeout(80);ok(await E(()=>document.documentElement.scrollWidth<=innerWidth+1),w+': لا فيض أفقي في '+nm,await E(()=>document.documentElement.scrollWidth))}
@@ -82,7 +82,7 @@ let fail=0,pass=0;const ok=(c,m,x)=>{if(c){pass++;console.log('  ok   '+m)}else{
  /* صلاة: تنبيه مستقل */
  await E(async()=>{rdS().pa.asr=1;await rdNtSync(1)});ok(await E(()=>window.__P.some(x=>x.cat==='prayer'&&/العصر/.test(x.title))),w+': تنبيه صلاة مستقل');
  /* تنبيه تجريبي في الوارد */
- await E(()=>{S.sub='nc';UI.nct='ct';UI.sgo={nhelp:true};render()});await click('[data-a=rdtest]');await E(()=>{UI.nct='in';render()});ok(await E(()=>/إشعار تجريبي/.test([...document.querySelectorAll('.ncr')].map(x=>x.textContent).join())),w+': الإشعار التجريبي يظهر في الوارد');
+ ok(await E(()=>{S.sub='nc';UI.nct='in';render();return !document.querySelector('[data-a=rdtest],[data-a=rdperm],[data-a=rdandset]')}),w+': مركز الإشعارات بلا أزرار تشخيص (تجربة، فحص إذن، إعدادات أندرويد)');
  /* وارد: عنصر حان وقته يُسجَّل مرة واحدة */
  await E(()=>{window.__now=rdAt('2026-11-16',17*60+5,rdCity().tz);S.nf=[];NCT=0;ncGen();ncGen()});const dn=await E(()=>S.nf.filter(x=>/^nt/.test(x.id)&&!/ntest/.test(x.id)).length);ok(dn>=1,w+': التنبيه المستحق يدخل الوارد',dn);
  await E(()=>{NCT=0;ncGen()});ok(await E(()=>new Set(S.nf.map(x=>x.id)).size===S.nf.length),w+': لا تكرار في الوارد');
