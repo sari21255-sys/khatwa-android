@@ -18,20 +18,43 @@ jobs:
         with: { distribution: temurin, java-version: 21 }
       - name: Generated files match the committed ones
         run: python3 tools/build.py --check
-      - name: Install (locked)
+      - name: Install (locked, clean)
         run: |
-          npm ci
-          npm install --save --no-audit --no-fund @capacitor/geolocation@^7   # موقع تقريبي لـ«استخدم موقعي»؛ يُحدَّث package-lock لاحقًا من جهاز متصل
+          npm ci --no-audit --no-fund
           pip install pillow
-      - name: Lock candidate (geolocation) for committing from a connected machine
-        run: cp package-lock.json package-lock.candidate.json
-      - uses: actions/upload-artifact@v4
-        with: { name: package-lock-candidate, path: package-lock.candidate.json, retention-days: 14 }
+      - name: Dependencies are pinned and the lock is in sync
+        run: |
+          node -e "const p=require('./package.json');const v=p.dependencies['@capacitor/geolocation'];if(!/^\d+\.\d+\.\d+\$/.test(v)){console.error('geolocation is not pinned: '+v);process.exit(1)};console.log('geolocation pinned at '+v)"
+          git diff --exit-code -- package.json package-lock.json
+      - name: Accounts config for this build (public URL + public key only)
+        env:
+          SB_URL: ${{ vars.SB_URL }}
+          SB_ANON_KEY: ${{ vars.SB_ANON_KEY }}
+        run: python3 scripts/inject_config.py
       - name: Generate Android project
         run: |
           npx cap add android
           python3 scripts/patch_android.py
           npx cap sync android
+      - name: No secret key inside the app bundle
+        run: |
+          python3 - <<'PY'
+          import os,re,json,base64,sys
+          bad=[]
+          for r,_,fs in os.walk('android/app/src/main/assets/public'):
+              for f in fs:
+                  if not f.endswith(('.js','.html','.json')):continue
+                  t=open(os.path.join(r,f),encoding='utf8',errors='ignore').read()
+                  if 'sb_secret_' in t:bad.append((f,'sb_secret_'))
+                  for j in re.findall(r'eyJ[A-Za-z0-9_-]{8,}\.([A-Za-z0-9_-]{8,})\.[A-Za-z0-9_-]{4,}',t):
+                      try:
+                          role=json.loads(base64.urlsafe_b64decode(j+'='*(-len(j)%4))).get('role')
+                          if role and role!='anon':bad.append((f,'jwt role '+role))
+                      except Exception:pass
+          if bad:
+              print('::error title=secret-scan::'+str(bad));sys.exit(1)
+          print('::notice title=secret-scan::no service_role/secret key in the bundle')
+          PY
       - name: Inspect plugin sources (diagnostic)
         run: |
           { echo "== health manifest"; grep -rniE "uses-permission|queries" node_modules/@capgo/capacitor-health/android/src/main/AndroidManifest.xml || true
