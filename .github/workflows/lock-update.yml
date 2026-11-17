@@ -1,0 +1,35 @@
+name: Lock update (geolocation)
+# يُشغَّل مرة واحدة عند تغيير tools/lock-update.trigger: يثبّت نسخة @capacitor/geolocation المتوافقة مع Capacitor 7
+# في package.json وpackage-lock.json، ويتحقق أن npm ci ينجح من نسخة نظيفة، ثم يلتزم النتيجة على الفرع نفسه.
+on:
+  push:
+    branches: ['ux/**']
+    paths: ['tools/lock-update.trigger']
+permissions:
+  contents: write
+jobs:
+  lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Pin geolocation (exact, Capacitor 7 line)
+        run: |
+          V=$(npm view "@capacitor/geolocation@^7" version | tail -1 | tr -d "'\" ")
+          echo "resolved geolocation: $V"
+          npm install --save-exact --no-audit --no-fund "@capacitor/geolocation@$V"
+          grep -n "geolocation" package.json
+      - name: Prove a clean npm ci works against the new lock
+        run: |
+          rm -rf node_modules
+          npm ci --no-audit --no-fund
+          npm ls @capacitor/core @capacitor/geolocation @capacitor/android
+      - name: Commit lock files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git diff --cached --quiet && { echo "nothing to commit"; exit 0; }
+          git commit -m "build: pin @capacitor/geolocation (Capacitor 7 line) in package.json and package-lock.json"
+          git push origin HEAD:${GITHUB_REF_NAME}

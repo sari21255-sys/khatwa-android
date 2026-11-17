@@ -138,18 +138,29 @@ function fxSignOut(){const p=rsPend(),go=async()=>{RS.hold=1;
  if(!p){go();return}
  const b=document.createElement('div');b.innerHTML='<p style="margin:0 0 6px" id="fx-so-n">لديك <b class="num">'+F(p)+'</b> تعديلًا لم تُزامَن بعد.</p><p class="mu" style="margin:0">إن خرجت الآن حُفظت في مساحة حسابك على هذا الجهاز وعُزلت عن وضع الزائر وعن أي حساب آخر، ولن تُرفع إلا حين تدخل إلى الحساب نفسه.</p>';
  fxSheet('تعديلات تنتظر المزامنة',b,()=>{go();return false},{ok:'خروج رغم ذلك'})}
-/* حذف الحساب: تبقى بيانات الجهاز (كما يعد النص)؛ تصير زائرًا إن كان الزائر فارغًا، وإلا تبقى معزولة وتُعرض للإضافة */
+/* مسح مساحة الحساب الحالي من الجهاز نهائيًا: بيانات الحساب وطابور رفعه ومعلومات مزامنته. مساحة الزائر والحسابات الأخرى لا تُمسّ */
+function fxWipeAccount(note){const m=spMeta();RS.hold=1;clearTimeout(RST);
+ const rm=k=>{try{localStorage.removeItem(k)}catch(e){lg(e)}};
+ spKeys().forEach(rm);spDrop(m.a);
+ const orph=(m.orph||[]).filter(i=>i!==m.a);
+ spRestore('guest');spPut({a:'guest',orph:orph});
+ try{if(note)localStorage.setItem('fit_acct_note',note)}catch(e){lg(e)}
+ try{Storage.prototype.setItem=function(){}}catch(e){lg(e)}   /* بعد الكتابات كلها: لا يعيد أي مؤقت كتابة المساحة قبل إعادة التحميل */
+ location.reload()}
+/* حذف الحساب بعد تأكيده: تُمسح بيانات هذا الحساب من الجهاز ويعود التطبيق إلى مساحة الزائر كما كانت */
 (function(){const D=ACT.adel;ACT.adel=async function(){const was=SB.ses;const r=await D.apply(this,arguments);
- if(was&&!SB.ses&&!fxIsGuest()){const m=spMeta();RS.hold=1;try{save();rsSave()}catch(e){lg(e)}
-  const gh=fxHasData(spRead('guest','fit1')),orph=(m.orph||[]).slice();spStash(m.a);
-  if(!gh){/* الزائر فارغ: بيانات الحساب المحذوف تصير مساحة الزائر المحلية */
-    spRestore(m.a);['fit_sb','fit_rs','fit_rs_off','fit_sync'].forEach(k=>localStorage.removeItem(k));spDrop(m.a);spPut({a:'guest',orph:orph})}
-  else{orph.push(m.a);spRestore('guest');spPut({a:'guest',orph:orph})}
-  location.reload()}return r}})();
+ if(was&&!SB.ses&&!fxIsGuest())fxWipeAccount('del');return r}})();
+/* حساب حُذف من جهاز آخر: الخادم يرفض أي رفع منه (الجلسة تسقط مع المستخدم). هنا نتأكد ثم نمسح مساحته ونلغي طابور رفعه */
+async function fxAcctGone(){if(!SB.ses||fxIsGuest())return false;
+ try{const r=await fetch(CFG.sbUrl+'/auth/v1/user',{headers:SB.hd(1)});if(r.status===404)return true;
+  if(r.status===401||r.status===403){let m='';try{const j=await r.json();m=String(j.msg||j.message||j.error_description||j.error_code||'')}catch(e){lg(e)}
+   return /user_not_found|sub claim in JWT does not exist/i.test(m)}}catch(e){lg(e)}return false}
+(function(){const R=rsSync;let busy=0;rsSync=async function(){const o=await R.apply(this,arguments);
+ if(o==='err'&&RS.err==='auth'&&!busy&&!fxIsGuest()){busy=1;try{if(await fxAcctGone())fxWipeAccount('gone')}catch(e){lg(e)}finally{busy=0}}return o}})();
 /* مسح بيانات هذا الجهاز: يخص المساحة الحالية فقط */
 ACT.rswipe=async function(){RS.hold=1;try{await Promise.race([SB.out(),new Promise(r=>setTimeout(r,3000))])}catch(e){lg(e)}
- const m=spMeta();spKeys().forEach(k=>{try{localStorage.removeItem(k)}catch(e){lg(e)}});
- if(m.a!=='guest'){spDrop(m.a);spRestore('guest');spPut({a:'guest',orph:m.orph})}location.reload();return false};
+ const m=spMeta();if(m.a==='guest'){spKeys().forEach(k=>{try{localStorage.removeItem(k)}catch(e){lg(e)}});location.reload();return false}
+ fxWipeAccount();return false};
 /* ---- بطاقة «الحساب» داخل الملف الشخصي ---- */
 function fxAccCard(){const m=spMeta();let orph='';
  if(fxIsGuest()){(m.orph||[]).forEach((id,i)=>{if(fxHasData(spRead(id,'fit1')))orph+='<div class="note" style="margin:8px 0">بقيت على الجهاز بيانات حساب محذوف معزولة عن الزائر.</div><button class="btn sm ghost" data-a="fxorph" data-v="'+i+'">أضفها إلى وضع الزائر</button> '});
@@ -200,4 +211,8 @@ Object.assign(ENT,{
 'احتفظ بنسخة الزائر':'Keep the guest copy','احذف المنقول من الزائر':'Delete transferred data from guest','قرّر بشأن بيانات الزائر':'Decide about guest data','سجّل الدخول من جديد':'Sign in again',
 'جارٍ استعادة بياناتك…':'Restoring your data…','ابدأ إعدادًا جديدًا':'Start a fresh setup','أعد المحاولة':'Try again','تعذّرت الاستعادة':'Restore failed',
 'ينتظر المزامنة':'Waiting to sync','تمت المزامنة':'Synced','تسجيل الدخول أو إنشاء حساب':'Sign in or create account','أضفها إلى وضع الزائر':'Add it to guest mode',
-'العودة إلى اليوم':'Back to Today'});
+'العودة إلى اليوم':'Back to Today',
+'حُذف حسابك ومُسحت بياناته من هذا الجهاز':'Your account was deleted and its data was removed from this device','حُذف هذا الحساب من جهاز آخر فمُسحت بياناته من هذا الجهاز':'This account was deleted on another device, so its data was removed from this device','سيُحذف حسابك ومنشوراتك وتعليقاتك وبيانات مزامنته نهائيًا، وتُمسح بيانات هذا الحساب من هذا الجهاز أيضًا (وما لم يُرفع منها). وضع الزائر والحسابات الأخرى على الجهاز لا تتأثر.':'Your account, posts, comments and sync data will be deleted permanently, and this account’s data is removed from this device too (including anything not yet uploaded). Guest mode and other accounts on the device are not affected.'});
+
+/* إشعار بعد مسح حساب محذوف من الجهاز */
+setTimeout(()=>{try{const n=localStorage.getItem('fit_acct_note');if(n){localStorage.removeItem('fit_acct_note');toast(n==='del'?'حُذف حسابك ومُسحت بياناته من هذا الجهاز':'حُذف هذا الحساب من جهاز آخر فمُسحت بياناته من هذا الجهاز')}}catch(e){lg(e)}},900);

@@ -17,7 +17,8 @@ const A='http://127.0.0.1:8795';const b=await chromium.launch();
 const SEED=`S.prof.ob=1;S.prof.name='اختبار';S.prof.sex='m';S.prof.age=30;S.prof.ht=178;S.prof.startW=85;S.prof.goalType='lose';S.prof.lvl='b';S.prof.eq='gym';S.prof.dpw=7;calcTargets();genPlan();save();`;
 const ready=p=>p.waitForFunction(()=>typeof S!=='undefined'&&typeof rsSync==='function'&&typeof fxAuth==='function');
 async function open(ctx){const p=await ctx.newPage();p.ctx=ctx;p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));await p.goto(A+'/');await ready(p);await p.waitForTimeout(250);return p}
-async function dev(){const ctx=await b.newContext({viewport:{width:390,height:844},timezoneId:'Asia/Riyadh'});const p=await open(ctx);p.ctx=ctx;return p}
+async function dev(){const ctx=await b.newContext({viewport:{width:390,height:844},timezoneId:'Asia/Riyadh'});await ctx.clock.install({time:new Date('2026-11-16T10:00:00+03:00')});   /* يوم تمرين ثابت: الاختبار لا يتغيّر بيوم الراحة */
+  const p=await open(ctx);p.ctx=ctx;return p}
 const reload=async p=>{await p.reload();await ready(p);await p.waitForTimeout(300)};
 const nav=async(p,act)=>{await Promise.all([p.waitForEvent('load'),act()]);await ready(p);await p.waitForTimeout(350)};
 const idle=p=>p.evaluate(async()=>{for(let i=0;i<150&&RS.busy;i++)await new Promise(r=>setTimeout(r,100))});
@@ -165,14 +166,40 @@ try{
   await ctx2.addInitScript(([o,s])=>{if(!sessionStorage.getItem('fx_seeded')){localStorage.setItem('fit1',o);localStorage.setItem('fit_sb',s);sessionStorage.setItem('fx_seeded','1')}},[old,s6]);
   const p2=await open(ctx2);const r2=await p2.evaluate(()=>({n:S.prof.name,bw:S.bw['2026-08-01'],sp:spMeta().a,em:SB.email(),ses:!!SB.ses}));const u6=await uidDb(E6);
   rec('J6b','ترقية مستخدم مسجّل: يبقى مسجّلًا في مساحة حسابه نفسها بكل بياناته (لا يصير زائرًا ولا يفقد شيئًا)',r2.n==='قديم'&&r2.bw===88&&r2.sp==='u_'+u6&&r2.ses,JSON.stringify(r2));await ctx2.close()}
- /* ===== حذف الحساب: يبقى المسار ويُمنع الرفع من جهاز قديم ===== */
- {const E7=email('j7');await mkAccount(E7);const d1=await dev(),d2=await dev();
-  for(const d of [d1,d2]){await d.evaluate(e=>SB.in(e,'password123'),E7);await nav(d,()=>d.evaluate(()=>fxAfterAuth()))}
-  await d1.evaluate(()=>{S.prof.ob=1;S.bw['2026-07-01']=80;save()});await sync(d1);await d2.evaluate(()=>{S.prof.ob=1;save()});await sync(d2);
-  const u7=await uidDb(E7);
-  await d1.evaluate(async()=>{await SB.q('rpc/delete_my_account','POST',{})});
-  await d2.evaluate(()=>{S.bw['2026-07-05']=79;save()});const o=await sync(d2).catch(()=>'x');await d2.waitForTimeout(300);
-  const left=+dbq(`select count(*) from public.sync_records where user_id='${u7}'`);
-  rec('J7','بعد حذف الحساب لا يستطيع جهاز قديم إعادة رفع البيانات المحذوفة',left===0&&o!=='ok',`out=${o} left=${left}`);await d1.ctx.close();await d2.ctx.close()}
+ /* ===== حذف الحساب (البند 2): مسح مساحة الحساب فقط، وإلغاء طابور رفعه، وجهاز آخر بلا اتصال لا يعيد الرفع ===== */
+ {const E7=email('j7'),EK=email('k7'),EG=email('g7');await mkAccount(E7);await mkAccount(EK);await mkAccount(EG);
+  /* أ) جهاز X: زائر له بيانات ← الحساب K (يبقى معزولًا بعد الخروج) ← الحساب G ثم يحذف G */
+  {const d=await dev();await d.evaluate(SEED);await d.evaluate(()=>{S.bw['2026-09-01']=111;save()});
+   const login=async em=>{await ui(d,'in',em,'password123');await nav(d,()=>d.click('#fxa-go'));await d.waitForTimeout(500);if(await d.$('#fx-sheet [data-fxleave]'))await d.click('#fx-sheet [data-fxleave]');await d.waitForTimeout(300)};
+   await login(EK);await d.evaluate(()=>{S.prof.ob=1;S.bw['2026-09-02']=222;save()});await sync(d);
+   await nav(d,()=>d.evaluate(()=>fxSignOut()));
+   await login(EG);await d.evaluate(()=>{S.prof.ob=1;S.bw['2026-09-03']=333;save()});await sync(d);
+   await d.ctx.route('http://127.0.0.1:8796/**',r=>r.abort());await d.evaluate(()=>{S.bw['2026-09-04']=444;save();rsMark();rsSave()});
+   const pend=await d.evaluate(()=>rsPend());await d.ctx.unroute('http://127.0.0.1:8796/**');
+   const UG=await uidDb(EG),before=await nRec(UG);
+   await nav(d,()=>d.evaluate(()=>ACT.adel()));
+   const after=await d.evaluate(([g,k])=>({sp:spMeta().a,ses:!!SB.ses,s1:S.bw['2026-09-01'],s3:S.bw['2026-09-03'],s4:S.bw['2026-09-04'],pend:(rsMark(),rsPend()),
+     keys:Object.keys(localStorage).filter(x=>x.indexOf('fit_sp_'+g)===0).length,kk:!!localStorage.getItem('fit_sp_'+k+'_fit1'),kb:(JSON.parse(localStorage.getItem('fit_sp_'+k+'_fit1')||'{}').bw||{})['2026-09-02'],tok:localStorage.getItem('fit_sb'),rs:(JSON.parse(localStorage.getItem('fit_rs')||'{}').uid||'')}),['u_'+UG,'u_'+(await uidDb(EK))]);
+   rec('J7a','بعد تأكيد حذف الحساب: تُمسح مساحة الحساب (بياناته وطابور رفعه ومعلومات مزامنته وجلسته) ويعود الجهاز إلى الزائر',after.sp==='guest'&&!after.ses&&after.s3===undefined&&after.s4===undefined&&after.keys===0&&!after.tok&&!after.rs&&pend>=1,JSON.stringify({after,pend}));
+   rec('J7b','بيانات الزائر والحساب الآخر على الجهاز تبقى سليمة',after.s1===111&&after.kk&&after.kb===222,JSON.stringify(after));
+   rec('J7c','حذف الحساب أزال سجلاته من الخادم ولم يُرفع منه شيء بعده',before>=1&&await nRec(UG)===0,'before='+before);
+   await d.waitForTimeout(1500);rec('J7d','لا طلبات مزامنة بعد المسح (الرفع المعلّق أُلغي)',await nRec(UG)===0,'');
+   await d.ctx.close()}
+  /* ب) جهاز ثانٍ بلا اتصال عند الحذف وعليه تعديلات معلّقة؛ بعد عودة الاتصال لا يعيد رفع شيء ويمسح مساحة الحساب */
+  {const d1=await dev(),d2=await dev();
+   for(const d of [d1,d2]){await d.evaluate(e=>SB.in(e,'password123'),E7);await nav(d,()=>d.evaluate(()=>fxAfterAuth()))}
+   await d1.evaluate(()=>{S.prof.ob=1;S.bw['2026-07-01']=80;save()});await sync(d1);await d2.evaluate(()=>{S.prof.ob=1;save()});await sync(d2);
+   const u7=await uidDb(E7);
+   await d2.ctx.route('http://127.0.0.1:8796/**',r=>r.abort());await d2.evaluate(()=>{S.bw['2026-07-05']=79;S.bw['2026-07-06']=78;save();rsMark();rsSave()});
+   const p2=await d2.evaluate(()=>rsPend());
+   await nav(d1,()=>d1.evaluate(()=>ACT.adel()));
+   rec('J7e','الجهاز الآخر بلا اتصال: تعديلاته معلّقة ومحفوظة محليًا ولا شيء رُفع',p2>=2&&await nRec(u7)===0,'pend='+p2);
+   await d2.ctx.unroute('http://127.0.0.1:8796/**');
+   await Promise.all([d2.waitForEvent('load',{timeout:15000}).catch(()=>null),d2.evaluate(()=>rsSync())]);await ready(d2);await d2.waitForTimeout(600);
+   const o=await d2.evaluate(()=>({sp:spMeta().a,ses:!!SB.ses,s5:S.bw['2026-07-05'],pend:(rsMark(),rsPend()),tok:localStorage.getItem('fit_sb'),rs:(JSON.parse(localStorage.getItem('fit_rs')||'{}').uid||''),note:localStorage.getItem('fit_acct_note')}));
+   rec('J7f','عند عودة الاتصال: الخادم يرفض الرفع، والجهاز يتحقق من حذف الحساب فيمسح مساحته ويعود زائرًا بلا طابور',o.sp==='guest'&&!o.ses&&o.s5===undefined&&!o.tok&&!o.rs,JSON.stringify(o));
+   rec('J7g','لا يعود أي سجل للحساب المحذوف إلى الخادم بعد ذلك',await nRec(u7)===0&&+dbq(`select count(*) from public.sync_meta where user_id='${u7}'`)===0,'left='+await nRec(u7));
+   await d1.ctx.close();await d2.ctx.close()}
+ }
 }catch(e){fails++;console.log('FAIL EXCEPTION',e.stack||e)}
 await b.close();st.close();sb.close();console.log(fails?`\n${fails} FAIL`:'\nall PASS');process.exit(fails?1:0)

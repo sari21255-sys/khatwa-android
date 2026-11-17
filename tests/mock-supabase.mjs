@@ -19,10 +19,11 @@ export function startMock(port){
   if(p==='/auth/v1/signup'){const em=String(b.email||'').toLowerCase();if(users.has(em))return J({msg:'User already registered'},400);const id=crypto.randomUUID();dbq(`insert into auth.users(id) values('${id}')`);const us={id,email:em,pw:b.password,ok:!confirmMode};users.set(em,us);if(confirmMode){sent.push({t:'signup',email:em,rd:u.searchParams.get('redirect_to')});return J({id,email:em,confirmation_sent_at:new Date().toISOString()})}return J(newSession(us))}
   if(p==='/auth/v1/token'){const g=u.searchParams.get('grant_type');
    if(g==='password'){const us=users.get(String(b.email||'').toLowerCase());if(!us||us.pw!==b.password)return J({msg:'Invalid login credentials'},400);if(us.ok===false)return J({msg:'Email not confirmed'},400);return J(newSession(us))}
-   if(g==='refresh_token'){const r=refs.get(b.refresh_token);if(!r)return J({msg:'Invalid Refresh Token'},400);const ex=dbq(`select count(*) from auth.sessions where id='${r.sid}'`);if(ex==='0')return J({msg:'Invalid Refresh Token: Session Expired'},400);return J(issue({id:r.uid,email:[...users.values()].find(x=>x.id===r.uid)?.email},r.sid))}}
+   if(g==='refresh_token'){const r=refs.get(b.refresh_token);if(!r)return J({msg:'Invalid Refresh Token'},400);const ex=dbq(`select count(*) from auth.sessions where id='${r.sid}'`);if(ex==='0')return J({msg:'Invalid Refresh Token: Session Expired'},400);const ru=[...users.values()].find(x=>x.id===r.uid);if(!ru)return J({msg:'Invalid Refresh Token: Refresh Token Not Found'},400);return J(issue({id:r.uid,email:ru.email},r.sid))}}
   if(p==='/auth/v1/recover'){sent.push({t:'recover',email:String(b.email||'').toLowerCase(),rd:u.searchParams.get('redirect_to')});return J({})}
   if(p==='/auth/v1/resend'){sent.push({t:'resend',email:String(b.email||'').toLowerCase(),rd:u.searchParams.get('redirect_to')});return J({})}
   if(p==='/auth/v1/user'){const t=toks.get((q.headers.authorization||'').slice(7));if(!t)return J({msg:'invalid JWT'},401);const us=[...users.values()].find(x=>x.id===t.uid);
+   if(!us)return J({code:403,error_code:'user_not_found',msg:'User from sub claim in JWT does not exist'},403);
    if(q.method==='PUT'){if(b.password){if(String(b.password).length<6)return J({msg:'Password should be at least 6 characters'},422);us.pw=b.password}return J({id:us.id,email:us.email})}
    return J({id:us.id,email:us.email,email_confirmed_at:us.ok===false?null:'2026-01-01T00:00:00Z'})}
   if(p==='/auth/v1/logout'){const t=toks.get((q.headers.authorization||'').slice(7));if(t)dbq(`delete from auth.sessions where id='${t.sid}'`);return J({})}
@@ -35,6 +36,7 @@ export function startMock(port){
    const r=sh(sql);
    if(r.status){const m=(r.stderr.match(/ERROR:\s+(.*)/)||[])[1]||'error';return J({message:m},/session revoked|not signed in|permission denied/.test(m)?403:400)}
    const out=r.stdout.trim().split('\n').filter(Boolean).pop()||'null';
+   if(fn==='delete_my_account')for(const [k,v] of [...users])if(v.id===t.uid)users.delete(k);   /* كما يفعل Supabase: المستخدم يزول فيرفض /user الرمز */
    try{return J(JSON.parse(out==='t'?'true':out==='f'?'false':out))}catch(e){return res.writeHead(200,H),res.end('null')}}
   J({message:'not found'},404)}catch(e){res.writeHead(500,{'content-type':'application/json'});res.end(JSON.stringify({message:String(e.message||e).slice(0,300)}))}})});
  const link=(email,type)=>{const us=users.get(email.toLowerCase());const s=newSession(us);return 'access_token='+s.access_token+'&refresh_token='+s.refresh_token+'&expires_in=3600&expires_at='+s.expires_at+'&token_type=bearer&type='+type};
