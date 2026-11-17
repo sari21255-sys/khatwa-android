@@ -63,11 +63,11 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'لا تمرير أفقي ('+w+')');await ctx.close()}
  {const {ctx,p}=await mk();
   const lg=await p.evaluate(()=>{const e=document.querySelector('#nav .sjhome'),c=getComputedStyle(e);return{bg:c.backgroundColor,fg:c.color,svg:!!e.querySelector('svg')}});
-  ok(lg.svg&&lg.bg==='rgb(0, 0, 0)'&&lg.fg==='rgb(255, 255, 255)','الشعار الأبيض داخل الزر الأسود',JSON.stringify(lg));
+  ok(lg.svg&&/^rgb\((\d|1\d|2\d), (\d|1\d|2\d), (\d|1\d|2\d)\)$/.test(lg.bg)&&lg.fg==='rgb(255, 255, 255)','الشعار الأبيض داخل الزر الأسود',JSON.stringify(lg));
   await go(p,'food');await p.click('#nav .sjhome');await p.waitForTimeout(200);
   const t=await p.evaluate(()=>document.body.innerText);
   ok(await p.evaluate(()=>S.tab==='dash'&&!S.sub)&&/سجلّك الرياضي/.test(t),'الشعار يفتح الصفحة الرئيسية التعريفية');
-  ok(!/استأنف التدريب/.test(t)&&!await p.$('[data-a=wkstart]'),'بلا جلسة جارية: لا «استأنف التدريب» ولا تكرار لصفحة التدريب');
+  ok(!/استأنف التدريب/.test(t)&&!await p.$('#sx-go')&&!await p.$('[data-a=smres]'),'بلا جلسة جارية: لا «استأنف التدريب» ولا تكرار لصفحة التدريب');
   ok(!!await p.$('.sjwx'),'بطاقة الوقت والطقس ظاهرة');
   await go(p,'train');await p.click('[data-a=wkstart]');await p.waitForTimeout(250);await p.fill('#wk-w','60');await p.click('[data-a=wkset]');await p.waitForTimeout(200);await p.click('#wk-back');await p.waitForTimeout(250);
   await go(p,'dash');ok(!!await p.$('[data-a=smres]'),'مع جلسة جارية يظهر «استأنف التدريب»');

@@ -7320,6 +7320,8 @@ vVis=function(){const L=smVL().slice().sort((a,b)=>smVTs(b)-smVTs(a)),op=smOpen(
 
 /* ---------- 2) منبّه الغياب في الإشعارات، والتنبيه يصل المركز ---------- */
 (()=>{const N=gyNotify;gyNotify=function(t,b){try{if(!Array.isArray(S.nf))S.nf=[];S.nf.push({id:'gy'+Date.now().toString(36),ty:'workout',t:t,b:b||'',ts:Date.now(),r:0});if(S.nf.length>200)S.nf=S.nf.slice(-200);save()}catch(e){}return N.apply(this,arguments)}})();
+/* منبّه الغياب مستقل عن مفتاح تذكيرات النادي العام */
+(()=>{const R0=remTick;remTick=function(){const r=gy().rem;if(r&&!r.on&&r.away&&r.away.on){const it=r.items;r.on=1;r.items=[];try{return R0.apply(this,arguments)}finally{r.on=0;r.items=it}}return R0.apply(this,arguments)}})();
 function smAway(){const a=gy().rem.away,ad=awayDays();
  return '<div class="card" id="sm-away"><h2>'+ic('moon')+'منبّه الغياب</h2><div class="row"><span class="mu" style="flex:1">يرسل لك تنبيهًا إذا مرّت أيام بلا تمرين أو زيارة للنادي. يصلك داخل مركز الإشعارات.</span><button class="chip'+(a.on?' on':'')+'" data-a="raway">'+(a.on?'يعمل':'متوقف')+'</button></div>'
   +(a.on?'<div class="row" style="margin-top:10px;flex-wrap:nowrap"><label class="f" style="flex:1">بعد كم يوم غياب<select data-gyr="away:days">'+[2,3,4,5,7].map(n=>'<option value="'+n+'"'+(a.days===n?' selected':'')+'>'+n+' أيام</option>').join('')+'</select></label><label class="f" style="flex:1">وقت التنبيه<input type="time" data-gyr="away:t" value="'+esc(a.t)+'"></label></div><label class="f" style="margin-top:8px">نص التنبيه<input type="text" data-gyr="away:msg" value="'+esc(a.msg||'')+'" placeholder="اشتقنا لك، جلسة قصيرة اليوم تكفي"></label>'+(ad!=null?'<div class="mu" style="margin-top:8px;font-size:13px">آخر نشاط مسجّل قبل '+F(ad)+' يوم.</div>':''):'')+'</div>'}
@@ -7371,7 +7373,7 @@ ACT.rdgeo=()=>{const tk=++SMGEO,s=rdS();s.geoBusy=1;
   if(tk!==SMGEO)return;
   if(!ok){s.geoBusy=0;s.geoDeny=1;save();render();toast('لم يُمنح إذن الموقع، فتظهر ساعة جهازك فقط. اضغط «استخدم موقعي» لتحاول مجددًا، أو فعّل الإذن من إعدادات الجهاز.');return}
   try{const p=await smPos();if(tk!==SMGEO)return;s.geoBusy=0;smApplyLoc(p[0],p[1],false);toast('حُدّث الوقت والطقس من موقعك')}
-  catch(e){s.geoBusy=0;s.geoFail=1;save();render();toast('تعذّر تحديد موقعك الآن. تأكد من تشغيل الموقع في جهازك وحاول مجددًا.')}})();return false};
+  catch(e){s.geoBusy=0;if(e&&(e.code===1||/denied/i.test(String(e.message||''))))s.geoDeny=1;else s.geoFail=1;save();render();if(s.geoDeny){toast('لم يُمنح إذن الموقع، فتظهر ساعة جهازك فقط. اضغط «استخدم موقعي» لتحاول مجددًا، أو فعّل الإذن من إعدادات الجهاز.');return}toast('تعذّر تحديد موقعك الآن. تأكد من تشغيل الموقع في جهازك وحاول مجددًا.')}})();return false};
 ACT.rdgeoclr=()=>{const s=rdS();s.cus=null;s.geo=0;s.geoDeny=0;UI._rdf=undefined};
 /* تحديث صامت عند الفتح والعودة وكل فترة: لا يطلب إذنًا */
 let SMLOCT=0;
