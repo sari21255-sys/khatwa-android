@@ -93,7 +93,7 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   ok(/منبّه الغياب/.test(t),'الترس ← الإشعارات ← منبّه الغياب');
   ok(!/فحص الإذن|إعدادات Android|إعدادات أندرويد|حالة الجدولة|الإضافة البرمجية|إرسال إشعار تجريبي|كل جهاز وله طريقته|كل جهاز وطريقته/.test(t),'لا عبارات تشخيصية في الإعدادات');
   /* منبّه الغياب ينبّه ويصل المركز */
-  await p.evaluate(()=>{const a=gy().rem.away;a.on=1;a.days=2;a.t='00:00';gy().rem.fired={};gy().vis=[];S.done={};S.sx={};S.cd={};remTick()});await p.waitForTimeout(150);
+  await p.evaluate(()=>{const a=gy().rem.away;a.on=1;a.days=2;a.t='00:00';gy().rem.fired={};gy().vis=[{id:'old1',d:'2026-11-10',t:'10:00',m:30,c:''}];S.done={};S.sx={};S.cd={};remTick()});await p.waitForTimeout(150);
   const nf=await p.evaluate(()=>(S.nf||[]).filter(x=>/اشتقنا/.test(x.t)).length);ok(nf>=1,'تنبيه الغياب يظهر في مركز الإشعارات عند صدوره',String(nf));
   await go(p,'ex','vis');t=await p.evaluate(()=>document.body.innerText);ok(!/منبه|الغياب/.test(t),'صفحة النادي بلا مفاتيح ولا بطاقات منبّه الغياب');
   await go(p,'ex','gyms');t=await p.evaluate(()=>document.body.innerText);ok(!await p.$('[data-v=rem]'),'صفحة الأندية بلا رابط للمنبّه');
