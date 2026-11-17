@@ -5,7 +5,7 @@ const file=path.resolve(process.argv[2]||path.join(__dirname,'../www/index.html'
 let fail=0;const ok=(c,m,x)=>{if(c)console.log('  ok   '+m);else{fail++;console.log('  FAIL '+m+(x?'  ['+x+']':''))}};
 const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=30;S.prof.ht=178;S.prof.startW=85;S.prof.goalType='lose';S.prof.lvl='b';S.prof.eq='gym';S.prof.dpw=7;S.bw[TD()]=85;calcTargets();genPlan();save()};
 (async()=>{const b=await chromium.launch();
- const mk=async(w,lang)=>{const ctx=await b.newContext({viewport:{width:w||390,height:844},timezoneId:'Asia/Riyadh'});const p=await ctx.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));await p.goto('file://'+file);await p.waitForTimeout(400);await p.evaluate(seed);if(lang==='en'){await p.evaluate(()=>{document.body.classList.add('en1')})}await p.evaluate(()=>render());await p.waitForTimeout(150);return{ctx,p}};
+ const mk=async(w,lang)=>{const ctx=await b.newContext({viewport:{width:w||390,height:844},timezoneId:'Asia/Riyadh'});await ctx.clock.install({time:new Date('2026-11-16T10:00:00+03:00')});const p=await ctx.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));await p.goto('file://'+file);await p.waitForTimeout(400);await p.evaluate(seed);if(lang==='en'){await p.evaluate(()=>{document.body.classList.add('en1')})}await p.evaluate(()=>render());await p.waitForTimeout(150);return{ctx,p}};
  console.log('1) التنقّل');
  for(const w of [320,390]){const {ctx,p}=await mk(w);
   const xs=await p.$$eval('#nav [data-a]',a=>a.map(x=>({v:x.dataset.v,x:Math.round(x.getBoundingClientRect().left)})));

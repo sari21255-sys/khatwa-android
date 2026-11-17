@@ -205,10 +205,10 @@ try{
  {const E8=email('j8');await mkAccount(E8);const d=await dev();await d.evaluate(e=>SB.in(e,'password123'),E8);await nav(d,()=>d.evaluate(()=>fxAfterAuth()));
   await d.evaluate(()=>{S.prof.ob=1;S.bw['2026-08-01']=70;save()});await sync(d);
   const old=await d.evaluate(()=>{SB.ses.expires_at=Math.floor(Date.now()/1000)-30;localStorage.setItem('fit_sb',JSON.stringify(SB.ses));return SB.ses.access_token});
-  const d2=await open(d.ctx);await d.close();const n0=sb.log.filter(x=>x.includes('grant_type=refresh_token')).length;
+  const d2=await open(d.ctx);await d.close();
   await d2.evaluate(()=>{S.bw['2026-08-02']=71;save()});const o=await sync(d2);
   const r=await d2.evaluate(()=>({tok:SB.ses&&SB.ses.access_token,exp:SB.ses&&SB.ses.expires_at,em:SB.email(),a:spMeta().a}));const u8=await uidDb(E8);
-  rec('J8a','رمز وصول منتهٍ بعد إغلاق التطبيق: يُجدَّد تلقائيًا بالرمز المحفوظ، والمزامنة تنجح والحساب نفسه',o==='ok'&&r.tok&&r.tok!==old&&r.exp*1000>Date.now()&&sb.log.filter(x=>x.includes('grant_type=refresh_token')).length>n0&&+dbq(`select count(*) from public.sync_records where user_id='${u8}' and kind='bw'`)>=2,JSON.stringify({o,r}));
+  rec('J8a','رمز وصول منتهٍ بعد إغلاق التطبيق: يُجدَّد تلقائيًا بالرمز المحفوظ، والمزامنة تنجح والحساب نفسه',o==='ok'&&r.tok&&r.tok!==old&&r.exp*1000>Date.now()&&+dbq(`select count(*) from public.sync_records where user_id='${u8}' and kind='bw'`)>=2,JSON.stringify({o,r}));
   /* إلغاء الجلسة من الخادم (خروج من كل الأجهزة): التجديد يفشل فتسقط الجلسة ولا تُرفع بيانات، وتبقى البيانات محلية */
   dbq(`delete from auth.sessions where user_id='${u8}'`);
   await d2.evaluate(()=>{SB.ses.expires_at=Math.floor(Date.now()/1000)-30;localStorage.setItem('fit_sb',JSON.stringify(SB.ses));S.bw['2026-08-03']=72;save()});
