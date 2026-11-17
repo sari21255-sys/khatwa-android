@@ -17,7 +17,9 @@ const st=http.createServer((q,res)=>{let f=q.url.split('?')[0];if(f==='/')f='/in
  const p=path.join(WWW,f);if(!p.startsWith(WWW)||!fs.existsSync(p)||fs.statSync(p).isDirectory()){res.writeHead(404);return res.end()}res.writeHead(200,{'content-type':MIME[path.extname(p)]||'application/octet-stream'});res.end(fs.readFileSync(p))}).listen(8790);
 let cfgMode='full';const A='http://127.0.0.1:8790';const b=await chromium.launch();
 const SEEDJS=`S.plan=eval(`+JSON.stringify('(()=>{const d=()=>({t:"يوم",ex:[E("بنش",3,8,40),E("سحب",3,10,30)]});return[0,1,2,3,4,5,6].map(d)})()')+`);S.prof.ob=1;S.prof.name='اختبار';S.prof.sex='m';S.prof.age=30;S.prof.ht=178;S.prof.startW=85;S.prof.goalType='lose';calcTargets();genPlan();save();`;
-async function device(){const c=await b.newContext({viewport:{width:390,height:844}});const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));await p.goto(A+'/');await p.waitForFunction(()=>typeof S!=='undefined'&&typeof rsSync==='function');p.errs=errs;p.ctx=c;return p}
+/* الإزاحة نفسها لكل الأجهزة (فلا يختل ترتيب الأحدث-يفوز) والغاية يوم تمرين لا يوم راحة */
+const SHIFT=((new Date().getUTCDay()+6)%7)*86400000;
+async function device(){const c=await b.newContext({viewport:{width:390,height:844}});await c.clock.install({time:new Date(Date.now()-SHIFT)});const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));await p.goto(A+'/');await p.waitForFunction(()=>typeof S!=='undefined'&&typeof rsSync==='function');p.errs=errs;p.ctx=c;return p}
 const email=n=>`u${Date.now()}${n}@test.invalid`;
 const edit=async(p,js)=>{await p.evaluate(js+';save();0');await p.waitForTimeout(300)};
 /* ينتظر انتهاء أي مزامنة جارية (مثل مزامنة الإقلاع بعد إعادة التحميل) قبل أن يشغّل مزامنته، وإلا ردّ rsSync بـ«busy» دون عمل */
