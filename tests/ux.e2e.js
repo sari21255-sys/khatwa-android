@@ -10,9 +10,9 @@ async function ctxOf(b,w,init){const ctx=await b.newContext({viewport:{width:w||
  const errs=[];p.on('pageerror',e=>errs.push(e.message));p.errs=errs;await p.clock.install({time:NOW});
  if(init)await ctx.addInitScript(init);await p.goto('file://'+file);await p.waitForTimeout(600);await p.clock.resume();return{ctx,p}}
 const setup=p=>p.evaluate(plan=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=30;S.prof.ht=175;S.prof.startW=80;S.prof.dpw=3;S.prof.goalType='lose';S.bw[TD()]=80;S.plan=eval(plan);S.tab='train';UI.trk='hub';S.sub=null;save();render()},PLAN);
-const txt=p=>p.evaluate(()=>document.body.innerText);
+const txt=p=>p.evaluate(()=>{if(S.tab==='dash'&&!S.sub){S.tab='train';UI.trk='hub';render()}return document.body.innerText});
 const endWk=async p=>{await p.evaluate(()=>document.querySelectorAll('details.sjmore').forEach(d=>{d.open=true}));await p.click('[data-a="wkend"]');await p.waitForTimeout(150);if(await p.$('#fx-sheet [data-fxs]')){await p.click('#fx-sheet [data-fxs]');await p.waitForTimeout(250)}};
-const click=async(p,sel)=>{await p.evaluate(()=>document.querySelectorAll('details.sjmore').forEach(d=>{d.open=true}));await p.click(sel);await p.waitForTimeout(60)};
+const click=async(p,sel)=>{if(/^(#sx-go|#mk-go|\[data-a="?wkstart"?\])$/.test(sel))await p.evaluate(()=>{if(S.tab==='dash'&&!S.sub){S.tab='train';UI.trk='hub';render()}});await p.evaluate(()=>document.querySelectorAll('details.sjmore').forEach(d=>{d.open=true}));await p.click(sel);await p.waitForTimeout(60)};
 const sx=p=>p.evaluate(()=>JSON.parse(JSON.stringify(S.sx)));
 const ovf=p=>p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
 (async()=>{const b=await chromium.launch();

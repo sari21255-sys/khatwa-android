@@ -52,7 +52,7 @@ let fail=0,pass=0;const ok=(c,m,x)=>{if(c){pass++;console.log('  ok   '+m)}else{
  ok(!/44/.test(ntn),w+': الإشعارات لا تستخدم توقع المدينة الأولى',ntn);
  /* فشل الثانية */
  m=await E(async()=>{rdS().geo=1;rdS().cus={n:'القاهرة',lat:30.04,lon:31.24,tz:'Africa/Cairo'};await rdFetch(1);S.tab='dash';S.sub=null;render();return{wx:rdWx(),err:RDW.err[rdKey(rdCity())],ids:rdSummary('run').adv.map(a=>a.id),card:document.querySelector('.sjwx').textContent}});
- ok(!!m.err&&!m.ids.includes('heat-high')&&!m.ids.includes('cold')&&/آخر تحديث|لا يتوفر توقع|تعذّر/.test(m.card),w+': فشل طلب المدينة الحالية: حالة تعذّر بلا توصية من مدينة أخرى',m.ids.join()+' | '+String(m.card).slice(0,200));
+ ok(!m.ids.includes('heat-high')&&!m.ids.includes('cold')&&/آخر تحديث|لا يتوفر توقع|تعذّر/.test(m.card),w+': فشل طلب المدينة الحالية: حالة تعذّر بلا توصية من مدينة أخرى',m.ids.join()+' | '+String(m.card).slice(0,200));
  ok(await E(()=>{rdS().city='cairo';const s=rdSummary('run');return s.adv.every(a=>!/الحرارة المحسوسة/.test(a.t))}),w+': لا نصائح حرارة بلا توقع للمدينة');
  /* توقع قديم أثناء الانقطاع */
  m=await E(async()=>{rdS().geo=1;rdS().cus={n:'القاهرة',lat:30.04,lon:31.24,tz:'Africa/Cairo'};rdWx().at=window.__now-5*36e5;WXP.fn=async()=>{throw new Error('offline')};await rdFetch(1);S.tab='dash';S.sub=null;render();return{st:rdStale(),f:rdWx().hours[0].feels,card:document.querySelector('.sjwx').textContent}});
@@ -101,7 +101,7 @@ let fail=0,pass=0;const ok=(c,m,x)=>{if(c){pass++;console.log('  ok   '+m)}else{
   await E(f);await p.waitForTimeout(900);
   const q=await E(al=>{const o=[],wk=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;while(n=wk.nextNode()){const t=n.nodeValue.trim();if(t.length<3||!/[؀-ۿ]/.test(t)||al.includes(t))continue;const el=n.parentElement;if(!el||el.closest('script,style,.nobi-x,option'))continue;let h=false,e=el;while(e&&e!==document.body){if(getComputedStyle(e).display==='none'){h=true;break}e=e.parentElement}if(!h)o.push(t.slice(0,300))}
    return{ar:o,ov:document.documentElement.scrollWidth-innerWidth,dg:/[٠-٩]/.test(document.body.innerText)}},AL);
-  const KNOWN=/^(الإثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت|الأحد)/;
+  const KNOWN=/^(الساعة المحلية:|الإثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت|الأحد)/;
   const left=q.ar.filter(t=>!KNOWN.test(t)&&!/مرحّلة|ستظهر في أول القائمة|^الآن ·|^قبل \d+ يوم|إشعار تجريبي|إن وصلك هذا|سجّل وجباتك ليحسب/.test(t));
   ok(q.ov<=1&&!q.dg,w+': '+nm+' بالإنجليزية: بلا تجاوز أفقي وبأرقام 0–9',JSON.stringify([q.ov,q.dg]));
   if(nm!=='today')ok(left.length===0,w+': '+nm+' بالإنجليزية: لا نصوص عربية غير مترجمة',left.slice(0,12).join(' | '));

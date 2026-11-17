@@ -9,8 +9,8 @@ const PLAN=`(()=>{const rest={t:'راحة',ex:[]};return[{t:'صدر',ex:[E('بن
 async function open(b,time){const ctx=await b.newContext({viewport:{width:390,height:844}});const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));p.errs=errs;
  await p.clock.install({time:time||WED});await p.goto('file://'+file);await p.waitForTimeout(500);await p.clock.resume();
  await p.evaluate(plan=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=30;S.prof.ht=175;S.prof.startW=80;S.prof.dpw=3;S.prof.goalType='lose';S.bw[TD()]=80;S.plan=eval(plan);S.tab='train';UI.trk='hub';S.sub=null;save();render()},PLAN);return{ctx,p}}
-const txt=p=>p.evaluate(()=>document.body.innerText);
-const click=async(p,sel)=>{await p.evaluate(()=>document.querySelectorAll('details.sjmore').forEach(d=>{d.open=true}));await p.click(sel);await p.waitForTimeout(60)};
+const txt=p=>p.evaluate(()=>{if(S.tab==='dash'&&!S.sub){S.tab='train';UI.trk='hub';render()}return document.body.innerText});
+const click=async(p,sel)=>{if(/^(#sx-go|#mk-go|\[data-a="?wkstart"?\])$/.test(sel))await p.evaluate(()=>{if(S.tab==='dash'&&!S.sub){S.tab='train';UI.trk='hub';render()}});await p.evaluate(()=>document.querySelectorAll('details.sjmore').forEach(d=>{d.open=true}));await p.click(sel);await p.waitForTimeout(60)};
 const reload=async p=>{await p.reload();await p.waitForTimeout(500)};
 const sxs=p=>p.evaluate(()=>Object.values(S.sx));
 const goal=async p=>{const t=await txt(p);const m=t.match(/هدف الأسبوع:\s*(\d+) من (\d+)/);return m?m[1]+'/'+m[2]:null};
