@@ -1,0 +1,28 @@
+/* تمارين الحديد */
+.irtabs{margin:10px 0 12px}.irtabs button,.irsub button{font-size:14px;padding:9px 4px;min-height:44px}
+.irsub{margin:6px 0}
+.irx .irlast{margin:2px 0 8px}
+.irset{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--bd,rgba(127,127,127,.2))}
+.irset.wu{opacity:.75}.irset.hi{background:rgba(255,179,71,.18);border-radius:8px;padding-inline:6px}
+.irok{display:inline-flex;align-items:center;gap:3px;font-size:12px;color:#16a34a}.irok .ico{width:14px;height:14px}
+.irnew{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:end;margin-top:10px}
+.irnew .irsv{grid-column:1/-1;min-height:48px}
+.irf{display:flex;flex-direction:column;gap:4px;min-width:0}
+.irin,.irsel{width:100%;min-height:44px;padding:8px 10px;border-radius:10px;border:1px solid var(--bd,rgba(127,127,127,.3));background:var(--bg2,transparent);color:inherit;font:inherit;box-sizing:border-box}
+.irset .irin{width:84px;min-height:40px}
+.irb{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid currentColor}
+.irb-live{color:#f59e0b}.irb-ok{color:#16a34a}.irb-part{color:#8b8b95}.irb-old{color:#6366f1}
+.irban{border-inline-start:4px solid var(--ac)}
+.irchoice{display:grid;gap:8px}
+.irtw{display:flex;flex-direction:column;gap:4px;margin-top:6px}.irtw .irin{max-width:180px}
+.irl{font-size:14px}
+.irday.today{outline:1px solid var(--ac);border-radius:12px;padding:0 6px 6px}
+.irrest{opacity:.8}
+.irev{display:flex;align-items:center;gap:10px;width:100%;text-align:start;margin:6px 0;padding:10px 12px;cursor:pointer}
+.irevic{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;flex:none}.irevb{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}.irevt{overflow-wrap:anywhere}
+.irdh{margin:12px 2px 2px;font-size:13px;opacity:.7}
+.irch{width:100%;height:auto;max-width:100%;display:block;margin-top:6px;overflow:visible}.irpt{cursor:pointer}
+.irmus{border-top:1px solid var(--bd,rgba(127,127,127,.2))}.irmh{display:flex;gap:10px;align-items:center;width:100%;padding:10px 2px;background:none;border:0;color:inherit;font:inherit;text-align:start;min-height:44px}
+.irmit{display:flex;justify-content:space-between;gap:8px;width:100%;padding:8px 6px;background:none;border:0;color:inherit;font:inherit;text-align:start}
+.irxs{flex-wrap:wrap}.irflt .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:360px){.irtabs button{font-size:12.5px}.irset .irin{width:70px}}

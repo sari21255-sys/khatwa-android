@@ -5,7 +5,7 @@ R=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 P=os.path.join(R,'app/fitness-tracker.html')
 s=open(P,encoding='utf8').read()
 js=open(os.path.join(R,'app/tracks.src.js'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/ready.src.js'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/fixes.src.js'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/accounts.src.js'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/iron.src.js'),encoding='utf8').read().rstrip('\n')
-css=open(os.path.join(R,'app/tracks.css'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/ready.css'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/fixes.css'),encoding='utf8').read().rstrip('\n')
+css=open(os.path.join(R,'app/tracks.css'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/ready.css'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/fixes.css'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/iron.css'),encoding='utf8').read().rstrip('\n')
 J0,J1='/*TRK-JS-BEGIN*/','/*TRK-JS-END*/'
 C0,C1='/*TRK-CSS-BEGIN*/','/*TRK-CSS-END*/'
 def put(s,a,b,body,anchor,before=True):
