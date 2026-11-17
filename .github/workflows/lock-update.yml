@@ -16,7 +16,8 @@ jobs:
         with: { node-version: 20 }
       - name: Pin geolocation (exact, Capacitor 7 line)
         run: |
-          V=$(npm view "@capacitor/geolocation@^7" version | tail -1 | tr -d "'\" ")
+          V=$(npm view "@capacitor/geolocation@^7" version --json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);const a=Array.isArray(j)?j:[j];a.sort((x,y)=>x.localeCompare(y,undefined,{numeric:true}));console.log(a[a.length-1])})')
+          case "$V" in [0-9]*.[0-9]*.[0-9]*) ;; *) echo "bad version: $V"; exit 1;; esac
           echo "resolved geolocation: $V"
           npm install --save-exact --no-audit --no-fund "@capacitor/geolocation@$V"
           grep -n "geolocation" package.json
