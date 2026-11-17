@@ -42,7 +42,7 @@ const ovf=p=>p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
   ok(/أكمل التمرين/.test(t)&&/هدف الأسبوع: 0 من 3/.test(t),'الزر «أكمل التمرين» والهدف ما زال 0 من 3');
   await click(p,'#nav [data-a="go"][data-v="train"]');await click(p,'.sjtk[data-v="irs"]');await click(p,'[data-a=trk][data-v=iron]');ok(/أكمل التمرين/.test(await txt(p)),'تبويب التمرين يعرض «أكمل» أيضًا');
   await click(p,'[data-a="go"][data-v="dash"]').catch(()=>{});
-  await p.reload();await p.waitForTimeout(500);
+  await p.reload();await p.waitForTimeout(500);await p.evaluate(()=>{S.tab='train';S.sub=null;UI.trk='hub';render()});await p.waitForTimeout(200);
   t=await txt(p);ok(/أكمل التمرين/.test(t)&&/1 من 9 مجموعة/.test(t.replace(/\s+/g,' ')),'بعد تحديث الصفحة: الجلسة الجزئية محفوظة');
   ok(await p.evaluate(()=>{const d=rsDecomp(S);return Object.keys(d).filter(k=>k.indexOf('sx\u0001')===0).length===1}),'الجلسة تدخل المزامنة كسجل مستقل (rsDecomp: sx/معرّف)');
   await click(p,'#sx-go');

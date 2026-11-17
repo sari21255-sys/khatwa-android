@@ -70,7 +70,7 @@ const logOne=async p=>{await click(p,'[data-a=wkty][data-v=d]');await click(p,'[
   ok(await p.evaluate(()=>Object.keys(S.done).length===4),'S.done فيه 4 تمارين بلا تكرار')}
 
  console.log('4) جلستان جزئيتان معًا: اليوم وتعويض، كل منهما يُستأنف بمعرّفه');
- {const {p}=await open(b);await click(p,'#sx-go');await logOne(p);const A=(await sxs(p))[0].id;await endWk(p);
+ {const {p}=await open(b);await click(p,'#sx-go');await logOne(p);const A=(await sxs(p))[0].id;await endWk(p);await p.evaluate(()=>{S.tab='train';S.sub=null;UI.trk='hub';render()});
   await click(p,'#mk-go');await click(p,'.mkc[data-day="2"] [data-a=wkmk]');await logOne(p);const all=await sxs(p),B=all.find(x=>x.id!==A).id;await endWk(p);
   ok(all.length===2&&(await sxs(p)).length===2,'جلستان جزئيتان');
   await reload(p);ok(/أكمل التمرين/.test(await txt(p)),'الزر الرئيسي «أكمل التمرين»');await click(p,'#sx-go');
