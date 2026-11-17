@@ -102,8 +102,8 @@ const ovf=p=>p.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
   await click(p,'[data-a="seg"][data-v="wk"]');t=await txt(p);ok(/أسبوع 2026-11-07/.test(t)&&/أسبوع 2026-10-31/.test(t),'ملخص الأسابيع القديم ما زال يعرض أسابيعه');
   const reach=await p.evaluate(()=>{const bad=[];['wgt','rpt','tools','cul','ach','arch','plan','prog','coach','set','link','vis','rem','gyms'].forEach(k=>{try{S.sub=k;render()}catch(e){bad.push(k+':'+e.message)}});['club','pg','me','food','train','dash'].forEach(k=>{try{S.sub=null;S.tab=k;render()}catch(e){bad.push(k+':'+e.message)}});return bad});
   ok(reach.length===0,'المزايا القائمة (الوزن والتقارير والأدوات والثقافة والأوسمة والنادي والزيارات...) تُرسم بعد التحديث',reach.join(','));
-  const items=await p.evaluate(()=>[['pg','arch'],['pg','rpt'],['ex','cul'],['ex','tools']].map(([t,k])=>{S.sub=null;S.tab=t;render();return !!document.querySelector('[data-a="sub"][data-v="'+k+'"]')}));
-  ok(items.every(Boolean),'الأرشيف والتقارير في «التقدّم»، والثقافة والأدوات في «المزيد» (مكان واحد لكل منها)',items.join());
+  const items=await p.evaluate(()=>[['ex','arch'],['me','rpt'],['ex','cul'],['ex','tools']].map(([t,k])=>{S.sub=null;S.tab=t;render();return !!document.querySelector('[data-a="sub"][data-v="'+k+'"]')}));
+  ok(items.every(Boolean),'الأرشيف والثقافة والأدوات في «المزيد» والتقارير في «الملف الشخصي»؛ بلا «المزيد» (مكان واحد لكل منها)',items.join());
   ok(p.errs.length===0,'لا أخطاء JavaScript',p.errs.join('|'));await ctx.close()}
 
  console.log('5) النسخة الاحتياطية: التنزيل والاستعادة');
