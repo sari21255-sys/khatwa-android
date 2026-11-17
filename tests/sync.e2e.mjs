@@ -208,8 +208,10 @@ try{
  /* ---- حذف الحساب: لا يعيد جهاز آخر الرفع ---- */
  {const em3=email('z');const x=await device(),y=await device();await x.evaluate(SEED);await up(x,em3);await login(y,em3);await sync(x);await sync(y);const uid=await uidOf(x);
   await x.evaluate(async()=>{await SB.q('rpc/delete_my_account','POST',{});SB.set(null)});
-  await edit(y,"S.bw['2026-11-30']=50");const r=await sync(y);const err=await get(y,"RS.err"),rows=dbq(`select count(*) from public.sync_records where user_id='${uid}'`),usr=dbq(`select count(*) from auth.users where id='${uid}'`),loc=await get(y,"S.bw['2026-11-30']");
-  rec('DEL-04','بعد حذف الحساب: السجلات محذوفة، والجهاز الآخر لا يعيد الرفع ويبقى محليًا مع رسالة جلسة منتهية',r==='err'&&err==='auth'&&rows==='0'&&usr==='0'&&loc===50,JSON.stringify({r,err,rows,usr,loc}));await x.ctx.close();await y.ctx.close()}
+  await edit(y,"S.bw['2026-11-30']=50");
+  await Promise.all([y.waitForEvent('load',{timeout:15000}).catch(()=>null),y.evaluate(()=>rsSync())]);await y.waitForFunction(()=>typeof S!=='undefined'&&typeof rsSync==='function',null,{timeout:15000});await y.waitForTimeout(500);
+  const sp=await y.evaluate(()=>spMeta().a),loc=await y.evaluate(()=>S.bw['2026-11-30']),ses=await y.evaluate(()=>!!SB.ses),rows=dbq(`select count(*) from public.sync_records where user_id='${uid}'`),usr=dbq(`select count(*) from auth.users where id='${uid}'`);
+  rec('DEL-04','بعد حذف الحساب من جهاز آخر: السجلات محذوفة، والجهاز الآخر لا يعيد الرفع ويمسح مساحة الحساب ويعود زائرًا',sp==='guest'&&loc===undefined&&!ses&&rows==='0'&&usr==='0',JSON.stringify({sp,loc,ses,rows,usr}));await x.ctx.close();await y.ctx.close()}
  /* ---- إبطال الجلسة وانتهاء الرمز ---- */
  {const e5=email('s');const x=await device();await x.evaluate(SEED);await up(x,e5);await sync(x);
   await x.evaluate(()=>{SB.ses.expires_at=Math.floor(Date.now()/1000)-5});await edit(x,"S.bw['2026-11-11']=61");const r1=await sync(x);const ref=await get(x,"SB.ses.expires_at>Math.floor(Date.now()/1000)");
