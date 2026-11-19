@@ -73,12 +73,12 @@ function scLocState(st){const s=st.s;
  if(st.has)return '<div class="scs scloc" id="sc-loc">'+scIc('pin')+'الموقع: '+esc(st.c.n)+(s.geo===1?' · من جوالك (تقريبي)':' · اخترته يدويًا')+'</div>';
  return '<div class="scs scloc" id="sc-loc" role="status">'+scIc('pin')+(s.geoDeny?'لم يُمنح إذن الموقع، فنعرض ساعة جهازك والمشهد تقريبيًا. فعّل الإذن من إعدادات الجهاز ثم حاول مجددًا.':s.geoFail?'تعذّر تحديد موقعك الآن. تأكد من تشغيل الموقع ثم حاول مجددًا.':'اسمح بالموقع ليظهر الطقس ومواعيد الشروق والغروب لمنطقتك.')+'</div>'}
 function scCard(){const st=scState(),M=scModel(st),dt=scDateTx(st.now,st.c.tz),p=SCP[M.per];
- return '<div class="card scn sc-p-'+M.per+(scReduced()?' sc-rm':'')+'" id="sc-card" data-key="'+esc(M.key)+'" style="--sk1:'+scCss(M.sk.top)+';--sk2:'+scCss(M.sk.bot)+'" role="group" aria-label="'+esc(scAria(st,M))+'">'+scArt(st,M)+
+ return '<div class="card scn fxscene sc-p-'+M.per+(scReduced()?' sc-rm':'')+'" id="sc-card" data-key="'+esc(M.key)+'" style="--sk1:'+scCss(M.sk.top)+';--sk2:'+scCss(M.sk.bot)+'" role="group" aria-label="'+esc(scAria(st,M))+'">'+scArt(st,M)+
   '<div class="scin"><div class="row scdt" style="gap:8px;flex-wrap:nowrap;align-items:flex-start"><div style="flex:1;min-width:0"><div class="scdate">'+scIc('cal')+'<span id="sc-date">'+esc(dt.g)+'</span></div>'+(dt.h?'<div class="scs scdate">'+scIc('cal')+'<span id="sc-hijri">'+esc(dt.h)+'</span></div>':'')+'</div>'+
   '<div class="sctimebox"><div class="sctime">'+scIc('clock')+'<b class="num" id="sc-time" data-rdclk>'+rdF(st.now,st.c.tz)+'</b></div><div class="scper"><span id="sc-per-ic">'+scIc(p[1])+'</span><b id="sc-per">'+p[0]+'</b></div></div></div>'+
   scLocState(st)+(st.has?'':'<div class="row" style="margin-top:8px"><button class="btn sm" data-a="rdgeo"'+(st.s.geoBusy?' disabled':'')+'>'+scIc('pin')+(st.s.geoBusy?'جارٍ تحديد الموقع…':'استخدم موقعي')+'</button></div>')+
   (st.has&&!st.s.geoBusy?'<div class="row" style="margin-top:8px;gap:8px;flex-wrap:wrap"><button class="chip" data-a="rdgeo">'+scIc('pin')+'استخدم موقعي</button></div>':'')+
-  scWeather(st)+(st.approx?'<div class="scs">المشهد تقريبي بحسب ساعة الجهاز. مواعيد الشروق والغروب تظهر عند تحديد الموقع.</div>':'<div class="scs scnote">حركة القمر ليلًا تأثير بصري وليست موضعًا فلكيًا.</div>')+'</div></div>'}
+  scWeather(st)+(st.approx?'<div class="scs">المشهد تقريبي بحسب توقيت الجهاز. مواعيد الشروق والغروب تظهر عند تحديد الموقع.</div>':'<div class="scs scnote">حركة القمر ليلًا تأثير بصري وليست موضعًا فلكيًا.</div>')+'</div></div>'}
 const SC_OLD=rdTodayCard;
 rdTodayCard=function(){let more='';try{if(smHasLoc()||rdWx()){const old=SC_OLD.apply(this,arguments),m=typeof old==='string'&&old.match(/<details class="sjmore[^"]*" id="rd-more"[\s\S]*<\/details>/);if(m)more=m[0]}}catch(e){lg(e)}
  return scCard()+more};

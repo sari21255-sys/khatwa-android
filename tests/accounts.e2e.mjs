@@ -38,13 +38,11 @@ try{
   const wel=await (async()=>{const x=await dev();const t=await x.evaluate(()=>document.body.innerText);const ids=await x.$$eval('.sjwel [data-a]',a=>a.map(z=>z.dataset.a));await x.ctx.close();return{t,ids}})();
   rec('J1a','شاشة البداية: تسجيل الدخول · إنشاء حساب · المتابعة كزائر تحت الشعار',['welin','welup','welguest'].every(x=>wel.ids.includes(x))&&/المتابعة كزائر/.test(wel.t),JSON.stringify(wel.ids));
   const before=sb.log.length;await d.ctx.route('http://127.0.0.1:8796/**',r=>r.abort());
-  await d.evaluate(()=>{S.tab='dash';S.sub=null;render()});await d.click('[data-a=wkstart]');await d.waitForTimeout(300);
-  await d.fill('#wk-w','60');await d.click('[data-a=wkset]');await d.waitForTimeout(250);
+  await d.evaluate(()=>{S.tab='dash';S.sub=null;render()});await d.evaluate(()=>{const xv=irXv('بنش بريس بالبار');qSave(TD(),xv,'بنش بريس بالبار',[{w:60,r:8}]);save()});await d.waitForTimeout(250);
   await d.evaluate(()=>{S.bw[TD()]=84.2;S.wtr[TD()]=750;save()});
   const d2=await open(d.ctx);await d.close();   // إغلاق كامل ثم فتح صفحة جديدة بالتخزين نفسه
-  const r=await d2.evaluate(()=>({bw:S.bw[TD()],w:S.wtr[TD()],open:!!sxOpen(),n:Object.keys(S.sx).length,ses:localStorage.getItem('fit_sb'),sp:(JSON.parse(localStorage.getItem('fit_space')||'{}')).a,rs:rsOn()}));
-  await d2.evaluate(()=>{S.tab='dash';S.sub=null;render()});await d2.click('[data-a=wkstart]');await d2.waitForTimeout(300);
-  const resumed=await d2.evaluate(()=>S.sub==='wk'&&Object.keys(S.sx).length===1);
+  const r=await d2.evaluate(()=>({bw:S.bw[TD()],w:S.wtr[TD()],open:Object.keys(qAll()).length>=1,n:Object.keys(S.sx).length,ses:localStorage.getItem('fit_sb'),sp:(JSON.parse(localStorage.getItem('fit_space')||'{}')).a,rs:rsOn()}));
+  const resumed=await d2.evaluate(()=>Object.keys(S.sx).length===1&&qSets(TD(),irXv('بنش بريس بالبار')).length===1);
   rec('J1b','زائر بلا إنترنت: الوزن والماء والجلسة الجزئية تبقى بعد إغلاق التطبيق وتُستأنف من مكانها دون نسخة ثانية',r.bw===84.2&&r.w===750&&r.open&&r.n===1&&resumed,JSON.stringify({r,resumed}));
   rec('J1c','الزائر: لا جلسة سحابية ولا مزامنة ولا أي طلب إلى الخادم',r.ses===null&&!r.rs&&sb.log.length===before,JSON.stringify({ses:r.ses,rs:r.rs,reqs:sb.log.length-before}));
   await d2.ctx.unroute('http://127.0.0.1:8796/**');

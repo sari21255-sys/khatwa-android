@@ -44,6 +44,7 @@ function fdSection(slot,d){const L=(S.meals[d]||[]).map((m,i)=>[m,i]).filter(x=>
 function fdView(){const d=fdDate();let h='<h1>التغذية</h1>'+fdDateBar()+fdSummary(d);
  FDS.forEach(s=>{h+=fdSection(s[0],d)});
  const loose=(S.meals[d]||[]).filter(m=>!FDS.some(s=>s[0]===m.slot));if(loose.length)h+=fdSection('',d);
+ try{h+=waterCard(d)}catch(e){}
  h+='<div class="card fdmore"><h2>خلف اليومية</h2><div class="row" style="gap:8px;flex-wrap:wrap"><button class="chip" data-a="fdgo" data-v="month">التخطيط</button><button class="chip" data-a="fdgo" data-v="lib">الوصفات ووجباتي</button><button class="chip" data-a="fdgo" data-v="ins">التحليل</button><button class="chip" data-a="fdtools">'+(UI.fdt?'إخفاء الأدوات':'بحث وباركود وتصوير')+'</button></div></div>';
  if(UI.fdt)h+=qaRail()+(UI.qa==='search'?offCard():'');
  return h+fdSheet()}

@@ -61,7 +61,7 @@ try{
  /* SX-01: جلسة جزئية على الأول تُستكمل على الثاني */
  {const id=await d1.evaluate("H.start()");await d1.evaluate(i=>H.add(i,0,50,8,'d'),id);await settle(d1,d2);
   const seen=await d2.evaluate(i=>{const s=S.sx[i];return s?{st:s.st,n:sxCnt(s.ex[0]),part:!!sxPart(TI()),hero:/أكمل التمرين/.test(sxHero(0,0).btn)}:null},id);
-  rec('SX-01a','الجلسة الجزئية تصل الجهاز الثاني وتظهر فيه «أكمل التمرين»',!!seen&&seen.st==='p'&&seen.n===1&&seen.part&&seen.hero,JSON.stringify(seen));
+  rec('SX-01a','الجلسة الجزئية تصل الجهاز الثاني وتظهر مجموعاتها المحفوظة (بلا زر استئناف)',!!seen&&seen.st==='p'&&seen.n===1&&seen.part&&!seen.hero,JSON.stringify(seen));
   await d2.evaluate(i=>{H.add(i,0,52,8,'n');H.add(i,0,54,8,'f');H.add(i,1,30,10);H.add(i,1,30,10);H.add(i,1,30,10)},id);await settle(d1,d2);
   const r1=await d1.evaluate(i=>({st:S.sx[i].st,cnt:S.sx[i].ex.map(x=>sxCnt(x)),first:S.sx[i].ex[0].sets[0],done:Object.keys(S.done).length,inv:H.inv()}),id);
   rec('SX-01b','استكمال الجلسة على الثاني: تكتمل على الأول، المجموعة الأولى (RPE/نوع/وزن) محفوظة، S.done مرة واحدة لكل تمرين',r1.st==='c'&&r1.cnt.join()==='3,3'&&r1.first.ty==='d'&&r1.first.w===50&&r1.done===2&&r1.inv.length===0,JSON.stringify(r1));

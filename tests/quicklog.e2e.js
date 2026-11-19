@@ -313,8 +313,41 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
    const r=await p.evaluate(()=>({cls:document.getElementById('sc-card').classList.contains('sc-rm'),an:getComputedStyle(document.querySelector('.scstars i')).animationName}));ok(r.cls&&r.an==='none','تقليل الحركة: بلا رسوم متحركة',JSON.stringify(r));await ctx.close()}
   /* بلا موقع */
   {const {ctx,p}=await mkAt('2026-11-16T10:30:00+03:00',{geo:null});const t=await txt(p);
-   ok(/استخدم موقعي/.test(t)&&/اسمح بالموقع/.test(t)&&/تقريبي بحسب ساعة الجهاز/.test(t),'بلا موقع: حالة مفهومة وزر «استخدم موقعي»');
+   ok(/استخدم موقعي/.test(t)&&/اسمح بالموقع/.test(t)&&/تقريبي بحسب توقيت الجهاز/.test(t),'بلا موقع: حالة مفهومة وزر «استخدم موقعي»');
    ok(await p.evaluate(()=>!document.querySelector('.scchip')),'بلا موقع: لا مواعيد شروق وغروب مختلقة');
    await p.evaluate(()=>{const s=rdS();s.geoDeny=1;render()});ok(/لم يُمنح إذن الموقع/.test(await txt(p)),'حالة رفض الإذن واضحة');
    ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}}
+
+ console.log('9) زائر: حفظ تمرين وطعام وصورة ثم إغلاق وفتح، وترقية من النسخة السابقة');
+ {const {ctx,p}=await mk();
+  const png='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+  /* حالة كالنسخة السابقة: حصة جزئية قديمة وصورة قديمة وجلسة جري جارية */
+  await p.evaluate(png=>{S.sx.legacy1={id:'legacy1',wk:wkey('2026-11-09'),date:'2026-11-09',ts:Date.parse('2026-11-09T09:00:00'),up:1,dy:2,kd:'t',t:'تمرين',st:'p',ar:1,sec:0,vol:0,u:'l:guest',ex:[{k:'k1',id:'a1',n:'بنش بريس بالبار',d:2,tg:3,tr:8,o:0,sets:[{i:'s1',w:60,r:8,ty:'n',rp:0,at:1,up:1},{i:'s2',w:60,r:7,ty:'n',rp:0,at:2,up:2}],rm:[],dn:0,sk:0}]};
+   SJ().ss.push({id:'oldrun',k:'run',st:'act',day:'2026-11-16',t0:Date.now()-600000,acc:600000,ra:Date.now(),plan:null,src:'يدوي',d:{dist:'2',laps:[],mode:'free'}});
+   localStorage.setItem('fit_pp',JSON.stringify([{d:'2026-09-01',w:92.4,img:png}]));save()},png);
+  await p.reload();await p.waitForFunction(()=>typeof qSave==='function');await p.waitForTimeout(300);
+  const snap=async()=>p.evaluate(()=>({sx:Object.keys(S.sx).sort().join(),sets:Object.values(S.sx).reduce((a,s)=>a+s.ex.reduce((b,x)=>b+x.sets.length,0),0),st:S.sx.legacy1.st,run:SJ().ss.filter(x=>x.k==='run').map(x=>x.st).join(),pp:PP.length,ppid:PP[0].id,meals:Object.values(S.meals).reduce((a,l)=>a+l.length,0),plan:S.plan.reduce((a,x)=>a+x.ex.length,0)}));
+  const a=await snap();ok(a.st==='c'&&a.sets===2&&a.run==='done'&&a.pp===1,'الترقية: حصة جزئية صارت محفوظة وجلسة الجري أُنهيت وصورة قديمة باقية',JSON.stringify(a));
+  /* تمرين وطعام وصورة */
+  await p.evaluate(()=>{const di=qDi(TD());irPlanAdd(di,'سكوات',3,5,0);qSave(TD(),irXv('سكوات'),'سكوات',[{w:100,r:5},{w:100,r:5}]);mealSave(TD(),{n:'تمر',kcal:100,p:1,c:25,f:0,slot:'b'});
+   PP.push({id:'pnew',d:TD(),w:85,bf:18,img:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',at:Date.now()});savePP();save()});
+  const b1=await snap();
+  for(let i=0;i<2;i++){await p.reload();await p.waitForFunction(()=>typeof qSave==='function');await p.waitForTimeout(250)}
+  const b2=await snap();ok(JSON.stringify(b1)===JSON.stringify(b2),'بعد إغلاق وفتح مرتين: بلا تكرار ولا فقد',JSON.stringify(b1)+' / '+JSON.stringify(b2));
+  ok(b2.meals===1&&b2.pp===2&&b2.sets===4,'الطعام والصورة والمجموعات كما حُفظت');
+  ok(await p.evaluate(()=>{const e=qAll();return Object.keys(e).filter(k=>/سكوات/.test(e[k].n)).length===1}),'التمرين مرة واحدة في الشاملة');
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
+ console.log('10) المقاسات والخط والأرقام والسمات: 320 و390');
+ for(const w of [320,390]){const {ctx,p}=await mk({ctx:{viewport:{width:w,height:800}}});
+  await p.evaluate(()=>{const di=qDi(TD());irPlanAdd(di,'ضغط دمبل مائل بزاوية منخفضة جدًا للصدر العلوي',3,10,28);qSave('2026-11-09',irXv('ضغط دمبل مائل بزاوية منخفضة جدًا للصدر العلوي'),'ضغط دمبل مائل بزاوية منخفضة جدًا للصدر العلوي',[{w:26,r:10}]);PP.push({id:'a',d:'2026-10-01',w:88,bf:21,img:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',at:1});savePP();save()});
+  const views=[['الرئيسية',()=>{S.tab='dash';S.sub=null}],['الخطة الحالية',()=>{S.tab='train';S.sub=null;UI.trk='irs';UI.qt='cur'}],['الخطة الشاملة',()=>{S.tab='train';S.sub=null;UI.trk='irs';UI.qt='all'}],['التغذية',()=>{S.tab='food';S.sub=null;UI.fm='today'}],['ألبوم الصور',()=>{S.tab='me';S.sub='ppg'}]];
+  for(const th of ['black','white','blue']){await p.evaluate(t=>{S.thm=t;if(typeof applyTheme==='function')applyTheme();document.documentElement.dataset.sj=t},th);
+   for(const v of views){await p.evaluate(f=>{eval('('+f+')()');render();window.scrollTo(0,0)},v[1].toString());await p.waitForTimeout(80);
+    const r=await p.evaluate(()=>({o:document.documentElement.scrollWidth>innerWidth+1,ar:/[٠-٩۰-۹]/.test(document.body.innerText),f:getComputedStyle(document.body).fontFamily}));
+    if(th==='black'){ok(!r.o,w+' '+v[0]+': لا تمرير أفقي');ok(!r.ar,w+' '+v[0]+': أرقام 0–9 فقط');ok(/Almarai/i.test(r.f),w+' '+v[0]+': خط Almarai')}else ok(!r.o,w+' '+v[0]+' ('+th+'): لا تمرير أفقي')}}
+  /* حجم أهداف اللمس الأساسية */
+  await p.evaluate(()=>{S.tab='train';S.sub=null;UI.trk='irs';UI.qt='cur';render()});
+  const small=await p.evaluate(()=>[...document.querySelectorAll('button[data-a]')].filter(b=>{const r=b.getBoundingClientRect();return r.width>0&&!b.classList.contains('sjl')&&(r.height<30||r.width<30)}).map(b=>b.dataset.a).slice(0,5));
+  ok(small.length===0,w+': أهداف اللمس 30px فأكثر في الخطة',small.join());
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
  await b.close();console.log(fail?'FAILED '+fail:'all PASS');process.exit(fail?1:0)})();

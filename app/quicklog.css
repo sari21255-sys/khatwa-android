@@ -8,3 +8,5 @@
 .qar .qarh{display:flex;flex-direction:column;gap:4px;width:100%;background:none;border:0;padding:12px;color:inherit;font:inherit;text-align:start;min-height:44px}
 .qar .qrec,.qar .qfull{padding:0 12px 12px}
 .qflt .chips{display:flex;flex-wrap:wrap;gap:6px}
+
+button[data-a=trkhub]{min-height:36px;display:inline-flex;align-items:center}
