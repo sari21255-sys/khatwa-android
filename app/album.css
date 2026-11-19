@@ -1,0 +1,13 @@
+.alit{display:flex;gap:12px;align-items:flex-start;padding:10px;margin:8px 0;border:1px solid var(--bd);border-radius:14px;background:var(--cd,transparent)}
+.althumb{flex:0 0 96px;width:96px;padding:0;border:0;background:none;border-radius:10px;overflow:hidden}
+.althumb img{display:block;width:96px;aspect-ratio:3/4;object-fit:cover}
+.alinfo{flex:1;min-width:0}
+.alprev{display:block;max-width:100%;max-height:260px;margin:8px auto;border-radius:12px}
+.alfig{margin:0;border-radius:12px;overflow:hidden;border:1px solid var(--bd)}
+.alfig img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover}
+.alfig figcaption{padding:6px;font-size:13px;text-align:center}
+.alz{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.92);display:flex;flex-direction:column;color:#fff}
+.alzt{display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px}
+.alzb{flex:1;overflow:auto;touch-action:pan-x pan-y pinch-zoom;display:flex;align-items:flex-start;justify-content:center}
+.alzb img{display:block;max-width:none;height:auto}
+.sechead.alm{margin-top:14px}

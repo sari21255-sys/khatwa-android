@@ -16,8 +16,8 @@ const bpFire=inp=>{inp.dispatchEvent(new Event('change',{bubbles:true}));inp.dis
 fxHeight=function(inp){const prev=+inp.value||+S.prof.ht||0;
  bpWheelSheet({title:'الطول',unit:'سم',prev:prev,note:prev?'القيمة السابقة: <b class="num">'+prev+'</b> سم. عدّلها إن لزم ثم أكّد.':'لا قيمة سابقة. اختر طولك.',
   wheels:[{min:100,max:230,step:1,val:prev||170,fmt:v=>String(v),label:'الطول'}],save:a=>{inp.value=a[0];bpFire(inp)}})};
-fxWeight=function(inp,title){const u=typeof uL==='function'?uL():'كغ',lb=/lb|رطل/i.test(u),L=bpLast(),cur=+inp.value||0,seed=cur||(L.v?bpUserW(L.v):0),prev=seed;
- const lo=lb?40:20,hi=lb?660:300,v0=seed||(lb?154:70);
+fxWeight=function(inp,title){const u=typeof uL==='function'?uL():'كغ',lb=/lb|رطل/i.test(u),stn=/ستون|st/i.test(u),L=bpLast(),cur=+inp.value||0,seed=cur||(L.v?bpUserW(L.v):0),prev=seed;
+ const lo=lb?40:stn?3:20,hi=lb?660:stn?50:300,v0=seed||(lb?154:stn?11:70);
  bpWheelSheet({title:title||'الوزن',unit:u,prev:prev,note:cur?'القيمة السابقة: <b class="num">'+cur+'</b> '+u+'. عدّلها إن لزم ثم أكّد.':(L.v?'آخر وزن محفوظ: <b class="num">'+bpUserW(L.v).toFixed(1)+'</b> '+u+' · <span class="num">'+L.d+'</span>. ابدأنا منه، عدّله ثم أكّد.':'لا وزن سابق. اختر وزنك.'),
   wheels:[{min:lo,max:hi,step:1,val:Math.floor(v0),fmt:v=>String(v),label:'الجزء الصحيح'},{min:0,max:9,step:1,val:Math.round((v0-Math.floor(v0))*10),fmt:v=>'.'+v,label:'الكسر'}],
   save:a=>{inp.value=(a[0]+a[1]/10).toFixed(1);bpFire(inp)}})};

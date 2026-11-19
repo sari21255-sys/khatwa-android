@@ -151,4 +151,53 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   ok(await p.evaluate(()=>!!document.getElementById('fx-sheet')&&document.getElementById('tin').value===''),'الوزن: لا حفظ دون اختيار عند غياب وزن سابق');
   ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));
   await ctx.close()}
+
+ console.log('6) ألبوم الصور الزمني');
+ {const {ctx,p}=await mk();
+  const png='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+  /* ترقية صور قديمة */
+  await p.evaluate(png=>{localStorage.setItem('fit_pp',JSON.stringify([{d:'2026-09-01',w:92.4,img:png},{d:'2026-10-15',w:88,img:png}]))},png);
+  await p.reload();await p.waitForFunction(()=>typeof alView==='function');
+  const up=await p.evaluate(()=>PP.map(q=>({id:!!q.id,d:q.d,w:q.w,bf:q.bf})));
+  ok(up.length===2&&up.every(q=>q.id&&q.bf===null)&&up[0].w===92.4&&up[1].d==='2026-10-15','الترقية تبقي التاريخ والوزن كما سُجّلا وتضيف معرّفًا ولا تستنتج نسبة',JSON.stringify(up));
+  await p.evaluate(()=>{S.tab='me';S.sub='ppg';render()});await p.waitForTimeout(100);
+  let t=await txt(p);
+  ok(/على هذا الجهاز فقط ولا تُرفع إلى السحابة/.test(t),'حالة الحفظ واضحة: محلي لا سحابي');
+  const order=await p.$$eval('.alit .alinfo b',a=>a.map(x=>x.textContent));
+  ok(order.join()==='2026-10-15,2026-09-01','الخط الزمني: الأحدث أولًا',order.join());
+  ok(/92\.4/.test(t)&&/88/.test(t),'الوزن المرتبط بالصورة ظاهر');
+  /* إضافة صورة بتاريخ سابق مع وزن ونسبة */
+  await p.evaluate(()=>{S.bw={};S.bw['2026-11-10']=85.5;UI.alp={img:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',d:TD(),w:0,bf:0};render()});await p.waitForTimeout(100);
+  ok(await p.evaluate(()=>document.getElementById('al-d-d').value==='16'&&document.getElementById('al-d-m').value==='11'),'التاريخ الافتراضي اليوم');
+  ok(/آخر وزن محفوظ/.test(await txt(p))&&/85\.5/.test(await txt(p))&&/2026-11-10/.test(await txt(p)),'يقترح آخر وزن محفوظ بتاريخه');
+  await p.selectOption('#al-d-d','3');await p.selectOption('#al-d-m','11');
+  await p.click('#al-w');await p.waitForTimeout(500);await p.click('[data-fxs]');await p.waitForTimeout(100);
+  ok(await p.evaluate(()=>document.getElementById('al-w').value==='85.5'&&UI.alp.w===85.5),'اختيار الوزن يبدأ من 85.5');
+  await p.fill('#al-bf','18.5');
+  await p.click('#al-save');await p.waitForTimeout(150);
+  const n=await p.evaluate(()=>PP.find(q=>q.d==='2026-11-03'));
+  ok(n&&n.w===85.5&&n.bf===18.5&&await p.evaluate(()=>PP.length)===3,'حُفظت الصورة بالتاريخ والوزن والنسبة',JSON.stringify(n&&{d:n.d,w:n.w,bf:n.bf}));
+  ok(await p.evaluate(()=>PP.length)===3,'لا تكرار');
+  /* الوزن المسجّل لا يتغير بتغيّر وزن الجسم لاحقًا */
+  await p.evaluate(()=>{S.bw[TD()]=80;save()});
+  ok(await p.evaluate(()=>PP.find(q=>q.d==='2026-11-03').w===85.5),'وزن الصورة ثابت كما سُجّل');
+  /* مقارنة */
+  const ids=await p.evaluate(()=>PP.map(q=>q.id));
+  await p.evaluate(([a,b])=>{UI.alc=[a,b];render()},[ids[0],ids[2]]);
+  ok(await p.$('#al-cmp')!==null&&/بين الصورتين/.test(await txt(p)),'مقارنة صورتين بتاريخين مختلفين');
+  /* تعديل */
+  await p.evaluate(id=>{ACT.aledit({dataset:{v:id}});render()},ids[2]);await p.waitForTimeout(100);
+  await p.fill('#al-bf','17');await p.click('#al-save');await p.waitForTimeout(100);
+  ok(await p.evaluate(id=>PP.find(q=>q.id===id).bf===17,ids[2]),'تعديل النسبة');
+  /* تكبير */
+  await p.evaluate(id=>{UI.alz=id;render()},ids[0]);ok(await p.$('#al-zoom')!==null,'التكبير');
+  await p.evaluate(()=>{UI.alz=null;render()});
+  /* حذف بخطوتين */
+  await p.evaluate(id=>{ACT.aldel({dataset:{v:id}});render()},ids[0]);ok(await p.evaluate(()=>PP.length)===3,'الحذف يحتاج تأكيدًا');
+  await p.evaluate(id=>{ACT.aldel({dataset:{v:id}});render()},ids[0]);ok(await p.evaluate(()=>PP.length)===2,'الحذف بعد التأكيد');
+  /* استعادة بعد إغلاق وفتح */
+  await p.reload();await p.waitForFunction(()=>typeof alView==='function');
+  ok(await p.evaluate(()=>PP.length)===2,'الصور باقية بعد إعادة الفتح دون تكرار');
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));
+  await ctx.close()}
  await b.close();console.log(fail?'FAILED '+fail:'all PASS');process.exit(fail?1:0)})();
