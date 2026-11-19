@@ -1,0 +1,10 @@
+/* التسجيل السريع: خطتي بتبويبين */
+.qdate .chip svg{width:18px;height:18px}
+.qx .qrow{margin:6px 0;align-items:center}
+.qx .irin{min-width:0;flex:1;text-align:center}
+.qx .qsaved{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.qx .irsel,.qdp .irsel{min-width:0;flex:1;font-family:inherit}
+.qar{padding:0}
+.qar .qarh{display:flex;flex-direction:column;gap:4px;width:100%;background:none;border:0;padding:12px;color:inherit;font:inherit;text-align:start;min-height:44px}
+.qar .qrec,.qar .qfull{padding:0 12px 12px}
+.qflt .chips{display:flex;flex-wrap:wrap;gap:6px}
