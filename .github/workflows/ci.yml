@@ -29,18 +29,13 @@ jobs:
           npm i -g playwright
           npx playwright install --with-deps chromium
           NODE_PATH="$(npm root -g)" node tests/app.e2e.js
-      - name: UX acceptance (today/train/archive, makeup sessions, local Cairo font)
+      - name: Quick-log acceptance (plans, direct logging, album, diary, scene, layout)
         run: |
-          NODE_PATH="$(npm root -g)" node tests/ux.e2e.js
-          NODE_PATH="$(npm root -g)" node tests/ux2.e2e.js
+          NODE_PATH="$(npm root -g)" node tests/quicklog.e2e.js
           NODE_PATH="$(npm root -g)" node tests/sxmerge.e2e.js
-          NODE_PATH="$(npm root -g)" node tests/wm.e2e.js
           NODE_PATH="$(npm root -g)" node tests/theme.e2e.js
-          NODE_PATH="$(npm root -g)" node tests/wrap.e2e.js
           NODE_PATH="$(npm root -g)" node tests/rpt.e2e.js
-          NODE_PATH="$(npm root -g)" node tests/font.e2e.js
           NODE_PATH="$(npm root -g)" node tests/consent.e2e.js
-          NODE_PATH="$(npm root -g)" node tests/nav.e2e.js
       - name: P0 acceptance (security headers + CSP, offline eq-db, 320px, worker failure)
         run: NODE_PATH="$(npm root -g)" node docs/technical-audit/evidence/p0-acceptance.mjs
       - name: Supabase schema + RLS tests
