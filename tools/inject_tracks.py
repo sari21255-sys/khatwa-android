@@ -4,8 +4,12 @@ import os,re
 R=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 P=os.path.join(R,'app/fitness-tracker.html')
 s=open(P,encoding='utf8').read()
-js=open(os.path.join(R,'app/tracks.src.js'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/ready.src.js'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/fixes.src.js'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/accounts.src.js'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/iron.src.js'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/simplify.src.js'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/quicklog.src.js'),encoding='utf8').read().rstrip('\n')
-css=open(os.path.join(R,'app/tracks.css'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/ready.css'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/fixes.css'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/iron.css'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/simplify.css'),encoding='utf8').read().rstrip('\n')+'\n'+open(os.path.join(R,'app/quicklog.css'),encoding='utf8').read().rstrip('\n')
+OV=['tracks','ready','fixes','accounts','iron','simplify','quicklog','bodypick','album','food','scene']
+def rd(ext,name):
+    f=os.path.join(R,'app/%s.%s'%(name,ext))
+    return open(f,encoding='utf8').read().rstrip('\n') if os.path.exists(f) else None
+js='\n'.join(x for x in (rd('src.js',n) for n in OV) if x)
+css='\n'.join(x for x in (rd('css',n) for n in OV) if x)
 J0,J1='/*TRK-JS-BEGIN*/','/*TRK-JS-END*/'
 C0,C1='/*TRK-CSS-BEGIN*/','/*TRK-CSS-END*/'
 def put(s,a,b,body,anchor,before=True):

@@ -107,4 +107,48 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   ok(/أيام تدريب/.test(await txt(p)),'الهدف الأسبوعي «أيام تدريب»');
   ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));
   await ctx.close()}
+
+ console.log('5) منتقيات بيانات الجسم المشتركة');
+ {const {ctx,p}=await mk();
+  const mkin=async(v)=>{await p.evaluate(v=>{const i=document.createElement('input');i.id='tin';i.value=v;document.body.appendChild(i)},v)};
+  /* العمر: حساب قديم بعمر فقط */
+  await p.evaluate(()=>{delete S.prof.dob;S.prof.age=30;save()});await mkin('30');
+  await p.evaluate(()=>fxDob(document.getElementById('tin')));await p.waitForTimeout(100);
+  let t=await p.evaluate(()=>document.getElementById('fx-sheet').innerText);
+  ok(/العمر المحفوظ حاليًا/.test(t)&&/30/.test(t),'عمر قديم يظهر للمراجعة بلا فقدان');
+  await p.click('[data-fxs]');await p.waitForTimeout(80);
+  ok(await p.evaluate(()=>!!document.getElementById('fx-sheet'))&&/اختر اليوم/.test(await p.evaluate(()=>document.getElementById('bp-e').textContent)),'لا حفظ قبل اختيار تاريخ الميلاد');
+  ok(await p.evaluate(()=>S.prof.age===30&&!S.prof.dob),'العمر القديم باقٍ إلى أن يُختار التاريخ');
+  await p.selectOption('#bp-d','15');await p.selectOption('#bp-m','6');await p.selectOption('#bp-y','1995');
+  const age=await p.evaluate(()=>document.getElementById('bp-age').textContent);ok(age==='31','العمر يُحسب تلقائيًا (31)',age);
+  await p.selectOption('#bp-d','31');await p.selectOption('#bp-m','2');await p.waitForTimeout(50);
+  ok(await p.evaluate(()=>document.getElementById('bp-d').value)==='28','فبراير يقصّ اليوم إلى 28');
+  await p.click('[data-fxs]');await p.waitForTimeout(80);
+  ok(await p.evaluate(()=>S.prof.dob==='1995-02-28'&&S.prof.age===31&&!document.getElementById('fx-sheet')),'حفظ تاريخ الميلاد وتحديث العمر');
+  ok(await p.evaluate(()=>/[^0-9‎‏\s·]/.test(document.getElementById('tin').value)===false),'أرقام 0–9 في الحقل');
+  /* الطول */
+  await p.evaluate(()=>{S.prof.ht=0;document.getElementById('tin').value=''});
+  await p.evaluate(()=>fxHeight(document.getElementById('tin')));await p.waitForTimeout(500);
+  await p.click('[data-fxs]');await p.waitForTimeout(80);
+  ok(await p.evaluate(()=>!!document.getElementById('fx-sheet')&&/اختر القيمة/.test(document.querySelector('#fx-sheet [role=alert]').textContent)),'الطول: لا حفظ قبل الاختيار عند غياب قيمة سابقة');
+  ok(await p.evaluate(()=>/سم/.test(document.querySelector('#fx-sheet .fxu').textContent)),'الوحدة ظاهرة: سم');
+  await p.click('#fx-sheet .fxw .fxi[data-v="180"]');await p.waitForTimeout(100);await p.click('[data-fxs]');await p.waitForTimeout(80);
+  ok(await p.evaluate(()=>document.getElementById('tin').value==='180'&&!document.getElementById('fx-sheet')),'الطول يُحفظ بعد الاختيار');
+  await p.evaluate(()=>fxHeight(document.getElementById('tin')));await p.waitForTimeout(300);
+  ok(await p.evaluate(()=>/القيمة السابقة/.test(document.getElementById('fx-sheet').innerText)&&/تأكيد/.test(document.querySelector('[data-fxs]').textContent)),'الطول: القيمة السابقة للمراجعة وزر تأكيد');
+  await p.click('[data-fxs]');await p.waitForTimeout(80);
+  ok(await p.evaluate(()=>document.getElementById('tin').value==='180'),'التأكيد يبقي القيمة السابقة');
+  /* الوزن يبدأ من آخر وزن محفوظ */
+  await p.evaluate(()=>{S.bw={};S.bw['2026-11-10']=85.5;document.getElementById('tin').value=''});
+  await p.evaluate(()=>fxWeight(document.getElementById('tin'),'الوزن'));await p.waitForTimeout(500);
+  t=await p.evaluate(()=>document.getElementById('fx-sheet').innerText);
+  ok(/آخر وزن محفوظ/.test(t)&&/85\.5/.test(t)&&/2026-11-10/.test(t),'الوزن: آخر وزن محفوظ بتاريخه');
+  await p.click('[data-fxs]');await p.waitForTimeout(100);
+  ok(await p.evaluate(()=>document.getElementById('tin').value==='85.5'),'التأكيد يحفظ 85.5 (كسر)',await p.evaluate(()=>document.getElementById('tin').value));
+  /* بلا وزن سابق */
+  await p.evaluate(()=>{S.bw={};document.getElementById('tin').value=''});
+  await p.evaluate(()=>fxWeight(document.getElementById('tin'),'الوزن'));await p.waitForTimeout(500);await p.click('[data-fxs]');await p.waitForTimeout(80);
+  ok(await p.evaluate(()=>!!document.getElementById('fx-sheet')&&document.getElementById('tin').value===''),'الوزن: لا حفظ دون اختيار عند غياب وزن سابق');
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));
+  await ctx.close()}
  await b.close();console.log(fail?'FAILED '+fail:'all PASS');process.exit(fail?1:0)})();
