@@ -79,4 +79,32 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   ok(s.st==='c'&&s.id==='old1'&&s.sets.join()==='s1','الحصة الجزئية صارت مكتملة بمعرّفها ومجموعتها');
   ok(await p.evaluate(()=>{const e=qAll(),k=Object.keys(e).find(k=>/بنش/.test(e[k].n));return k&&e[k].max.w===60&&e[k].max.date==='2026-11-09'}),'تدخل التقارير والشاملة بتاريخها');
   await ctx.close()}
+
+ console.log('4) تسجيل مباشر لكل الرياضات، ويوم التدريب مرة واحدة');
+ {const {ctx,p}=await mk();
+  const tr=async k=>{await p.evaluate(k=>{S.tab='train';S.sub=null;UI.trk=k;UI.qd=TD();render()},k);await p.waitForTimeout(150)};
+  await tr('hub');let t=await txt(p);
+  ok(!/ابدأ أول حصة|ابدأ تمرين اليوم|عوّض تمرينًا|لم تبدأ بعد|جلسات مكتملة/.test(t),'صفحة التدريب بلا «ابدأ»');
+  ok(/سجّل أداء اليوم/.test(t)||/سجّل أول نشاط/.test(t),'أزرار تسجيل بدل البدء');
+  await tr('run');ok(!/ابدأ الآن|ابدأ</.test(await txt(p)),'صفحة الجري بلا بدء');
+  await p.fill('[data-tf=mmrun]','32');await p.fill('[data-tf=mlrun]','5.2');await p.click('#q-tk-save');await p.waitForTimeout(150);
+  let r=await p.evaluate(()=>{const s=SJ().ss.filter(x=>x.k==='run');return{n:s.length,d:s[0]&&s[0].day,km:s[0]&&s[0].res.km,acc:s[0]&&s[0].acc,st:s[0]&&s[0].st}});
+  ok(r.n===1&&r.d==='2026-11-16'&&r.km===5.2&&r.acc===1920000&&r.st==='done','جري: يحفظ المدة والمسافة بتاريخ اليوم',JSON.stringify(r));
+  /* تاريخ سابق */
+  await p.evaluate(()=>{UI.qd='2026-11-15';render()});await p.fill('[data-tf=mmrun]','20');await p.fill('[data-tf=mlrun]','3');await p.click('#q-tk-save');await p.waitForTimeout(100);
+  ok(await p.evaluate(()=>SJ().ss.filter(x=>x.k==='run'&&x.day==='2026-11-15').length)===1,'جري بتاريخ سابق');
+  await tr('swim');await p.fill('[data-tf=mmswim]','40');await p.fill('[data-tf=mlswim]','1200');await p.click('#q-tk-save');await p.waitForTimeout(100);
+  ok(await p.evaluate(()=>{const s=SJ().ss.find(x=>x.k==='swim');return s&&s.res.dist===1200&&s.acc===2400000}),'سباحة: مسافة ومدة');
+  await tr('cali');await p.fill('[data-qc="0,v"]','12');await p.click('[data-a=qcdup]');await p.waitForTimeout(80);await p.fill('[data-qc="1,v"]','10');await p.click('#q-tk-save');await p.waitForTimeout(100);
+  ok(await p.evaluate(()=>{const s=SJ().ss.find(x=>x.k==='cali');return s&&s.d.ents.length===2&&s.d.ents[0].val===12&&s.d.ents[1].val===10}),'كالسثينكس: مجموعتان بتكرارين مختلفين');
+  await tr('fn');await p.fill('[data-tf=fr]','5');await p.fill('[data-tf=fx]','7');await p.click('#q-tk-save');await p.waitForTimeout(100);
+  ok(await p.evaluate(()=>{const s=SJ().ss.find(x=>x.k==='fn');return s&&s.res.fmt==='amrap'&&s.res.rounds===5&&s.res.extra===7}),'كروسفت AMRAP: جولات وتكرارات');
+  /* حديد في نفس اليوم: اليوم يُحسب مرة واحدة */
+  await p.evaluate(()=>{const di=qDi(TD());S.plan[di].ex=[];irPlanAdd(di,'سكوات',3,5,0);qSave(TD(),irXv('سكوات'),'سكوات',[{w:100,r:5}]);qSave(TD(),irXv('سكوات'),'سكوات',[{w:100,r:5},{w:90,r:6}])});
+  const wd=await p.evaluate(()=>({n:wkDays().n,dates:[...qTrainDays(W())].sort().join()}));
+  ok(wd.dates==='2026-11-15,2026-11-16'&&wd.n===2,'أيام التدريب: 12 و16 فقط رغم تعدد الإدخالات',JSON.stringify(wd));
+  await p.evaluate(()=>{S.tab='dash';S.sub=null;UI.trk='hub';render()});await p.evaluate(()=>{S.tab='train';render()});
+  ok(/أيام تدريب/.test(await txt(p)),'الهدف الأسبوعي «أيام تدريب»');
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));
+  await ctx.close()}
  await b.close();console.log(fail?'FAILED '+fail:'all PASS');process.exit(fail?1:0)})();
