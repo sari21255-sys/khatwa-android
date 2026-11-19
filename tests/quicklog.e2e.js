@@ -200,4 +200,63 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   ok(await p.evaluate(()=>PP.length)===2,'الصور باقية بعد إعادة الفتح دون تكرار');
   ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));
   await ctx.close()}
+
+ console.log('7) يومية التغذية المبسّطة');
+ {const {ctx,p}=await mk();
+  await p.evaluate(()=>{S.meals={};S.lib=[];S.nt.kcal=2000;S.nt.p=150;S.nt.c=200;S.nt.f=60;S.tab='food';S.sub=null;UI.fm='today';UI.fd='';render()});await p.waitForTimeout(150);
+  let t=await txt(p);
+  ok(/المسجّل/.test(t)&&/الهدف/.test(t)&&/المتبقي/.test(t)&&/بروتين/.test(t)&&/كربوهيدرات/.test(t)&&/دهون/.test(t),'الأعلى: المسجّل والهدف والمتبقي ثم الماكروز');
+  const secs=await p.$$eval('.fdsec h2',a=>a.map(x=>x.textContent));ok(secs.join('|')==='الفطور|الغداء|العشاء|الوجبات الخفيفة','الأقسام بالترتيب: '+secs.join('|'));
+  ok((await p.$$eval('[data-a=fdadd]',a=>a.map(x=>x.textContent.trim()))).every(x=>/إضافة طعام/.test(x)),'زر «إضافة طعام» في كل قسم');
+  ok(await p.evaluate(()=>document.getElementById('fd-logged').textContent.trim())==='0','المسجّل 0');
+  await p.click('#fd-add-b');await p.waitForTimeout(100);
+  ok(await p.$('#fds')!==null&&await p.$('#fds-q')!==null,'نافذة موحّدة فيها بحث');
+  ok((await p.$$eval('#fds [data-a=fdtab]',a=>a.map(x=>x.textContent))).join('|')==='الأخيرة|المفضلة|وجباتي المحفوظة','تبويبات: الأخيرة والمفضلة ووجباتي');
+  await p.fill('#fds-q','دجاج');await p.waitForTimeout(100);
+  const first=await p.$eval('#fds-l .fpr b',e=>e.textContent);ok(!!first,'نتائج البحث: '+first);
+  await p.click('#fds-l .fpr');await p.waitForTimeout(100);
+  const per=await p.evaluate(()=>{const it=UI.fds.pick;return{n:it.n,k:it.per100.k,sg:it.sg}});
+  await p.fill('#fds-g','200');await p.waitForTimeout(80);
+  const live=await p.evaluate(()=>document.getElementById('fds-m').innerText);
+  ok(new RegExp(String(Math.round(per.k*2))).test(live),'القيم تتحدث مباشرة بالكمية (200 غ → '+Math.round(per.k*2)+')',live.replace(/\n/g,' '));
+  await p.click('#fds-save');await p.waitForTimeout(150);
+  ok(!await p.$('#fds'),'النافذة تُغلق بعد الحفظ');
+  let logged=await p.evaluate(()=>+document.getElementById('fd-logged').textContent.replace(/\D/g,''));
+  ok(logged===Math.round(per.k*2),'المسجّل تحدّث فورًا: '+logged);
+  ok(/200 غ/.test(await txt(p)),'الكمية بالغرام ظاهرة');
+  /* تعديل الكمية */
+  await p.click('[data-a=fded]');await p.fill('#fde-q','100');await p.click('[data-a=fdesave]');await p.waitForTimeout(100);
+  logged=await p.evaluate(()=>+document.getElementById('fd-logged').textContent.replace(/\D/g,''));ok(logged===Math.round(per.k),'تعديل الكمية يعيد الحساب ('+logged+')');
+  /* نقل إلى الغداء */
+  await p.click('[data-a=fded]');await p.selectOption('#fde-s','l');await p.click('[data-a=fdesave]');await p.waitForTimeout(100);
+  ok(await p.evaluate(()=>S.meals[TD()][0].slot==='l')&&(await p.$$eval('.fdsec[data-slot=l] .fdrow',a=>a.length))===1,'نُقل الطعام إلى الغداء');
+  ok(await p.evaluate(()=>S.meals[TD()].length)===1,'لا تكرار بعد النقل');
+  /* الأخيرة والمفضلة */
+  await p.click('#fd-add-d');await p.waitForTimeout(100);
+  ok((await p.$$eval('#fds-l .fpr b',a=>a.map(x=>x.textContent))).indexOf(per.n)>=0,'الأخيرة تعرض الطعام المسجّل');
+  await p.click('#fds-l .fpr');await p.waitForTimeout(80);await p.click('[data-a=fdfav]');await p.waitForTimeout(60);
+  ok(await p.evaluate(n=>!!S.ffav[n],per.n),'تفضيل ★');
+  await p.click('[data-a=fdclose] >> nth=-1').catch(()=>{});await p.evaluate(()=>{UI.fds=null;render()});
+  await p.click('#fd-add-s');await p.click('[data-v=fav]');await p.waitForTimeout(80);
+  ok((await p.$$eval('#fds-l .fpr b',a=>a.map(x=>x.textContent))).indexOf(per.n)>=0,'المفضلة تعرضه');
+  await p.evaluate(()=>{UI.fds=null;render()});
+  /* نسخ وجبة سابقة بعد المراجعة */
+  await p.evaluate(()=>{const y=addDays(TD(),-1);S.meals[y]=[{id:'a1',n:'أرز أبيض مطبوخ',kcal:200,p:4,c:44,f:0,slot:'d',gm:150,ub:'g',pr:{k:133,p:3,c:29,f:0},sg:150,su:'حصة'},{id:'a2',n:'سلطة',kcal:50,p:1,c:5,f:3,slot:'d',sq:1,pm:{k:50,p:1,c:5,f:3}}];save();render()});
+  await p.click('[data-a=fdcopy][data-s=d]');await p.waitForTimeout(100);
+  ok((await p.$$eval('[data-fdc]',a=>a.length))===2,'مراجعة العناصر قبل النسخ (2)');
+  await p.uncheck('[data-fdc=a2]');await p.click('#fdc-go');await p.waitForTimeout(120);
+  ok(await p.evaluate(()=>S.meals[TD()].filter(m=>m.slot==='d').map(m=>m.n).join()==='أرز أبيض مطبوخ'),'نُسخ العنصر المحدد فقط');
+  ok(await p.evaluate(()=>S.meals[TD()].filter(m=>m.slot==='d')[0].id!=='a1'),'نسخة جديدة بمعرّف مختلف');
+  /* طعام مخصص */
+  await p.click('#fd-add-s');await p.click('[data-a=fdcust]');await p.fill('#fdk-n','ساندويتش منزلي');await p.fill('#fdk-k','350');await p.fill('#fdk-p','20');await p.check('#fdk-save');await p.click('#fdk-go');await p.waitForTimeout(120);
+  ok(await p.evaluate(()=>S.meals[TD()].some(m=>m.n==='ساندويتش منزلي'&&m.kcal===350&&m.slot==='s')&&S.lib.some(x=>x.n==='ساندويتش منزلي')),'طعام مخصص أُضيف وحُفظ في وجباتي');
+  /* خلف اليومية */
+  await p.click('[data-a=fdgo][data-v=month]');await p.waitForTimeout(100);
+  ok(/العودة إلى اليومية/.test(await txt(p)),'التخطيط خلف اليومية ومعه رجوع');
+  await p.click('[data-a=fdgo][data-v=today]');await p.waitForTimeout(80);ok(await p.$('#fd-sum')!==null,'العودة إلى اليومية');
+  /* التاريخ */
+  await p.click('[data-a=fdday][data-v="-1"]');await p.waitForTimeout(80);
+  ok(await p.evaluate(()=>UI.fd===addDays(TD(),-1))&&/سلطة|أرز/.test(await txt(p)),'الانتقال لأمس');
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));
+  await ctx.close()}
  await b.close();console.log(fail?'FAILED '+fail:'all PASS');process.exit(fail?1:0)})();

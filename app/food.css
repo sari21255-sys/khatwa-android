@@ -1,0 +1,8 @@
+.fdkc{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.fdkc b{display:block;font-size:26px}
+.fdkc div:first-child b{color:var(--ac)}
+.fdrow{padding:8px 0;border-top:1px solid var(--bd)}
+.fdsec .fdrow:first-of-type{border-top:0}
+.fded{padding:8px 0 4px}
+.fded .irsel,.fdsec .irsel{font-family:inherit;min-height:44px}
+.fdcp input{width:22px;height:22px;flex:none}
