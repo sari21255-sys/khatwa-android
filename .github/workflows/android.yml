@@ -8,6 +8,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       HAS_KS: ${{ secrets.KEYSTORE_B64 != '' }}
     steps:
@@ -99,6 +101,14 @@ jobs:
           path: |
             SIJIL-UX-*-test.apk
             SIJIL-UX-*-test.apk.sha256
+      - name: Hand the test APK over on the apk-delivery branch (ux/** only)
+        if: startsWith(github.ref_name, 'ux/')
+        run: |
+          d=$(mktemp -d); cp SIJIL-UX-*-test.apk SIJIL-UX-*-test.apk.sha256 "$d"/
+          cd "$d" && git init -q && git checkout -q -b apk-delivery
+          git config user.name "ci" && git config user.email "ci@users.noreply.github.com"
+          git add -A && git commit -q -m "APK ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" apk-delivery
       - name: Build signed release AAB (for Google Play)
         if: env.HAS_KS == 'true'
         working-directory: android
