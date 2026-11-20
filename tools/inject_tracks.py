@@ -4,7 +4,7 @@ import os,re
 R=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 P=os.path.join(R,'app/fitness-tracker.html')
 s=open(P,encoding='utf8').read()
-OV=['tracks','ready','fixes','accounts','iron','simplify','quicklog','bodypick','album','food','scene']
+OV=['tracks','ready','fixes','accounts','iron','simplify','quicklog','bodypick','album','food','scene','home']
 def rd(ext,name):
     f=os.path.join(R,'app/%s.%s'%(name,ext))
     return open(f,encoding='utf8').read().rstrip('\n') if os.path.exists(f) else None

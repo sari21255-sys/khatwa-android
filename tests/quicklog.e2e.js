@@ -278,7 +278,7 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
    const worst=await p.evaluate(()=>{const st=scState();let w=99,at='';for(let m=0;m<1440;m+=10){const ms=rdAt(st.D.ds,m,st.c.tz),k=scDay(ms,st.c)||st.D,c=scContrast(ms,k);if(c<w){w=c;at=m}}return{w:w,at:at}});
    ok(worst.w>=4.5,'أقل تباين للنص على مدار اليوم ≥ 4.5 ('+worst.w.toFixed(2)+')');
    /* السمات: النص أبيض على لوحة داكنة في الفاتح والأسود */
-   for(const th of ['light','dark']){await p.evaluate(t=>{document.documentElement.setAttribute('data-theme',t);render()},th);const cc=await p.evaluate(()=>{const e=document.querySelector('.scin');return getComputedStyle(e).color+'|'+getComputedStyle(document.querySelector('.scdate')).fontSize});ok(/^rgb\(255, 255, 255\)/.test(cc),'نص المشهد أبيض ('+th+')',cc)}
+   for(const th of ['light','dark']){await p.evaluate(t=>{document.documentElement.setAttribute('data-theme',t);render()},th);const cc=await p.evaluate(()=>{const e=document.querySelector('.scin');return getComputedStyle(e).color+'|'+getComputedStyle(document.querySelector('.hmwd')).fontSize});ok(/^rgb\(255, 255, 255\)/.test(cc),'نص المشهد أبيض ('+th+')',cc)}
    /* المقاسات على 320 */
    await p.setViewportSize({width:320,height:700});await p.waitForTimeout(100);
    const g=await p.evaluate(()=>({ov:document.documentElement.scrollWidth>innerWidth+1,btn:Math.min(...[...document.querySelectorAll('.scin button')].map(b=>b.getBoundingClientRect().height)),fs:Math.min(...[...document.querySelectorAll('.scin .scs,.scin .scdate,.scchip')].map(e=>parseFloat(getComputedStyle(e).fontSize)))}));
@@ -290,10 +290,10 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
    const x2=await p.evaluate(()=>document.querySelector('.scmoon').getAttribute('transform'));ok(x1!==x2,'القمر يتحرك مع الوقت (تأثير بصري)');
    ok(/تأثير بصري/.test(await txt(p)),'توضيح أن حركة القمر تأثير بصري');await ctx.close()}
   /* تغيّر اليوم والوقت يحدّث المشهد */
-  {const {ctx,p}=await mkAt('2026-11-16T16:50:00+03:00');const d1=await p.evaluate(()=>document.getElementById('sc-date').textContent+'|'+document.getElementById('sc-per').textContent);
-   await p.clock.fastForward(2*3600*1000);await p.waitForTimeout(100);const d2=await p.evaluate(()=>document.getElementById('sc-date').textContent+'|'+document.getElementById('sc-per').textContent);ok(d1!==d2&&/الليل/.test(d2),'الفترة تتغير مع الوقت: '+d2);
+  {const {ctx,p}=await mkAt('2026-11-16T16:50:00+03:00');const d1=await p.evaluate(()=>document.getElementById('hm-g').textContent+'|'+document.getElementById('sc-per').textContent);
+   await p.clock.fastForward(2*3600*1000);await p.waitForTimeout(100);const d2=await p.evaluate(()=>document.getElementById('hm-g').textContent+'|'+document.getElementById('sc-per').textContent);ok(d1!==d2&&/الليل/.test(d2),'الفترة تتغير مع الوقت: '+d2);
    await p.clock.fastForward(24*3600*1000);await p.waitForTimeout(100);await p.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await p.waitForTimeout(100);
-   ok(/17 نوفمبر|18 نوفمبر/.test(await p.evaluate(()=>document.getElementById('sc-date').textContent)),'تغيّر اليوم يحدّث التاريخ');
+   ok(/17 نوفمبر|18 نوفمبر/.test(await p.evaluate(()=>document.getElementById('hm-g').textContent)),'تغيّر اليوم يحدّث التاريخ');
    /* تغيّر الموقع: القاهرة */
    const before=await p.evaluate(()=>document.querySelector('.scsr').innerText);
    await p.evaluate(()=>{const s=rdS();s.cus={n:'القاهرة',lat:30.04,lon:31.24,tz:'Africa/Cairo'};s.geo=1;save();render()});await p.waitForTimeout(100);
@@ -350,4 +350,35 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   const small=await p.evaluate(()=>[...document.querySelectorAll('button[data-a]')].filter(b=>{const r=b.getBoundingClientRect();return r.width>0&&!b.classList.contains('sjl')&&(r.height<30||r.width<30)}).map(b=>b.dataset.a).slice(0,5));
   ok(small.length===0,w+': أهداف اللمس 30px فأكثر في الخطة',small.join());
   ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
+ console.log('11) الرئيسية: خانات منفصلة، صلوات، فاصل، اختصارات، سمات الشعار');
+ {const mk2=async(time,w)=>{const ctx=await b.newContext({viewport:{width:w||390,height:844},timezoneId:'Asia/Riyadh'});await ctx.clock.install({time:new Date(time)});const p=await ctx.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));
+   await p.goto('file://'+file);await p.waitForFunction(()=>typeof hmShort==='function');
+   await p.evaluate(()=>{S.prof.ob=1;S.prof.name='م';calcTargets();const s=rdS();s.geo=1;s.cus={n:'المدينة المنورة',lat:24.47,lon:39.61,tz:'Asia/Riyadh'};S.tab='dash';S.sub=null;save()});await p.reload();await p.waitForFunction(()=>typeof hmShort==='function');await p.waitForTimeout(250);return{ctx,p}};
+  const {ctx,p}=await mk2('2026-11-20T15:40:00+03:00');
+  const g=await p.evaluate(()=>({cells:['.hmdate','.hmtime','.hmwx'].map(q=>!!document.querySelector(q)),wd:document.getElementById('hm-wd').textContent,day:document.getElementById('hm-day').textContent,hj:document.getElementById('sc-hijri').textContent,tiles:[...document.querySelectorAll('.hmt b')].map(x=>x.textContent),cd:document.getElementById('hm-cd').textContent,nk:document.querySelector('.hmnk').textContent,od:[...document.querySelectorAll('.hmod1,.hmod2')].map(x=>x.textContent.trim()),red:getComputedStyle(document.querySelector('.hmod1'),'::after').backgroundColor,sc:[...document.querySelectorAll('.hmsc b')].map(x=>x.textContent)}));
+  ok(g.cells.every(Boolean),'ثلاث خانات منفصلة: التاريخ والوقت والحرارة');
+  ok(g.wd==='الجمعة'&&g.day==='20'&&/1448/.test(g.hj),'خانة اليوم: '+g.wd+' '+g.day+' '+g.hj);
+  ok(g.tiles.join('|')==='الفجر|الشروق|الجمعة|العصر|المغرب|العشاء','ست صلوات منفصلة (الظهر = الجمعة يوم الجمعة): '+g.tiles.join('|'));
+  ok(/المغرب/.test(g.nk)&&/^\d:\d\d:\d\d$/.test(g.cd),'العدّ التنازلي حتى المغرب: '+g.cd);
+  const exp=await p.evaluate(()=>{const c=rdCity(),T=rdPray(rdP(rdNow(),c.tz).d);return Math.round((T.maghrib-rdNow())/1000)});const [hh,mm,ss]=g.cd.split(':').map(Number);ok(Math.abs(hh*3600+mm*60+ss-exp)<=2,'العدّاد = المغرب − الآن (±2ث)',g.cd+' / '+exp);
+  await p.clock.fastForward(60000);await p.waitForTimeout(100);const cd2=await p.evaluate(()=>document.getElementById('hm-cd').textContent);ok(cd2!==g.cd,'العدّاد يتحرك: '+g.cd+' ← '+cd2);
+  ok(await p.evaluate(()=>{const w=+document.getElementById('hm-tb').style.width.replace('%','');return w>0&&w<100}),'شريط الصلاة الحالية يعرض المتبقي');
+  ok(g.od.join('|')==='One Day|Day One'&&/229, ?36, ?43|rgb\(229, 36, 43\)/.test(g.red),'الفاصل: One Day بخط أحمر ثم Day One',g.od.join('|')+' '+g.red);
+  ok(g.sc.length===6&&g.sc.includes('متابعة الوزن')&&g.sc.includes('تسجيل وقت التمرين'),'ستة اختصارات افتراضية: '+g.sc.join('|'));
+  /* تخصيص الاختصارات: إزالة وإضافة وترتيب وبقاء بعد إعادة الفتح */
+  await p.click('[data-a=hmed]');await p.click('[data-a=hmtg][data-v=photos]');await p.click('[data-a=hmmv][data-v=food][data-d="-1"]');await p.click('[data-a=hmtg][data-v=run]');await p.click('[data-a=hmed]');
+  const L1=await p.evaluate(()=>[...document.querySelectorAll('.hmsc')].map(x=>x.dataset.v).join());
+  await p.reload();await p.waitForFunction(()=>typeof hmShort==='function');await p.waitForTimeout(200);
+  const L2=await p.evaluate(()=>[...document.querySelectorAll('.hmsc')].map(x=>x.dataset.v).join());
+  ok(L1===L2&&!/photos/.test(L2)&&/run/.test(L2)&&L2.indexOf('food')<L2.indexOf('wlog'),'التخصيص يُحفظ ويبقى: '+L2);
+  /* الاختصار يفتح وجهته */
+  await p.click('.hmsc[data-v=wgt]');ok(await p.evaluate(()=>S.tab==='me'&&S.sub==='wgt'),'«متابعة الوزن» تفتح مراقبة الوزن');
+  await p.evaluate(()=>{S.tab='dash';S.sub=null;render()});await p.click('.hmsc[data-v=wlog]');ok(await p.evaluate(()=>S.tab==='train'&&UI.trk==='irs'&&UI.qt==='cur'),'«تسجيل وقت التمرين» تفتح التسجيل اليوم');
+  await p.evaluate(()=>{S.tab='dash';S.sub=null;render()});await p.click('.hmsc[data-v=food]');ok(await p.evaluate(()=>S.tab==='food'&&!!UI.fds),'«تسجيل طعام» تفتح نافذة الإضافة');
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
+ /* شعار الرئيسية يتبع السمة */
+ {const {ctx,p}=await mk();await go(p,'dash');
+  const bg={};for(const th of ['black','white','blue','emerald','olive','purple']){bg[th]=await p.evaluate(t=>{document.documentElement.dataset.sj=t;return getComputedStyle(document.querySelector('.smhero')).backgroundColor+'|'+getComputedStyle(document.querySelector('.smtx')).color},th)}
+  ok(new Set(Object.values(bg).map(x=>x.split('|')[0])).size>=5&&bg.white.split('|')[0]!==bg.black.split('|')[0],'خلفية الشعار تتغير مع السمة',JSON.stringify(bg));
+  ok(/rgb\(16, 16, 16\)|rgb\(0, 0, 0\)/.test(bg.white.split('|')[1]),'نص الشعار مقروء على الأبيض',bg.white);await ctx.close()}
  await b.close();console.log(fail?'FAILED '+fail:'all PASS');process.exit(fail?1:0)})();
