@@ -401,4 +401,16 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   await p.goto('file://'+file);await p.waitForFunction(()=>typeof hmAuto==='function');await p.evaluate(()=>{S.prof.ob=1;S.prof.name='م';calcTargets();S.tab='dash';S.sub=null;save()});
   for(let i=0;i<3;i++){await p.reload();await p.waitForFunction(()=>typeof hmAuto==='function');await p.waitForTimeout(900)}
   const n=await p.evaluate(()=>({g:window.__g,t:document.querySelector('#sc-loc').textContent.trim(),ask:rdS().geoAsked}));ok(n.ask===1&&/غير مفعّل|حدّد/.test(n.t),'بعد الرفض: حالة قصيرة والصلاحية لا تُطلب كل مرة',JSON.stringify(n));await ctx.close()}
+ console.log('13) قسم المجتمع محذوف كاملًا');
+ {const {ctx,p}=await mk();await go(p,'dash');
+  const r=await p.evaluate(()=>{const hits=[];const txt=()=>document.body.innerText;
+   for(const t of ['dash','train','food','me','ex']){try{S.tab=t;S.sub=null;render();if(/مجتمع|المجتمع/.test(txt()))hits.push('tab:'+t)}catch(e){hits.push('err:'+t)}}
+   for(const s of ['set','nc','comm','more','tools']){try{S.tab='me';S.sub=s;render();if(/مجتمع|المجتمع/.test(txt()))hits.push('sub:'+s)}catch(e){hits.push('err:'+s)}}
+   const gone=['vComm','commCard','postCard','cmLoad','cmNotes','CM'].filter(n=>{try{return typeof eval(n)!=='undefined'}catch(e){return false}});
+   const acts=['ppost','plike','pcm','psend','prep'].filter(k=>ACT[k]);
+   return {hits,gone,acts,keep:typeof cmSyncSet==='function'&&typeof cmPull==='function'}});
+  ok(r.hits.length===0,'لا نص «المجتمع» في أي تبويب أو صفحة فرعية',JSON.stringify(r.hits));
+  ok(r.gone.length===0&&r.acts.length===0,'دوال المجتمع ومعالجات النشر/الإعجاب/التعليق محذوفة',JSON.stringify(r));
+  ok(r.keep,'مزامنة الاختصاراتَ والتفضيلات للحساب باقية');
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
  await b.close();console.log(fail?'FAILED '+fail:'all PASS');process.exit(fail?1:0)})();

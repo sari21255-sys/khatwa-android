@@ -184,8 +184,8 @@ Object.assign(ACT,{fxin:()=>{fxAuth('in',{email:SB.email()||spMeta().email||''})
 /* شاشة البداية: تسجيل الدخول · إنشاء حساب · المتابعة كزائر (متاح دائمًا ودون إنترنت) */
 vWelcome=function(){return '<div class="sjwel"><div class="bg"></div><div class="art">'+SJART+'</div><div class="in"><button class="lang" data-a="langm" aria-label="اللغة">English</button><div class="lgw">'+SJLOGO+'</div><div class="sp"></div><h1>أهلًا بك</h1>'+
  '<button class="btn" data-a="welin" id="wel-in">تسجيل الدخول</button><button class="btn fxw2" data-a="welup" id="wel-up">إنشاء حساب</button><hr><button class="sec" data-a="welguest" id="wel-go">المتابعة كزائر</button></div></div>'};
-/* مجتمع SIJIL: الدخول عبر النافذة نفسها لا عبر نموذج ثانٍ */
-authCard=function(){return '<div class="card"><h2>'+ic('users')+'تسجيل الدخول</h2><div class="mu" style="margin-bottom:10px">الحساب لازم للمشاركة في المجتمع. وضع الزائر يبقى محليًا ولا يُرفع.</div><button class="btn" style="width:100%" data-a="fxin">تسجيل الدخول أو إنشاء حساب</button></div>'};
+/* تسجيل الدخول عبر النافذة نفسها لا عبر نموذج ثانٍ */
+authCard=function(){return '<div class="card"><h2>'+ic('users')+'تسجيل الدخول</h2><div class="mu" style="margin-bottom:10px">الحساب اختياري لمزامنة بياناتك. وضع الزائر يبقى محليًا ولا يُرفع.</div><button class="btn" style="width:100%" data-a="fxin">تسجيل الدخول أو إنشاء حساب</button></div>'};
 /* حساب جديد بلا بيانات محلية: انتظر الاستعادة بدل معالج الإعداد إن كان للحساب نسخة سحابية */
 (function(){const V=vOnb;vOnb=function(){const m=spMeta();
  if(!S.prof.ob&&SB.ses&&m.wait&&!UI.fxnowait&&!(m.xfer&&m.xfer.st==='ask')){

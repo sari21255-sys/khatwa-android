@@ -174,7 +174,7 @@ vEx=function(){
  const R=(k,n,t,a,d)=>'<button class="sjrow" '+a+'>'+sjI(k,n)+'<span class="t">'+t+(d?'<small>'+d+'</small>':'')+'</span>'+ic('next')+'</button>',S2=v=>'data-a="sub" data-v="'+v+'"';
  let h='<div class="sjttl"><div><h1>المزيد</h1><div class="mu">الخدمات والأدوات</div></div></div>';
  h+=R('rp','chart','التقدّم',S2('pgs'),'ملخص تقدّمك عبر الوقت');
- h+='<div class="sjsec">المعرفة والأدوات</div>'+R('rp','book','الثقافة الرياضية',S2('cul'))+R('wt','calc','الأدوات والحاسبات',S2('tools'))+R('md','spark','المدرب الذكي',S2('coach'))+R('nt','users','المجتمع',S2('comm'));
+ h+='<div class="sjsec">المعرفة والأدوات</div>'+R('rp','book','الثقافة الرياضية',S2('cul'))+R('wt','calc','الأدوات والحاسبات',S2('tools'))+R('md','spark','المدرب الذكي',S2('coach'));
  h+='<div class="sjsec">الصحة</div>'+R('hr','heart','الخطوات والساعات',S2('link'),'قراءة الخطوات وجلسة خطوات');
  h+='<div class="sjsec">النادي</div>'+R('ar','pin','الأندية القريبة',S2('gyms'))+R('ar','cal','زياراتي للنادي',S2('vis'));
  h+='<div class="sjsec">سجلاتي</div>'+R('ar','box','الأرشيف',S2('arch'));

@@ -4964,7 +4964,7 @@ const rsPend=()=>Object.keys(RSM.rec).filter(k=>RSM.rec[k].p).length;
 function rsCard(){
  if(IN_CLAUDE||!(CFG.sbUrl&&CFG.sbKey))return '';
  let h='<div class="card"><h2>'+ic('watch')+'المزامنة السحابية والبيانات</h2>';
- if(!SB.ses){h+='<div class="mu" style="margin-bottom:8px">سجّل الدخول بحسابك لتتزامن بياناتك بين أجهزتك، والمساعد الذكي يعمل بالحساب نفسه. بدون حساب تبقى بياناتك على هذا الجهاز فقط.</div><button class="btn sm" data-a="sub" data-v="comm">تسجيل الدخول</button>'}
+ if(!SB.ses){h+='<div class="mu" style="margin-bottom:8px">سجّل الدخول بحسابك لتتزامن بياناتك بين أجهزتك، والمساعد الذكي يعمل بالحساب نفسه. بدون حساب تبقى بياناتك على هذا الجهاز فقط.</div><button class="btn sm" data-a="fxin">تسجيل الدخول</button>'}
  else{
   const pend=rsPend(),st=RS.pause?'متوقفة على هذا الجهاز':RS.closed?'النسخة السحابية محذوفة، لا رفع حتى تقرر':RS.err==='auth'?'انتهت الجلسة، سجّل الدخول من جديد':RS.err==='clock'?'ساعة جهازك غير مضبوطة (متقدمة كثيرًا). صحّح التاريخ والوقت ثم أعد المحاولة':RS.err==='net'?'تعذّر الاتصال، التعديلات محفوظة وستُرسل لاحقًا':RS.last?'آخر مزامنة '+ago(RS.last):'لم تتم مزامنة بعد';
   h+='<div class="mu">الحساب: <b dir="ltr">'+esc(SB.email())+'</b></div><div class="tag'+(RS.err||RS.pause?' bad':'')+'" style="margin:8px 0">'+esc(st)+(pend?' · '+pend+' تعديل بانتظار الإرسال':'')+'</div>';
@@ -4978,7 +4978,7 @@ function rsCard(){
   h+='<div class="mu" style="margin:16px 0 6px"><b>حذف البيانات</b> (كل خيار مستقل عن الآخر)</div>';
   h+=UI.rsdel?'<div class="mu" style="margin:6px 0">سيُحذف كل ما رفعته إلى السحابة. حسابك وبياناتك على هذا الجهاز تبقى. ولن تُرفع بيانات هذا الجهاز مجددًا إلا إذا أعدت تفعيل المزامنة. الأجهزة الأخرى لن تستطيع إعادة رفع النسخة المحذوفة.</div><div class="row"><button class="btn sm" style="background:#b91c1c" data-a="rsdel">تأكيد حذف النسخة السحابية</button><button class="btn sm ghost" data-a="rsdelc">إلغاء</button></div>':'<button class="btn sm ghost" data-a="rsdelq">'+ic('trash')+'حذف نسخة المزامنة السحابية</button>';
   h+=UI.rswipe?'<div class="mu" style="margin:10px 0 6px">سيُمسح كل ما على هذا الجهاز (التمارين والوجبات والوزن والإعدادات) ويُسجَّل خروجك. النسخة السحابية لا تتأثر ويمكنك استعادتها بتسجيل الدخول.</div><div class="row"><button class="btn sm" style="background:#b91c1c" data-a="rswipe">تأكيد مسح بيانات هذا الجهاز</button><button class="btn sm ghost" data-a="rswipec">إلغاء</button></div>':'<div style="margin-top:8px"><button class="btn sm ghost" data-a="rswipeq">'+ic('trash')+'مسح بيانات هذا الجهاز</button></div>';
-  h+='<div class="mu" style="margin-top:8px">حذف الحساب كاملًا (المجتمع والمزامنة والحصص) من صفحة «المجتمع».</div>'}
+  h+='<div class="mu" style="margin-top:8px">حذف الحساب كاملًا (المزامنة والحصص) من الإعدادات.</div>'}
  if(CFG.syncUrl&&SYNC.token&&!SYNC.dead)h+=(UI.lgdel?'<div class="mu" style="margin:14px 0 6px">سيُحذف نسخة المزامنة القديمة من الوسيط نهائيًا. لا تتأثر بيانات الجهاز ولا حسابك الجديد. إن كان لديك حساب مزامنة قديم (بريد وكلمة مرور) فأدخلهما ليُحذف الحساب نفسه أيضًا، وإلا تُحذف النسخة فقط.</div><label class="f">بريد حساب المزامنة القديم (اختياري)<input id="lgem" type="email" dir="ltr" autocomplete="off"></label><label class="f" style="margin-top:6px">كلمة المرور (اختياري)<input id="lgpw" type="password" dir="ltr" autocomplete="off"></label><div class="row" style="margin-top:8px"><button class="btn sm" style="background:#b91c1c" data-a="lgdel">تأكيد حذف المزامنة القديمة</button><button class="btn sm ghost" data-a="lgdelc">إلغاء</button></div>':'<div style="margin-top:14px"><button class="btn sm ghost" data-a="lgdelq">'+ic('trash')+'حذف المزامنة القديمة (رمز الوسيط)</button></div>');
  return h+'</div>'}
 function accCard(){
@@ -5087,7 +5087,6 @@ const FEATS=[
 {id:'vis',i:'cal',t:'جدول زياراتي',c:'#3b82f6',a:'sub',v:'vis'},
 {id:'cul',i:'book',t:'الثقافة',c:'#8b5cf6',a:'sub',v:'cul'},
 {id:'coach',i:'spark',t:'المدرب الذكي',c:'#eab308',a:'sub',v:'coach'},
-{id:'comm',i:'users',t:'المجتمع',c:'#3b82f6',a:'sub',v:'comm'},
 {id:'nc',i:'bell',t:'الإشعارات',c:'#ef4444',a:'sub',v:'nc'},
 {id:'set',i:'gear',t:'الإعدادات',c:'#64748b',a:'sub',v:'set'},
 {id:'me',i:'user',t:'ملفي',c:'#0a0a0a',a:'go',v:'me'}];
@@ -5103,7 +5102,7 @@ function picks(){
  if(!T.filter(t=>t.d===ti).every(t=>t.r)&&S.plan[ti].ex.length)id.push('wk');
  if(!(S.meals[td]||[]).length)id.push('meal');
  if(!S.bw[td])id.push('wgt');
- ['coach','prog','ach','plan','gyms','cul','tools','comm','rpt','link'].forEach(i=>{if(id.indexOf(i)<0)id.push(i)});
+ ['coach','prog','ach','plan','gyms','cul','tools','rpt','link'].forEach(i=>{if(id.indexOf(i)<0)id.push(i)});
  return id.slice(0,10).map(i=>FD[i])}
 const ago=ts=>{const m=Math.max(0,Math.round((Date.now()-ts)/6e4));return m<1?'الآن':m<60?'قبل '+m+' د':m<1440?'قبل '+Math.round(m/60)+' س':'قبل '+Math.round(m/1440)+' يوم'};
 const fmtTm=ts=>{try{return new Date(ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:!(S.prof&&S.prof.h24)})}catch(e){return ''}};
@@ -5123,19 +5122,11 @@ const SB={
  email(){return this.ses&&this.ses.user&&this.ses.user.email||''}};
 SB.init();
 const sbErr=e=>{const m=String(e&&e.message||e);return({'Invalid login credentials':'البريد أو كلمة المرور غير صحيحة','User already registered':'هذا البريد مسجّل مسبقًا','Email not confirmed':'أكّد بريدك من الرسالة التي وصلتك ثم سجّل الدخول'}[m])||(/at least 6/.test(m)?'كلمة المرور 6 أحرف على الأقل':/Failed to fetch|NetworkError/.test(m)?'تعذّر الاتصال، تحقق من الإنترنت':m)};
-const CM={posts:[],my:{},cm:{},notes:[],ld:0,err:'',tab:'new',open:0};
-const cmR=()=>{if(S.sub==='comm'||S.sub==='nc'||S.tab==='ex')render()};
-async function cmLoad(){if(!SB.on()||!SB.ses)return;CM.ld=1;CM.err='';cmR();
- try{const o=CM.tab==='top'?'likes.desc,created_at.desc':'created_at.desc';
-  CM.posts=await SB.q('posts?select=id,user_id,author,body,likes,comments,created_at&order='+o+'&limit=40');
-  const l=await SB.q('likes?select=post_id&user_id=eq.'+SB.uid());CM.my={};l.forEach(x=>CM.my[x.post_id]=1)}
- catch(e){CM.err=sbErr(e)}CM.ld=0;cmR()}
-async function cmNotes(){if(!SB.on()||!SB.ses)return;try{CM.notes=await SB.q('notifications?select=*&order=created_at.desc&limit=40');}catch(e){lg(e)}}
 async function cmSyncSet(){if(!SB.on()||!SB.ses)return;try{await SB.q('user_settings','POST',{user_id:SB.uid(),shortcuts:scList(),prefs:{ns:S.ns||{},h24:!!S.prof.h24},updated_at:new Date().toISOString()},'resolution=merge-duplicates')}catch(e){lg(e)}}
 async function cmPull(){if(!SB.on()||!SB.ses)return;try{const r=await SB.q('user_settings?select=shortcuts,prefs&user_id=eq.'+SB.uid());if(r&&r[0]){if(Array.isArray(r[0].shortcuts))S.sc=r[0].shortcuts;if(r[0].prefs){if(r[0].prefs.ns)S.ns=r[0].prefs.ns;S.prof.h24=!!r[0].prefs.h24}save();render()}}catch(e){lg(e)}}
 /* ---- local notification feed ---- */
 const NTY={workout:['dumbbell','#f97316'],late:['timer','#ef4444'],nutrition:['fork','#22c55e'],streak:['flame','#f97316'],weight:['scale','#8b5cf6'],like:['heart','#ef4444'],comment:['users','#3b82f6'],comm:['users','#3b82f6']};
-const NCAT=[['workout','التمارين'],['nutrition','التغذية'],['streak','السلسلة'],['weight','الوزن'],['community','المجتمع']];
+const NCAT=[['workout','التمارين'],['nutrition','التغذية'],['streak','السلسلة'],['weight','الوزن']];
 const nsOn=k=>{const n=S.ns||{};return n.on!==0&&n[k]!==0};
 let NCT=0;
 function ncGen(){
@@ -5151,53 +5142,32 @@ function ncGen(){
   const st=stats().cur;[3,7,14,30,60,100].forEach(n=>{if(st>=n)put('s'+n,'streak','سلسلة '+n+' أيام متتالية','استمر، هذا التزام حقيقي','streak')});
   const bd=Object.keys(S.bw).sort().pop();if(bd&&(Date.now()-new Date(bd))/864e5>=7)put('b'+td.slice(0,7)+Math.floor(+td.slice(8)/7),'weight','مرّ أسبوع على آخر تسجيل للوزن','سجّل وزنك لتتابع المسار','weight')}catch(e){lg(e)}
  if(add.length){S.nf=add.concat(S.nf).slice(0,60);try{save()}catch(e){lg(e)}}}
-function ncUnread(){ncGen();let n=(S.nf||[]).filter(x=>!x.r).length;if(nsOn('community'))n+=CM.notes.filter(x=>!x.read).length;return n}
+function ncUnread(){ncGen();return (S.nf||[]).filter(x=>!x.r).length}
 function ncFeed(){const a=(S.nf||[]).map(x=>({k:'l'+x.id,ty:x.ty,t:x.t,b:x.b,ts:x.ts,r:x.r}));
- if(nsOn('community'))CM.notes.forEach(x=>a.push({k:'r'+x.id,ty:x.type,t:x.title,b:x.body,ts:new Date(x.created_at).getTime(),r:x.read}));
  return a.sort((x,y)=>y.ts-x.ts)}
 function vNc(){
  const f=ncFeed(),n=S.ns||{};
- let h=back()+'<h1>مركز الإشعارات</h1><div class="mu" style="margin-bottom:10px">تنبيهات تمرينك وتغذيتك وتفاعلات المجتمع في مكان واحد.</div>';
+ let h=back()+'<h1>مركز الإشعارات</h1><div class="mu" style="margin-bottom:10px">تنبيهات تمرينك وتغذيتك في مكان واحد.</div>';
  h+='<div class="card"><div class="row"><b>'+ic('bell')+' تفعيل الإشعارات</b><span class="sp"></span><button class="chip'+(n.on!==0?' on':'')+'" data-a="nstog" data-v="on">'+(n.on!==0?'مفعّلة':'متوقفة')+'</button></div>'
   +'<div class="rail tight" style="margin-top:10px">'+NCAT.map(c=>'<button class="chip'+(n[c[0]]!==0?' on':'')+'" data-a="nstog" data-v="'+c[0]+'">'+c[1]+'</button>').join('')+'</div></div>';
  h+='<div class="row" style="margin:6px 0 10px"><b>الأحدث</b><span class="sp"></span><button class="chip" data-a="ncread">تعليم الكل كمقروء</button></div>';
  if(!f.length)h+='<div class="card mu" style="text-align:center;padding:26px">لا توجد إشعارات بعد. ستظهر هنا تنبيهات تمرينك وتغذيتك وتفاعلات المجتمع.</div>';
  f.forEach(x=>{const t=NTY[x.ty]||NTY.comm;h+='<div class="ncr'+(x.r?'':' un')+'"><span class="fi" style="--c:'+t[1]+'">'+ic(t[0])+'</span><div class="t"><b>'+esc(x.t)+'</b>'+(x.b?'<div class="mu">'+esc(x.b)+'</div>':'')+'<small class="mu">'+ago(x.ts)+' · '+fmtTm(x.ts)+'</small></div></div>'});
  return h}
-/* ---- community ---- */
+
 function authCard(){const up=UI.au==='up';
- return '<div class="card"><h2>'+ic('users')+(up?'إنشاء حساب':'تسجيل الدخول')+'</h2><div class="mu" style="margin-bottom:10px">الحساب لازم للمشاركة في المجتمع فقط. بيانات تمرينك تبقى على جهازك.</div>'
+ return '<div class="card"><h2>'+ic('users')+(up?'إنشاء حساب':'تسجيل الدخول')+'</h2><div class="mu" style="margin-bottom:10px">الحساب اختياري للمزامنة. بيانات تمرينك تبقى على جهازك.</div>'
  +seg([['in','دخول'],['up','حساب جديد']],'au',UI.au||'in')
  +(up?'<label class="f">الاسم الظاهر<input id="au-n" maxlength="24" autocomplete="nickname" value="'+esc(UI.an||'')+'"></label>':'')
  +'<label class="f">البريد الإلكتروني<input id="au-e" type="email" dir="ltr" autocomplete="email" value="'+esc(UI.ae||'')+'"></label><label class="f">كلمة المرور<input id="au-p" type="password" dir="ltr" autocomplete="'+(up?'new-password':'current-password')+'"></label>'
  +(UI.aerr?'<div class="mu" style="color:var(--t-rd);margin:6px 0">'+esc(UI.aerr)+'</div>':'')+'<button class="btn" style="width:100%;margin-top:10px" data-a="auth">'+(UI.abusy?'لحظة…':up?'إنشاء الحساب':'دخول')+'</button></div>'}
-function postCard(p){const mine=p.user_id===SB.uid(),lk=CM.my[p.id],op=CM.open===p.id;
- let h='<div class="card pst"><div class="row" style="gap:10px"><span class="pav">'+esc((p.author||'ع').charAt(0))+'</span><div class="t"><b>'+esc(p.author)+'</b><small class="mu">'+ago(new Date(p.created_at).getTime())+'</small></div><span class="sp"></span>'
-  +(mine?'<button class="chip" data-a="pdel" data-id="'+p.id+'" aria-label="حذف">'+ic('trash')+'</button>':'<button class="chip" data-a="prep" data-id="'+p.id+'" aria-label="إبلاغ">إبلاغ</button>')+'</div>'
-  +'<p class="pbody">'+esc(p.body)+'</p><div class="row" style="gap:8px"><button class="chip'+(lk?' on lkd':'')+'" data-a="plike" data-id="'+p.id+'">'+ic('heart')+'<b class="num">'+F(p.likes)+'</b></button><button class="chip'+(op?' on':'')+'" data-a="pcm" data-id="'+p.id+'">'+ic('users')+'تعليقات <b class="num">'+F(p.comments)+'</b></button></div>';
- if(op){const cs=CM.cm[p.id];h+='<div class="cms">'+(cs?cs.map(c=>'<div class="cmr"><b>'+esc(c.author)+'</b> <small class="mu">'+ago(new Date(c.created_at).getTime())+'</small><div>'+esc(c.body)+'</div></div>').join('')||'<div class="mu">لا تعليقات بعد.</div>':'<div class="mu">جارٍ التحميل…</div>')+'<div class="row" style="margin-top:8px"><input id="cm-c" maxlength="300" placeholder="اكتب تعليقًا" style="flex:1"><button class="btn sm" data-a="psend" data-id="'+p.id+'">إرسال</button></div></div>'}
- return h+'</div>'}
-function vComm(){
- let h=back()+'<h1>مجتمع SIJIL</h1><div class="mu" style="margin-bottom:10px">شارك إنجازك، واسأل، وألهم غيرك. المنشورات عامة لكل الأعضاء.</div>';
- if(!SB.on())return h+'<div class="card"><b>المجتمع غير مفعّل بعد</b><div class="mu" style="margin-top:6px">يعمل عند ربط التطبيق بقاعدة البيانات (ملف الإعداد).</div></div>';
- if(!SB.ses)return h+authCard();
- h+='<div class="card"><textarea id="cm-new" maxlength="500" rows="3" placeholder="شارك تمرينك أو إنجازك اليوم…"></textarea><div class="row" style="margin-top:8px"><small class="mu">'+esc(SB.email())+'</small><span class="sp"></span><button class="btn sm" data-a="ppost">نشر</button></div></div>'
-  +seg([['new','الأحدث'],['top','الأكثر تأييدًا']],'cmt',CM.tab);
- if(CM.err)h+='<div class="card mu" style="color:var(--t-rd)">'+esc(CM.err)+'</div>';
- if(CM.ld&&!CM.posts.length)h+='<div class="mu" style="text-align:center;padding:20px">جارٍ التحميل…</div>';
- else if(!CM.posts.length&&!CM.err)h+='<div class="card mu" style="text-align:center;padding:26px">لا منشورات بعد. كن أول من يشارك.</div>';
- return h+CM.posts.map(postCard).join('')}
-function commCard(){
- const p=CM.posts[0];
- return '<div class="sechead"><h2>المجتمع</h2><button class="chip" data-a="sub" data-v="comm">فتح</button></div><button class="card cmc" data-a="sub" data-v="comm"><span class="fi" style="--c:#3b82f6">'+ic('users')+'</span><span class="t"><b>'+(p?esc(p.author):'مجتمع SIJIL')+'</b><span class="mu">'+(p?esc(p.body.slice(0,90)):SB.on()?'شارك إنجازك وتابع تمارين الآخرين':'قريبًا: شارك إنجازك مع الأعضاء')+'</span></span></button>'}
 /* ---- explore ---- */
 const CTI={curr:['check','#0f766e'],coach:['user','#3b82f6'],art:['book','#8b5cf6'],anat:['pulse','#ef4444'],learn:['target','#22c55e'],myth:['spark','#f59e0b'],gloss:['search','#0891b2'],safe:['heart','#e11d48'],aasn:['star','#d97706'],supp:['drop','#16a34a'],moh:['info','#0369a1']};
 function vEx(){
- const GRP=[['التدريب',['wk','plan','prog','ach','arch','rpt']],['الصحة والتغذية',['meal','wgt','tools','link','rem']],['النادي والمعرفة',['gyms','nau','vis','cul','coach']],['المجتمع والحساب',['comm','nc','set','me']]];
+ const GRP=[['التدريب',['wk','plan','prog','ach','arch','rpt']],['الصحة والتغذية',['meal','wgt','tools','link','rem']],['النادي والمعرفة',['gyms','nau','vis','cul','coach']],['الحساب',['nc','set','me']]];
  let h='<h1>المزيد</h1><div class="mu" style="margin-bottom:12px">كل ميزات SIJIL في مكان واحد</div>';
  h+='<div class="sechead"><h2>اخترنا لك</h2></div>'+rail(picks().map(chipF));
  h+='<div class="sechead"><h2>اختصاراتي</h2><button class="chip" data-a="drop" data-v="edit">تخصيص</button></div>'+rail(scList().map(i=>chipF(FD[i])));
- h+=commCard();
  h+='<div class="sechead"><h2>الثقافة الرياضية</h2><button class="chip" data-a="sub" data-v="cul">الكل</button></div>'+rail(CT.map(c=>{const m=CTI[c[0]]||['book','#64748b'];return '<button class="rc" data-a="cult" data-v="'+c[0]+'"><span class="fi" style="--c:'+m[1]+'">'+ic(m[0])+'</span><span>'+c[1]+'</span></button>'}));
  GRP.forEach(g=>{h+='<div class="sechead"><h2>'+g[0]+'</h2></div>'+rail(g[1].map(i=>chipF(FD[i])))});
  return h}
@@ -5219,15 +5189,14 @@ function prefCard(){
   +(CFG.aiUrl&&!IN_CLAUDE?'<div class="row" style="margin:6px 0" id="ai-row"><div class="t"><b>الذكاء الاصطناعي</b><div class="mu">'+(aiOk()?'وافقت على إرسال طلباتك للتحليل':'لا يُرسل شيء قبل موافقتك')+'</div></div><span class="sp"></span>'+(aiOk()?'<button class="chip" data-a="aiwd">سحب الموافقة</button>':'<span class="mu">غير مفعّلة</span>')+'</div>':'')
   +'<div class="row" style="margin:6px 0"><div class="t"><b>نظام 24 ساعة</b><div class="mu">عرض الأوقات بنظام 24 ساعة بدل 12 ساعة</div></div><span class="sp"></span><button class="chip'+(h24?' on':'')+'" data-a="h24">'+(h24?'مفعّل':'متوقف')+'</button></div>'
   +'<button class="lnk" data-a="sub" data-v="nc">'+ic('bell')+'<span class="t">مركز الإشعارات</span>'+(n?'<b class="nbd s">'+n+'</b>':'')+ic('next')+'</button>'
-  +'<button class="lnk" data-a="sub" data-v="comm">'+ic('users')+'<span class="t">مجتمع SIJIL</span>'+ic('next')+'</button>'
   +'<button class="lnk" data-a="drop" data-v="edit">'+ic('grid')+'<span class="t">تخصيص اختصاراتي</span>'+ic('next')+'</button></div>';
  h+='<div class="card"><h2>'+ic('info')+'حول التطبيق</h2><div class="row"><span>الإصدار</span><span class="sp"></span><b class="num" dir="ltr">'+APPV+'</b></div>'
   +(CFG.storeUrl?'<a class="lnk" href="'+esc(CFG.storeUrl)+'" target="_blank" rel="noopener">'+ic('share')+'<span class="t">صفحة التطبيق على المتجر</span>'+ic('next')+'</a>':'')
   +'<div style="text-align:center;margin:12px 0 4px"><b>قيّم SIJIL</b></div><div class="stars">'+[1,2,3,4,5].map(i=>'<button class="'+((S.rate||0)>=i?'on':'')+'" data-a="rate" data-v="'+i+'" aria-label="'+i+'">'+ic('star')+'</button>').join('')+'</div><div class="mu" style="text-align:center">SIJIL مجاني بلا إعلانات ولا اشتراكات. تقييمك في المتجر هو كل ما نحتاجه.</div>'
   +(CFG.supportEmail?'<a class="lnk" href="mailto:'+esc(CFG.supportEmail)+'">'+ic('mail')+'<span class="t">الاستفسارات والأسئلة</span><small class="mu" dir="ltr">'+esc(CFG.supportEmail)+'</small></a>':'')+'</div>';
- if(SB.on()){h+='<div class="card"><h2>'+ic('user')+'حساب المجتمع</h2>'+(SB.ses?'<div class="mu" dir="ltr" style="text-align:start;margin-bottom:8px">'+esc(SB.email())+'</div><button class="btn ghost" style="width:100%" data-a="aout">'+ic('logout')+'تسجيل الخروج</button>'
-   +(UI.deln?'<div class="mu" style="margin:10px 0">سيُحذف حسابك ومنشوراتك وتعليقاتك وبيانات مزامنته نهائيًا، وتُمسح بيانات هذا الحساب من هذا الجهاز أيضًا (وما لم يُرفع منها). وضع الزائر والحسابات الأخرى على الجهاز لا تتأثر.</div><button class="btn" style="width:100%;background:#b91c1c" data-a="adel">تأكيد حذف الحساب</button>':'<button class="btn ghost" style="width:100%;margin-top:8px;color:#b91c1c" data-a="adelq">'+ic('trash')+'حذف الحساب</button>')
-   :'<div class="mu" style="margin-bottom:8px">سجّل الدخول للمشاركة في المجتمع ومزامنة اختصاراتك.</div><button class="btn" style="width:100%" data-a="sub" data-v="comm">تسجيل الدخول</button>')+'</div>'}
+ if(SB.on()){h+='<div class="card"><h2>'+ic('user')+'حسابي</h2>'+(SB.ses?'<div class="mu" dir="ltr" style="text-align:start;margin-bottom:8px">'+esc(SB.email())+'</div><button class="btn ghost" style="width:100%" data-a="aout">'+ic('logout')+'تسجيل الخروج</button>'
+   +(UI.deln?'<div class="mu" style="margin:10px 0">سيُحذف حسابك وبيانات مزامنته نهائيًا، وتُمسح بيانات هذا الحساب من هذا الجهاز أيضًا (وما لم يُرفع منها). وضع الزائر والحسابات الأخرى على الجهاز لا تتأثر.</div><button class="btn" style="width:100%;background:#b91c1c" data-a="adel">تأكيد حذف الحساب</button>':'<button class="btn ghost" style="width:100%;margin-top:8px;color:#b91c1c" data-a="adelq">'+ic('trash')+'حذف الحساب</button>')
+   :'<div class="mu" style="margin-bottom:8px">سجّل الدخول لمزامنة بياناتك واختصاراتك.</div><button class="btn" style="width:100%" data-a="fxin">تسجيل الدخول</button>')+'</div>'}
  return h}
 
 function dtDate(d,ti){const x=new Date();x.setDate(x.getDate()+d-ti);return '<span class="dn"><em class="num">'+x.getDate()+'</em><small>'+MONTHS[x.getMonth()]+'</small></span>'}
@@ -5241,7 +5210,7 @@ function planHead(){const T=tasks(),ti=TI(),w=Math.max(1,Math.min(12,Math.floor(
 /* ---------- render ---------- */
 function view(){
  if(!S.prof.ob)return UI.wel2?vOnb():vWelcome();
- if(S.sub){const f={plan:vPlan,prog:vProg,arch:vArch,tools:vTools,watch:vWatch,prg:vPrg,mpg:vMpg,ach:vAch,cul:vCul,wgt:vWgt,exl:vExl,nau:vNau,nad:vNad,exd:vExd,ssd:vSsd,ply:vPly,fin:vFin,set:vSet,coach:vCoach,aip:vAip,gyms:vGyms,gye:vGye,vis:vVis,rem:vRem,rpt:vRpt,link:vLink,wk:vWk,mk:vMk,srch:vSrch,comm:vComm,nc:vNc}[S.sub];if(f)return f()}
+ if(S.sub){const f={plan:vPlan,prog:vProg,arch:vArch,tools:vTools,watch:vWatch,prg:vPrg,mpg:vMpg,ach:vAch,cul:vCul,wgt:vWgt,exl:vExl,nau:vNau,nad:vNad,exd:vExd,ssd:vSsd,ply:vPly,fin:vFin,set:vSet,coach:vCoach,aip:vAip,gyms:vGyms,gye:vGye,vis:vVis,rem:vRem,rpt:vRpt,link:vLink,wk:vWk,mk:vMk,srch:vSrch,nc:vNc}[S.sub];if(f)return f()}
  if(S.tab==='cardio'){S.tab='train';UI.tw='cardio'}
  return {home:vDash,dash:vDash,train:vTrain,food:vFood,pg:vPg,me:vMe,club:vClub,ex:vEx}[S.tab]()}
 function render(){
@@ -5557,7 +5526,7 @@ Object.assign(ACT,{
  scdel:b=>{S.sc=scList().filter(x=>x!==b.dataset.id);save();cmSyncSet()},
  scmv:b=>{const a=scList(),i=a.indexOf(b.dataset.id),j=i+(+b.dataset.d);if(i<0||j<0||j>=a.length)return false;[a[i],a[j]]=[a[j],a[i]];S.sc=a;save();cmSyncSet()},
  nstog:b=>{S.ns=Object.assign({},S.ns||{});const k=b.dataset.v;S.ns[k]=S.ns[k]===0?1:0;NCT=0;save();cmSyncSet()},
- ncread:()=>{(S.nf||[]).forEach(x=>x.r=1);const ids=CM.notes.filter(x=>!x.read).map(x=>x.id);CM.notes.forEach(x=>x.read=true);save();if(ids.length&&SB.ses)SB.q('notifications?user_id=eq.'+SB.uid()+'&read=eq.false','PATCH',{read:true}).catch(()=>{})},
+ ncread:()=>{(S.nf||[]).forEach(x=>x.r=1);save()},
  fontset:b=>{setFont(b.dataset.v)},
  h24:()=>{S.prof.h24=!S.prof.h24;save();cmSyncSet()},
  rate:b=>{S.rate=+b.dataset.v;save();toast('شكرًا لتقييمك');if(S.rate>=4&&CFG.storeUrl)window.open(CFG.storeUrl,'_blank')},
@@ -5567,27 +5536,16 @@ Object.assign(ACT,{
   if(UI.au==='up'&&n.length<2){UI.aerr='اكتب اسمًا ظاهرًا';render();return false}
   UI.abusy=1;render();
   try{if(UI.au==='up'){const j=await SB.up(e,p,n);if(!j.access_token){UI.aerr='أُرسل رابط تأكيد إلى بريدك. أكّده ثم سجّل الدخول.';UI.au='in'}}else await SB.in(e,p);
-   if(SB.ses){await Promise.all([cmLoad(),cmNotes(),cmPull()])}}catch(x){UI.aerr=sbErr(x)}
+   if(SB.ses){await cmPull()}}catch(x){UI.aerr=sbErr(x)}
   UI.abusy=0;render();return false},
- aout:async()=>{await SB.out();CM.posts=[];CM.notes=[];CM.my={};render();return false},
+ aout:async()=>{await SB.out();render();return false},
  adelq:()=>{UI.deln=1},
- adel:async()=>{try{await SB.q('rpc/delete_my_account','POST',{});}catch(e){toast(sbErr(e));UI.deln=0;render();return false}SB.set(null);RSM={dev:RSM.dev,epoch:null,cursor:0,uid:'',rec:{}};RS.pause=0;RS.acct=0;rsSave();UI.deln=0;CM.posts=[];CM.notes=[];toast('حُذف حسابك وحُذفت نسخة المزامنة معه');render();return false},
- ppost:async()=>{const t=(($('#cm-new')||{}).value||'').trim();if(!t){toast('اكتب شيئًا أولًا');return false}
-  try{await SB.q('posts','POST',{body:t},'return=minimal');await cmLoad();toast('تم النشر')}catch(e){toast(sbErr(e))}return false},
- plike:async b=>{const id=+b.dataset.id,p=CM.posts.find(x=>x.id===id);if(!p)return false;const had=CM.my[id];
-  if(had){delete CM.my[id];p.likes=Math.max(0,p.likes-1)}else{CM.my[id]=1;p.likes++}render();
-  try{if(had)await SB.q('likes?post_id=eq.'+id+'&user_id=eq.'+SB.uid(),'DELETE');else await SB.q('likes','POST',{post_id:id},'return=minimal')}catch(e){toast(sbErr(e));cmLoad()}return false},
- pcm:async b=>{const id=+b.dataset.id;CM.open=CM.open===id?0:id;if(CM.open&&!CM.cm[id]){render();try{CM.cm[id]=await SB.q('comments?select=author,body,created_at&post_id=eq.'+id+'&order=created_at.asc&limit=50')}catch(e){CM.cm[id]=[]}}},
- psend:async b=>{const id=+b.dataset.id,t=(($('#cm-c')||{}).value||'').trim();if(!t)return false;
-  try{await SB.q('comments','POST',{post_id:id,body:t},'return=minimal');CM.cm[id]=await SB.q('comments?select=author,body,created_at&post_id=eq.'+id+'&order=created_at.asc&limit=50');const p=CM.posts.find(x=>x.id===id);if(p)p.comments++}catch(e){toast(sbErr(e))}return false},
- pdel:async b=>{try{await SB.q('posts?id=eq.'+b.dataset.id,'DELETE');CM.posts=CM.posts.filter(x=>x.id!==+b.dataset.id);toast('حُذف المنشور')}catch(e){toast(sbErr(e))}return false},
- prep:async b=>{try{await SB.q('reports','POST',{post_id:+b.dataset.id},'return=minimal');toast('وصلنا بلاغك، شكرًا')}catch(e){toast(/duplicate|23505/.test(String(e.message))?'سبق أن أبلغت عن هذا المنشور':sbErr(e))}return false}});
+ adel:async()=>{try{await SB.q('rpc/delete_my_account','POST',{});}catch(e){toast(sbErr(e));UI.deln=0;render();return false}SB.set(null);RSM={dev:RSM.dev,epoch:null,cursor:0,uid:'',rec:{}};RS.pause=0;RS.acct=0;rsSave();UI.deln=0;toast('حُذف حسابك وحُذفت نسخة المزامنة معه');render();return false}});
 ACT.ddt=()=>{UI.ddo=!UI.ddo};
 ACT.cdo=b=>{const o=UI.cdo||(UI.cdo={}),k=b.dataset.i;o[k]=!o[k]};
-(()=>{const w=ACT.seg;ACT.seg=b=>{UI.ddo=0;if(b.dataset.k==='ct')UI.cd='';w(b);if(b.dataset.k==='cmt'){CM.tab=b.dataset.v;cmLoad()}if(b.dataset.k==='au')UI.aerr=''}})();
-['sub','go','fgo','wkstart','tplan','srch'].forEach(k=>{const f=ACT[k];if(f)ACT[k]=(b,e)=>{UI.dr='';UI.ad=null;const r=f(b,e);if(k==='sub'&&b.dataset.v==='comm')cmLoad();if(k==='sub'&&b.dataset.v==='nc')cmNotes().then(cmR);return r}});
-setInterval(()=>{if(SB.ses&&!(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName))){cmNotes().then(()=>{if(S.sub!=='comm')render()})}},9e4);
-if(SB.ses){cmNotes();cmPull();cmLoad()}
+(()=>{const w=ACT.seg;ACT.seg=b=>{UI.ddo=0;if(b.dataset.k==='ct')UI.cd='';w(b);if(b.dataset.k==='au')UI.aerr=''}})();
+['sub','go','fgo','wkstart','tplan','srch'].forEach(k=>{const f=ACT[k];if(f)ACT[k]=(b,e)=>{UI.dr='';UI.ad=null;const r=f(b,e);return r}});
+if(SB.ses){cmPull()}
 
 Object.assign(ACT,{
  fpopen:b=>{UI.fp={m:b.dataset.m,w:b.dataset.w,s:b.dataset.s,d:b.dataset.d,cat:'all',q:'',sel:-1,list:[]}},
@@ -5781,9 +5739,8 @@ function vEx(){
  h+='<div class="sechead"><h2>كل المزايا</h2></div>';
  h+='<div class="sechead"><h2>اخترنا لك</h2></div>'+rail(picks().map(chipF));
  h+='<div class="sechead"><h2>اختصاراتي</h2><button class="chip" data-a="drop" data-v="edit">تخصيص</button></div>'+rail(scList().map(i=>chipF(FD[i])));
- h+=commCard();
  h+='<div class="sechead"><h2>الثقافة الرياضية</h2><button class="chip" data-a="sub" data-v="cul">الكل</button></div>'+rail(CT.map(c=>{const m=CTI[c[0]]||['book','#64748b'];return '<button class="rc" data-a="cult" data-v="'+c[0]+'"><span class="fi" style="--c:'+m[1]+'">'+ic(m[0])+'</span><span>'+c[1]+'</span></button>'}));
- [['التدريب',['wk','plan','prog','ach','arch','rpt']],['الصحة والتغذية',['meal','wgt','tools','link','rem']],['النادي والمعرفة',['gyms','nau','vis','cul','coach']],['المجتمع والحساب',['comm','nc','set','me']]].forEach(g=>{h+='<div class="sechead"><h2>'+g[0]+'</h2></div>'+rail(g[1].map(i=>chipF(FD[i])))});
+ [['التدريب',['wk','plan','prog','ach','arch','rpt']],['الصحة والتغذية',['meal','wgt','tools','link','rem']],['النادي والمعرفة',['gyms','nau','vis','cul','coach']],['الحساب',['nc','set','me']]].forEach(g=>{h+='<div class="sechead"><h2>'+g[0]+'</h2></div>'+rail(g[1].map(i=>chipF(FD[i])))});
  return h}
 Object.assign(ENT,{'اليوم':'Today','التمرين':'Workout','التقدّم':'Progress','المزيد':'More','المظهر':'Appearance','تسجيل سريع':'Quick log','تسجيل الماء':'Log water','تسجيل الوزن':'Log weight','تسجيل وجبة':'Log meal','تسجيل تمرين':'Log workout','أهلًا بك':'Welcome','ابدأ الآن':'Start now','تسجيل الدخول':'Sign in','تمرين اليوم':'Today\'s workout','يوم راحة':'Rest day','سجلاتي':'My records','الصحة والجسم':'Health & body','النادي':'Gym','تعلّم':'Learn','التطبيق وحسابي':'App & account','الأسود':'Black','الأبيض':'White','الأزرق':'Blue','الزمردي':'Emerald','الزيتوني':'Olive','البنفسجي':'Purple','الملف الشخصي':'Profile','النبض':'Pulse','الماء':'Water','التغذية':'Nutrition','التقارير':'Reports','الأرشيف':'Archive','الأوسمة':'Medals','مراقبة الوزن':'Weight tracking','النوم':'Sleep','الإعدادات':'Settings'});
 document.addEventListener('toggle',ev=>{const d=ev.target;if(d&&d.classList&&d.classList.contains('sjlate'))UI.lateOpen=d.open},true);
@@ -6433,7 +6390,7 @@ function rdSet(){const s=rdS(),P=S.prof,c=rdCity(),n=s.nt,H=[];const th=(THEMES.
  const lang=({1:'عربي + English',0:'عربي فقط'})[(S.prof.lang!=null?S.prof.lang:1)]||'—';
  let h=back()+'<h1>الإعدادات</h1>';
  const sp=(s.fav.length?s.fav.map(k=>RDK[k]).join('، '):'لم تختر رياضات بعد');
- h+='<div class="card sjpc"><div class="row" style="gap:12px"><span class="avbig">'+(P.av?'<img alt="" src="'+P.av+'">':esc((P.name||'ض').charAt(0)))+'</span><div class="sp"><b style="font-size:18px">'+(esc(P.name)||'ضيف')+'</b><div class="mu">'+esc(sp)+'</div></div><button class="btn sm" data-a="sub" data-v="pf">ملفي الشخصي</button></div><div class="mu" style="margin-top:8px">'+(SYNC.token?'بياناتك على هذا الجهاز ومتزامنة برمزك.':'بياناتك محفوظة على هذا الجهاز فقط. الإعدادات والتمارين تعمل بلا حساب.')+(CFG.sbUrl?' <button class="chip" data-a="sub" data-v="comm">تسجيل الدخول</button>':'')+'</div></div>';
+ h+='<div class="card sjpc"><div class="row" style="gap:12px"><span class="avbig">'+(P.av?'<img alt="" src="'+P.av+'">':esc((P.name||'ض').charAt(0)))+'</span><div class="sp"><b style="font-size:18px">'+(esc(P.name)||'ضيف')+'</b><div class="mu">'+esc(sp)+'</div></div><button class="btn sm" data-a="sub" data-v="pf">ملفي الشخصي</button></div><div class="mu" style="margin-top:8px">'+(SYNC.token?'بياناتك على هذا الجهاز ومتزامنة برمزك.':'بياناتك محفوظة على هذا الجهاز فقط. الإعدادات والتمارين تعمل بلا حساب.')+(CFG.sbUrl?' <button class="chip" data-a="fxin">تسجيل الدخول</button>':'')+'</div></div>';
  /* 1 المظهر واللغة */
  h+=rdRow('ap','sun','#F6CF64','المظهر واللغة',esc(th)+' · '+(P.h24?'24':'12')+' س',sjThemeCard()+'<div class="card"><div class="mu">اللغة: '+lang+' · خط التطبيق يتبع الإعداد أدناه وحجم نص النظام.</div><div class="seg">'+[['a','المراعي'],['c','Cairo'],['q','قمرة'],['s','النظام']].map(x=>'<button class="'+(fn===x[0]?'on':'')+'" data-a="fontset" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div><div class="row" style="margin-top:10px"><b>نظام 24 ساعة</b><span class="sp"></span><button class="chip'+(P.h24?' on':'')+'" data-a="h24">'+rdOn(P.h24)+'</button></div><div class="mu">الأرقام 0–9 تظهر كما هي في كل اللغات.</div></div>'+(S.prof.oh!==undefined?'':''));
  /* 2 التدريب والوحدات */
@@ -6490,7 +6447,7 @@ function rdNc(){const s=rdS(),n=s.nt,t=UI.nct||'in';let h=back()+'<h1>مركز �
  h+=cat('prayer','الصلاة وضوء النهار','moon','#F6CF64','<div class="mu">الصلوات المفعّلة تُضبط من «مواقيت الصلاة» في الإعدادات.</div><div class="row" style="gap:6px;flex-wrap:wrap;margin-top:6px">'+RDPK.map(k=>rdChip('rdpa',k,s.pa[k],RDPN[k])).join('')+'</div><div class="row" style="margin-top:6px">'+rdChip('rdnt','sun',n.sun,'تنبيه قبل الغروب')+'</div>');
  h+=cat('hydr','التروية والقياسات','drop','#42B9FF','<div class="row" style="gap:6px">'+rdChip('rdptog','water',s.pref.water,'تذكير الماء '+rdOn(s.pref.water))+rdChip('rdnt','wl',n.wl,'تذكير الوزن '+rdOn(n.wl))+'</div>'+(s.pref.water?'<div class="g3"><label class="f">من<input type="time" data-rd="nt.hyF" value="'+esc(n.hyF)+'"></label><label class="f">إلى<input type="time" data-rd="nt.hyT" value="'+esc(n.hyT)+'"></label><label class="f">عدد المرات<input type="number" inputmode="numeric" data-rd="nt.hyN" value="'+F(n.hyN)+'"></label></div>':'')+(n.wl?'<label class="f">وقت الوزن<input type="time" data-rd="nt.wlt" value="'+esc(n.wlt)+'"></label><div class="row" style="gap:6px;flex-wrap:wrap">'+DAYS.map((d,i)=>rdChip('rdwld',i,(n.wld||[]).indexOf(i)>=0,d)).join('')+'</div>':''));
  const q=n.quiet;h+='<div class="card"><h2>ساعات الهدوء والصوت</h2><div class="row" style="gap:6px">'+rdChip('rdq','on',q.on,'ساعات الهدوء '+rdOn(q.on))+rdChip('rdnt','silent',n.silent,'تنبيه صامت '+rdOn(n.silent))+'</div>'+(q.on?'<div class="g3" style="margin-top:6px"><label class="f">من<input type="time" data-rd="nt.quiet.from" value="'+esc(q.from)+'"></label><label class="f">إلى<input type="time" data-rd="nt.quiet.to" value="'+esc(q.to)+'"></label></div>':'')+'<div class="mu">التنبيه الصامت يعتمد على دعم النظام لقنوات الإشعارات.</div></div>';
- h+='<div class="card"><h2>الفئات القديمة</h2><div class="rail tight">'+NCAT.filter(c=>['nutrition','streak','weight','community'].indexOf(c[0])>=0).map(c=>'<button class="chip'+((S.ns||{})[c[0]]!==0?' on':'')+'" data-a="nstog" data-v="'+c[0]+'">'+c[1]+'</button>').join('')+'</div></div>';
+ h+='<div class="card"><h2>الفئات القديمة</h2><div class="rail tight">'+NCAT.filter(c=>['nutrition','streak','weight'].indexOf(c[0])>=0).map(c=>'<button class="chip'+((S.ns||{})[c[0]]!==0?' on':'')+'" data-a="nstog" data-v="'+c[0]+'">'+c[1]+'</button>').join('')+'</div></div>';
  h+='<details class="sjgrp" data-g="nhelp"'+((UI.sgo||{}).nhelp?' open':'')+'><summary><span class="fi" style="--c:#8EAECE">'+ic('info')+'</span><b>لدي مشكلة</b><span class="sp"></span>'+ic('next')+'</summary><div class="sjgb"><div class="'+(rdNsLoad().state==='fail'||rdNsLoad().state==='perm'?'sjwarn':'mu')+'" id="rd-nst"><b>حالة الجدولة:</b> '+esc(rdNtStatus())+'<div class="mu">المطلوب '+F(rdNtPlan(rdNow()).length)+' · المؤكَّد من النظام '+F(Object.keys(rdNsLoad().conf).length)+(rdNsLoad().at?' · آخر محاولة '+rdF(rdNsLoad().at,rdCity().tz):'')+'</div><button class="btn sm" data-a="rdretry" style="margin-top:6px">أعد المحاولة</button></div><div class="mu">حالة الإذن: <b>'+esc(UI.ntperm||'لم تُفحص')+'</b></div><div class="row" style="gap:8px;flex-wrap:wrap;margin:8px 0"><button class="btn sm" data-a="rdtest">إرسال إشعار تجريبي</button><button class="chip" data-a="rdperm">فحص الإذن</button>'+(NAT?'<button class="chip" data-a="rdandset">إعدادات Android</button>':'')+'</div><div class="mu">إن حُجبت إشعارات النظام تبقى المعلومات متاحة في «الوارد». التنبيهات الدقيقة والتحديث في الخلفية تعتمد على المنصة وتوفير الطاقة والاتصال، وقد تتأخر على بعض الأجهزة.</div></div></details>';
  return h}
 const RDT0={run:'ez',swim:'tech',cali:'b0',fn:'a12'};
@@ -6607,7 +6564,7 @@ vEx=function(){
  const P=S.prof,R=(k,n,t,a,d)=>'<button class="sjrow" '+a+'>'+sjI(k,n)+'<span class="t">'+t+(d?'<small>'+d+'</small>':'')+'</span>'+ic('next')+'</button>',S2=v=>'data-a="sub" data-v="'+v+'"';
  let h='<div class="sjttl"><div><h1>المزيد</h1><div class="mu">إدارة التطبيق وتفضيلاتك</div></div></div>';
  h+='<button class="sjrow" data-a="go" data-v="me" style="background:var(--sj-btn)!important;color:var(--sj-btnt)!important"><span class="av" style="width:40px;height:40px;display:grid;place-items:center;border-radius:50%;flex:none;overflow:hidden">'+(P.av?'<img alt="" src="'+P.av+'" style="width:100%;height:100%;object-fit:cover">':esc((P.name||'س').charAt(0)))+'</span><span class="t">الملف الشخصي<small style="color:inherit;opacity:.75">بياناتك وأهدافك</small></span>'+ic('next')+'</button>';
- h+='<div class="sjsec">التطبيق</div>'+R('nt','gear','الإعدادات',S2('set'),'المظهر والوقت والصلاة والحساب والبيانات')+R('nt','bell','مركز الإشعارات',S2('nc'),ncUnread()?F(ncUnread())+' غير مقروء':'')+R('nt','users','المجتمع',S2('comm'));
+ h+='<div class="sjsec">التطبيق</div>'+R('nt','gear','الإعدادات',S2('set'),'المظهر والوقت والصلاة والحساب والبيانات')+R('nt','bell','مركز الإشعارات',S2('nc'),ncUnread()?F(ncUnread())+' غير مقروء':'');
  h+='<div class="sjsec">المعرفة والأدوات</div>'+R('rp','book','الثقافة الرياضية',S2('cul'))+R('wt','calc','الأدوات والحاسبات',S2('tools'),'الأدوات والمنبهات')+R('md','spark','المدرب الذكي',S2('coach'));
  h+='<div class="sjsec">النادي</div>'+R('ar','pin','النادي',S2('gyms'),'الأندية القريبة')+R('ar','calendar','جدول زيارتي للنادي',S2('vis'))+R('ar','bell','منبه الذهاب والغياب',S2('rem'));
  h+='<div class="sjsec">الدعم</div><a class="sjrow" href="privacy.html">'+sjI('dt','info')+'<span class="t">الخصوصية والدعم<small>سياسة الخصوصية وطرق التواصل</small></span>'+ic('next')+'</a>';
@@ -7060,8 +7017,8 @@ Object.assign(ACT,{fxin:()=>{fxAuth('in',{email:SB.email()||spMeta().email||''})
 /* شاشة البداية: تسجيل الدخول · إنشاء حساب · المتابعة كزائر (متاح دائمًا ودون إنترنت) */
 vWelcome=function(){return '<div class="sjwel"><div class="bg"></div><div class="art">'+SJART+'</div><div class="in"><button class="lang" data-a="langm" aria-label="اللغة">English</button><div class="lgw">'+SJLOGO+'</div><div class="sp"></div><h1>أهلًا بك</h1>'+
  '<button class="btn" data-a="welin" id="wel-in">تسجيل الدخول</button><button class="btn fxw2" data-a="welup" id="wel-up">إنشاء حساب</button><hr><button class="sec" data-a="welguest" id="wel-go">المتابعة كزائر</button></div></div>'};
-/* مجتمع SIJIL: الدخول عبر النافذة نفسها لا عبر نموذج ثانٍ */
-authCard=function(){return '<div class="card"><h2>'+ic('users')+'تسجيل الدخول</h2><div class="mu" style="margin-bottom:10px">الحساب لازم للمشاركة في المجتمع. وضع الزائر يبقى محليًا ولا يُرفع.</div><button class="btn" style="width:100%" data-a="fxin">تسجيل الدخول أو إنشاء حساب</button></div>'};
+/* تسجيل الدخول عبر النافذة نفسها لا عبر نموذج ثانٍ */
+authCard=function(){return '<div class="card"><h2>'+ic('users')+'تسجيل الدخول</h2><div class="mu" style="margin-bottom:10px">الحساب اختياري لمزامنة بياناتك. وضع الزائر يبقى محليًا ولا يُرفع.</div><button class="btn" style="width:100%" data-a="fxin">تسجيل الدخول أو إنشاء حساب</button></div>'};
 /* حساب جديد بلا بيانات محلية: انتظر الاستعادة بدل معالج الإعداد إن كان للحساب نسخة سحابية */
 (function(){const V=vOnb;vOnb=function(){const m=spMeta();
  if(!S.prof.ob&&SB.ses&&m.wait&&!UI.fxnowait&&!(m.xfer&&m.xfer.st==='ask')){
@@ -7566,7 +7523,7 @@ vEx=function(){
  const R=(k,n,t,a,d)=>'<button class="sjrow" '+a+'>'+sjI(k,n)+'<span class="t">'+t+(d?'<small>'+d+'</small>':'')+'</span>'+ic('next')+'</button>',S2=v=>'data-a="sub" data-v="'+v+'"';
  let h='<div class="sjttl"><div><h1>المزيد</h1><div class="mu">الخدمات والأدوات</div></div></div>';
  h+=R('rp','chart','التقدّم',S2('pgs'),'ملخص تقدّمك عبر الوقت');
- h+='<div class="sjsec">المعرفة والأدوات</div>'+R('rp','book','الثقافة الرياضية',S2('cul'))+R('wt','calc','الأدوات والحاسبات',S2('tools'))+R('md','spark','المدرب الذكي',S2('coach'))+R('nt','users','المجتمع',S2('comm'));
+ h+='<div class="sjsec">المعرفة والأدوات</div>'+R('rp','book','الثقافة الرياضية',S2('cul'))+R('wt','calc','الأدوات والحاسبات',S2('tools'))+R('md','spark','المدرب الذكي',S2('coach'));
  h+='<div class="sjsec">الصحة</div>'+R('hr','heart','الخطوات والساعات',S2('link'),'قراءة الخطوات وجلسة خطوات');
  h+='<div class="sjsec">النادي</div>'+R('ar','pin','الأندية القريبة',S2('gyms'))+R('ar','cal','زياراتي للنادي',S2('vis'));
  h+='<div class="sjsec">سجلاتي</div>'+R('ar','box','الأرشيف',S2('arch'));
