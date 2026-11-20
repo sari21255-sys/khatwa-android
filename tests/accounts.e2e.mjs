@@ -14,7 +14,7 @@ const st=http.createServer((q,res)=>{let f=q.url.split('?')[0];if(f==='/')f='/in
  if(f==='/config.js'){res.writeHead(200,{'content-type':'text/javascript'});return res.end(`window.APP_CONFIG={${cfgFull?'sbUrl:"http://127.0.0.1:8796",sbKey:"anon"':''}};`)}
  const p=path.join(WWW,f);if(!p.startsWith(WWW)||!fs.existsSync(p)||fs.statSync(p).isDirectory()){res.writeHead(404);return res.end()}res.writeHead(200,{'content-type':MIME[path.extname(p)]||'application/octet-stream'});res.end(fs.readFileSync(p))}).listen(8795);
 const A='http://127.0.0.1:8795';const b=await chromium.launch();
-const SEED=`S.prof.ob=1;S.prof.name='اختبار';S.prof.sex='m';S.prof.age=30;S.prof.ht=178;S.prof.startW=85;S.prof.goalType='lose';S.prof.lvl='b';S.prof.eq='gym';S.prof.dpw=7;calcTargets();genPlan();save();`;
+const SEED=`S.prof.ob=1;S.prof.name='اختبار';S.prof.sex='m';S.prof.age=30;S.prof.ht=178;S.prof.startW=85;S.prof.goalType='lose';S.prof.lvl='b';S.prof.eq='gym';S.prof.dpw=7;calcTargets();genPlan();rdS().geoAsked=1;save();`;
 const ready=p=>p.waitForFunction(()=>typeof S!=='undefined'&&typeof rsSync==='function'&&typeof fxAuth==='function');
 async function open(ctx){const p=await ctx.newPage();p.ctx=ctx;p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));await p.goto(A+'/');await ready(p);await p.waitForTimeout(250);return p}
 async function dev(){const ctx=await b.newContext({viewport:{width:390,height:844},timezoneId:'Asia/Riyadh'});await ctx.clock.install({time:new Date('2026-11-16T10:00:00+03:00')});   /* يوم تمرين ثابت: الاختبار لا يتغيّر بيوم الراحة */
