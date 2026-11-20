@@ -91,7 +91,7 @@ try{
  await nav(da,()=>da.evaluate(()=>fxAfterAuth()));await da.evaluate(SEED);await da.evaluate(()=>{S.prof.ob=1;S.bw['2026-10-01']=90;S.bw['2026-10-02']=89;S.meals['2026-10-02']=[{n:'حساب',kcal:100}];save()});await sync(da);await da.waitForTimeout(1500);await sync(da);await da.ctx.close();
  const U3=await uidDb(E3);const baseRecs=await nRec(U3);
  {const d=await dev();await d.evaluate(SEED);await d.evaluate(()=>{S.bw['2026-10-02']=70;S.bw['2026-10-03']=69;S.meals['2026-10-03']=[{n:'زائر',kcal:300}];S.wtr['2026-10-03']=1000;save()});
-  await d.evaluate(()=>{S.tab='dash';S.sub=null;render()});await d.click('[data-a=wkstart]');await d.waitForTimeout(250);await d.fill('#wk-w','50');await d.click('[data-a=wkset]');await d.waitForTimeout(250);
+  await d.evaluate(()=>{S.tab='dash';S.sub=null;render()});await d.evaluate(()=>{qSave(TD(),irXv('بنش بريس بالبار'),'بنش بريس بالبار',[{w:50,r:8}]);save()});await d.waitForTimeout(250);
   const gsx=await d.evaluate(()=>Object.keys(S.sx));
   const r0=rpcCount();await ui(d,'in',E3,'password123');await nav(d,()=>d.click('#fxa-go'));
   await d.waitForSelector('#fx-sheet',{timeout:8000});const sheet=await d.textContent('#fx-sheet');
