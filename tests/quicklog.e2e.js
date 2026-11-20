@@ -379,6 +379,7 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
  /* شعار الرئيسية يتبع السمة */
  {const {ctx,p}=await mk();await go(p,'dash');
   const bg={};for(const th of ['black','white','blue','emerald','olive','purple']){bg[th]=await p.evaluate(t=>{document.documentElement.dataset.sj=t;return getComputedStyle(document.querySelector('.smhero')).backgroundColor+'|'+getComputedStyle(document.querySelector('.smtx')).color},th)}
-  ok(new Set(Object.values(bg).map(x=>x.split('|')[0])).size>=5&&bg.white.split('|')[0]!==bg.black.split('|')[0],'خلفية الشعار تتغير مع السمة',JSON.stringify(bg));
-  ok(/rgb\(16, 16, 16\)|rgb\(0, 0, 0\)/.test(bg.white.split('|')[1]),'نص الشعار مقروء على الأبيض',bg.white);await ctx.close()}
+  ok(Object.values(bg).every(x=>x.startsWith('rgba(0, 0, 0, 0)')),'الشعار والعبارة بلا إطار ولا خلفية: على خلفية الصفحة مباشرة',JSON.stringify(bg));
+  ok(bg.white.split('|')[1]!==bg.black.split('|')[1]&&/rgb\(16, 16, 16\)/.test(bg.white.split('|')[1]),'لون الشعار والعبارة يتبع السمة (داكن على الأبيض)',bg.white);
+  ok(await p.evaluate(()=>!document.querySelector('.smart svg')&&SJART===''),'أيقونة الحديد محذوفة من الرئيسية وشاشة الدخول');await ctx.close()}
  await b.close();console.log(fail?'FAILED '+fail:'all PASS');process.exit(fail?1:0)})();

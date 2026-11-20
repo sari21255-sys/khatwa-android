@@ -1464,9 +1464,8 @@ button[data-a=trkhub]{min-height:36px;display:inline-flex;align-items:center}
 @media (prefers-reduced-motion:reduce){.scn *{animation:none!important;transition:none!important}}
 html.sc-hid .scn *{animation-play-state:paused!important}
 /* الرئيسية: خانات منفصلة */
-html body .smhero{background:var(--sj-s1);color:var(--sj-tx);border:1px solid var(--sj-ln)}
-html body .smhero .smlg svg,html body .smhero .smtx,html body .smhero .smart{color:var(--sj-tx)}
-html body .smhero .smart svg{stroke:var(--sj-tx);fill:none}
+html body .smhero{background:none;border:0;box-shadow:none;color:var(--sj-tx);min-height:0;padding:18px 12px 6px;border-radius:0}
+html body .smhero .smlg svg,html body .smhero .smtx{color:var(--sj-tx)}
 .hmc{background:var(--sj-s1);border:1px solid var(--sj-ln);border-radius:20px;color:var(--sj-tx);padding:14px}
 .hmgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
 .hmdate{grid-row:span 2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px;padding:16px 10px}
@@ -5724,7 +5723,7 @@ function sjQuickHtml(){
  const ttl={menu:'تسجيل سريع',h2o:'تسجيل الماء',w:'تسجيل الوزن',m:'تسجيل وجبة'}[m]||'تسجيل سريع';
  return '<div class="sjq" data-a="qlx"><div class="sjs" role="dialog" aria-modal="true" aria-label="'+ttl+'" tabindex="-1" data-stop="1"><div class="grab"></div><div class="sjh"><b>'+ttl+'</b><span class="row" style="gap:6px">'+(m!=='menu'?back:'')+'<button class="chip" data-a="qlx" aria-label="إغلاق">'+ic('x')+'</button></span></div>'+b+'</div></div>'}
 function sjThemeCard(){return '<div class="card" id="sj-theme"><h2>'+ic('sun')+'المظهر</h2><div class="sjth">'+THEMES.map(t=>'<button class="'+(TH===t[0]?'on':'')+'" data-a="thset" data-v="'+t[0]+'" aria-pressed="'+(TH===t[0])+'"><i style="--h:'+t[2]+';--b:'+t[3]+';background:'+t[4]+'"></i><span>'+t[1]+'</span></button>').join('')+'</div></div>'}
-const SJART='<svg viewBox="0 0 400 300" aria-hidden="true" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="10"><path d="M20 150H380"/><rect x="60" y="80" width="26" height="140" rx="4"/><rect x="96" y="104" width="20" height="92" rx="4"/><rect x="314" y="80" width="26" height="140" rx="4"/><rect x="284" y="104" width="20" height="92" rx="4"/></svg>';
+const SJART='';
 function vWelcome(){
  return '<div class="sjwel"><div class="bg"></div><div class="art">'+SJART+'</div><div class="in"><button class="lang" data-a="langm" aria-label="اللغة">English</button><div class="lgw">'+SJLOGO+'</div><div class="sp"></div><h1>أهلًا بك</h1><button class="btn" data-a="welgo" id="wel-go">ابدأ الآن</button>'+(CFG.sbUrl?'<hr><button class="sec" data-a="wellogin">تسجيل الدخول</button>':'')+'</div></div>'}
 function vToday(){

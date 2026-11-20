@@ -1,7 +1,6 @@
 /* الرئيسية: خانات منفصلة */
-html body .smhero{background:var(--sj-s1);color:var(--sj-tx);border:1px solid var(--sj-ln)}
-html body .smhero .smlg svg,html body .smhero .smtx,html body .smhero .smart{color:var(--sj-tx)}
-html body .smhero .smart svg{stroke:var(--sj-tx);fill:none}
+html body .smhero{background:none;border:0;box-shadow:none;color:var(--sj-tx);min-height:0;padding:18px 12px 6px;border-radius:0}
+html body .smhero .smlg svg,html body .smhero .smtx{color:var(--sj-tx)}
 .hmc{background:var(--sj-s1);border:1px solid var(--sj-ln);border-radius:20px;color:var(--sj-tx);padding:14px}
 .hmgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
 .hmdate{grid-row:span 2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px;padding:16px 10px}
