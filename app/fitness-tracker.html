@@ -1528,6 +1528,8 @@ html body .smhero .smlg svg,html body .smhero .smtx{color:var(--sj-tx)}
 @keyframes hmpulse{0%,100%{opacity:.55;transform:scale(.92)}50%{opacity:1;transform:scale(1.12)}}
 @media (prefers-reduced-motion:reduce){.hmgw:before{animation:none}}
 html.sc-hid .hmgw:before{animation-play-state:paused}
+html[data-sj] body #app>*{animation:none}
+html[data-sj] body #app.sjnv>*{animation:sjfade .14s ease-out both}
 /*TRK-CSS-END*/
 </style>
 
@@ -5214,13 +5216,13 @@ function view(){
  return {home:vDash,dash:vDash,train:vTrain,food:vFood,pg:vPg,me:vMe,club:vClub,ex:vEx}[S.tab]()}
 function render(){
  clearTimeout(renderT);dirty=false;
- if(locked()){$('#app').innerHTML=vLock();$('#nav').innerHTML='';fitLogos();return}
+ if(locked()){$('#app').innerHTML=vLock();$('#nav').innerHTML='';$('#nav').__nh=null;fitLogos();return}
  if(S.tab==='home')S.tab='dash';const y=window.scrollY,onb=!S.prof.ob,LA=!onb&&S.tab==='home'&&!S.sub;document.body.classList.toggle('lau-on',LA);document.body.classList.toggle('oh',!!S.prof.oh);document.body.classList.toggle('ohl',S.prof.oh==='l');
  const WKM=S.sub==='wk',head=(onb||LA||WKM||(S.tab==='me'&&!S.sub))?'':sjHead();
  $('#app').innerHTML=head+view()+((onb||LA||WKM)?'':sjQuickHtml())+sheetHtml()+aiConsentHtml()+drawerHtml()+langMenu()+fpHtml();
  const N=[['dash','home','اليوم'],['train','dumbbell','التمرين'],['food','fork','التغذية'],['pg','chart','التقدّم'],['ex','grid','المزيد']];
  const N4=N.filter(n=>n[0]!=='me'),nb=n=>'<button class="'+(n[0]===S.tab?'on':'')+'" data-a="go" data-v="'+n[0]+'" aria-label="'+n[2]+'">'+ic(n[1])+'<span>'+n[2]+'</span></button>';
- $('#nav').innerHTML=(onb||LA||WKM)?'':sjNav();
+ {const nh=(onb||LA||WKM)?'':sjNav(),nv=$('#nav');if(nv.__nh!==nh){nv.innerHTML=nh;nv.__nh=nh}}
  fitLogos();scanAttach();window.scrollTo(0,y)}
 function soft(){clearTimeout(renderT);renderT=setTimeout(()=>{if(editing())dirty=true;else render()},350)}
 const editing=()=>{const a=document.activeElement;return a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)&&a.type!=='file'};
@@ -8305,6 +8307,8 @@ vDash=function(){const st=scState(),M=scModel(st);if(!UI._hmAuto){UI._hmAuto=1;s
  return '<div class="smhm"><div class="smhero"><div class="smlg">'+SJLOGO+'</div><div class="smart">'+SJART+'</div><p class="smtx">سجلّك الرياضي في مكان واحد: تمارينك وأكلك ونموّك مع الأيام.</p></div>'+
   hmCells(st,M)+rdTodayCard()+hmPray()+hmDiv()+hmShort()+'</div>'};
 Object.assign(ENT,{'الوقت':'Time','الحرارة':'Temperature','مواقيت الصلاة':'Prayer times','اختصاراتي':'My shortcuts','تخصيص':'Customize','تم':'Done','متابعة الوزن':'Weight tracking','تسجيل وقت التمرين':'Log workout time','تسجيل طعام':'Log food','تسجيل الماء':'Log water','صور التقدّم':'Progress photos','تسجيل جري':'Log a run','بيانات الجسم':'Body data','الأوسمة':'Badges','الخطوات':'Steps','أضف اختصارًا':'Add a shortcut','استرجاع الاختصارات الافتراضية':'Restore default shortcuts','باقي على':'Time left until','متبقٍ':'Left','انتهى':'Ended','الجمعة':'Friday'});
+/* تنقّل سلس: يتحرّك المحتوى (ظهور خفيف) عند تغيّر الصفحة فقط، لا عند كل إعادة رسم */
+(()=>{const R=render;let K='';render=function(){try{const k=S.tab+'|'+(S.sub||'')+'|'+(UI.trk||'')+'|'+(UI.qt||'');const a=document.getElementById('app');if(a)a.classList.toggle('sjnv',k!==K);K=k}catch(e){}return R.apply(this,arguments)}})();
 /*TRK-JS-END*/
 render();
 if(document.fonts){document.fonts.ready.then(fitLogos);document.fonts.addEventListener&&document.fonts.addEventListener('loadingdone',fitLogos)}

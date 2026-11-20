@@ -63,3 +63,5 @@ html body .smhero .smlg svg,html body .smhero .smtx{color:var(--sj-tx)}
 @keyframes hmpulse{0%,100%{opacity:.55;transform:scale(.92)}50%{opacity:1;transform:scale(1.12)}}
 @media (prefers-reduced-motion:reduce){.hmgw:before{animation:none}}
 html.sc-hid .hmgw:before{animation-play-state:paused}
+html[data-sj] body #app>*{animation:none}
+html[data-sj] body #app.sjnv>*{animation:sjfade .14s ease-out both}

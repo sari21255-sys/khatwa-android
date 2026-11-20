@@ -413,4 +413,12 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   ok(r.gone.length===0&&r.acts.length===0,'دوال المجتمع ومعالجات النشر/الإعجاب/التعليق محذوفة',JSON.stringify(r));
   ok(r.keep,'مزامنة الاختصاراتَ والتفضيلات للحساب باقية');
   ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
+ console.log('14) تنقّل سلس: الحركة عند تغيّر الصفحة فقط، والشريط السفلي لا يُعاد بناؤه');
+ {const {ctx,p}=await mk();await go(p,'dash');
+  const an=()=>p.evaluate(()=>document.getAnimations().filter(a=>a.animationName==='sjfade').length);
+  await p.click('#nav [data-v=food]');await p.waitForTimeout(30);ok(await an()>0,'عند فتح تبويب جديد تظهر حركة ظهور خفيفة');await p.waitForTimeout(300);
+  const same=await p.evaluate(()=>{const n=document.querySelector('#nav .pill2');render();return document.querySelector('#nav .pill2')===n});
+  ok(same&&await an()===0,'إعادة رسم الصفحة نفسها بلا وميض ولا إعادة بناء للشريط السفلي');
+  for(const t of ['train','me','ex','dash','food']){await p.click('#nav [data-v='+t+']');ok(await p.evaluate(x=>S.tab===x&&!S.sub&&document.querySelector('#nav .on').dataset.v===x,t),'التنقل إلى '+t+' يفتح جذر التبويب والشريط يطابقه')}
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
  await b.close();console.log(fail?'FAILED '+fail:'all PASS');process.exit(fail?1:0)})();
