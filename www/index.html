@@ -1530,6 +1530,29 @@ html body .smhero .smlg svg,html body .smhero .smtx{color:var(--sj-tx)}
 html.sc-hid .hmgw:before{animation-play-state:paused}
 html[data-sj] body #app>*{animation:none}
 html[data-sj] body #app.sjnv>*{animation:sjfade .14s ease-out both}
+/* ===== الثيمات الداكنة: أسطح فاتحة قديمة تُحوَّل إلى ألوان الثيم ===== */
+label:focus-within{outline:0}
+html[data-theme="dark"] body .ncr{background:var(--sj-s1);border:1px solid var(--sj-ln);color:var(--sj-tx)}
+html[data-theme="dark"] body .ncr .t b{color:var(--sj-tx)}
+html[data-theme="dark"] body .ncr .t .mu,html[data-theme="dark"] body .ncr .t small{color:var(--sj-mu)}
+html[data-theme="dark"] body .tool.tc,html[data-theme="dark"] body .tool.tc.tc-bmi,html[data-theme="dark"] body .tool.tc.tc-protein,html[data-theme="dark"] body .tool.tc.tc-fat,html[data-theme="dark"] body .tool.tc.tc-cal,html[data-theme="dark"] body .tool.tc.tc-plate{background:var(--sj-s1)!important;border:1px solid var(--sj-ln);box-shadow:none;color:var(--sj-tx)}
+html[data-theme="dark"] body .tool.tc .tt b,html[data-theme="dark"] body .tool.tc .tt small{color:var(--sj-tx)}
+html[data-theme="dark"] body .tool.tc .tic{background:rgba(255,255,255,.1)}
+html[data-theme="dark"] body .tool.tc .tic .ico{color:var(--sj-tx)}
+html[data-theme="dark"] body .tool.tc .res,html[data-theme="dark"] body .tool.tc .note{background:rgba(255,255,255,.07);color:var(--sj-tx)}
+html[data-theme="dark"] body .fps{background:var(--sj-s1);border:1px solid var(--sj-ln);color:var(--sj-tx);box-shadow:0 -10px 40px rgba(0,0,0,.5);-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-theme="dark"] body .fps .mu,html[data-theme="dark"] body .fps small{color:var(--sj-mu)}
+html[data-theme="dark"] body .fps .chip{background:var(--sj-bg);color:var(--sj-tx);border:1px solid var(--sj-ln)}
+html[data-theme="dark"] body .fps .chip.on{background:var(--sj-btn)!important;color:var(--sj-btnt)!important}
+html[data-theme="dark"] body .fps input,html[data-theme="dark"] body .fps .irin{background:var(--sj-bg)!important;color:var(--sj-tx)!important;border:1px solid var(--sj-ln)!important}
+html[data-theme="dark"] body .fps .fpr{background:transparent;color:var(--sj-tx)}
+html[data-theme="dark"] body .fps .fpr.on{background:rgba(255,255,255,.08)}
+html[data-theme="dark"] body .sjwel.fxauth label.f input{background:var(--sj-bg)!important;color:var(--sj-tx)!important;border:1px solid var(--sj-ln)!important}
+html[data-theme="dark"] body .sjwel.fxauth label.f input:focus{outline:2px solid var(--sj-ac);outline-offset:1px}
+html[data-theme="dark"] body .ddb{background:var(--sj-s1)!important;border:1px solid var(--sj-ln)!important;color:var(--sj-tx)!important}
+html[data-theme="dark"] body .x2vx{color:var(--sj-mu)}
+html[data-theme="dark"] body .x2m b,html[data-theme="dark"] body .x2p .nv{color:var(--sj-tx)}
+html[data-theme="dark"] body .x2m .tr{background:rgba(255,255,255,.12)}
 /*TRK-CSS-END*/
 </style>
 <script src="config.js"></script>
@@ -6896,13 +6919,13 @@ function fxAuth(mode,opt){opt=opt||{};fxAuthClose();
  const st={mode:mode,msg:opt.msg||'',err:opt.err||'',busy:0,email:opt.email||'',sent:opt.sent||0};
  const h=()=>{const m=st.mode;
   d.innerHTML='<div class="bg"></div><div class="in fxain"><div class="fxalg">'+SJLOGO+'</div><h1>'+T[m]+'</h1>'+
-   (fxAuthOk()?'':'<div class="fxamsg err">الحساب غير مفعّل في هذه النسخة: لم تُضبط خدمة المزامنة. تابع كزائر الآن.</div>')+
-   (m==='up'?'<label class="f">الاسم الظاهر<input id="fxa-n" maxlength="24" autocomplete="nickname" placeholder="الاسم"></label>':'')+
-   (m!=='newpw'?'<label class="f">البريد الإلكتروني<input id="fxa-e" type="email" dir="ltr" autocomplete="email" inputmode="email" value="'+esc(st.email)+'"></label>':'')+
-   (m==='in'||m==='up'||m==='newpw'?'<label class="f">'+(m==='newpw'?'كلمة المرور الجديدة':'كلمة المرور')+'<input id="fxa-p" type="password" dir="ltr" autocomplete="'+(m==='in'?'current-password':'new-password')+'" placeholder="6 أحرف فأكثر"></label>':'')+
+   (fxAuthOk()?'':'<div class="fxamsg">المزامنة بالحساب غير متاحة في هذه النسخة. بياناتك محفوظة على جهازك وتعمل كاملة بلا حساب.</div>')+
+   (!fxAuthOk()?'':m==='up'?'<label class="f">الاسم الظاهر<input id="fxa-n" maxlength="24" autocomplete="nickname" placeholder="الاسم"></label>':'')+
+   (!fxAuthOk()?'':m!=='newpw'?'<label class="f">البريد الإلكتروني<input id="fxa-e" type="email" dir="ltr" autocomplete="email" inputmode="email" value="'+esc(st.email)+'"></label>':'')+
+   (!fxAuthOk()?'':m==='in'||m==='up'||m==='newpw'?'<label class="f">'+(m==='newpw'?'كلمة المرور الجديدة':'كلمة المرور')+'<input id="fxa-p" type="password" dir="ltr" autocomplete="'+(m==='in'?'current-password':'new-password')+'" placeholder="6 أحرف فأكثر"></label>':'')+
    (st.msg?'<div class="fxamsg ok" role="status" id="fxa-msg">'+esc(st.msg)+'</div>':'')+(st.err?'<div class="fxamsg err" role="alert" id="fxa-err">'+esc(st.err)+'</div>':'')+
-   '<button class="btn fxago" id="fxa-go"'+(st.busy||!fxAuthOk()?' disabled':'')+'>'+(st.busy?'لحظة…':m==='in'?'دخول':m==='up'?'إنشاء الحساب':m==='reset'?'أرسل رابط الاستعادة':m==='newpw'?'حفظ كلمة المرور':'أعد إرسال الرابط')+'</button>'+
-   '<div class="fxalinks">'+(m==='in'?'<button class="sec" data-fxm="reset">نسيت كلمة المرور؟</button><button class="sec" data-fxm="up">إنشاء حساب</button>':m==='up'?'<button class="sec" data-fxm="in">لديّ حساب</button>':m==='reset'||m==='resend'?'<button class="sec" data-fxm="in">رجوع لتسجيل الدخول</button>':'')+
+   (!fxAuthOk()?'':'<button class="btn fxago" id="fxa-go"'+(st.busy?' disabled':'')+'>'+(st.busy?'لحظة…':m==='in'?'دخول':m==='up'?'إنشاء الحساب':m==='reset'?'أرسل رابط الاستعادة':m==='newpw'?'حفظ كلمة المرور':'أعد إرسال الرابط')+'</button>')+
+   '<div class="fxalinks">'+(!fxAuthOk()?'':m==='in'?'<button class="sec" data-fxm="reset">نسيت كلمة المرور؟</button><button class="sec" data-fxm="up">إنشاء حساب</button>':m==='up'?'<button class="sec" data-fxm="in">لديّ حساب</button>':m==='reset'||m==='resend'?'<button class="sec" data-fxm="in">رجوع لتسجيل الدخول</button>':'')+
    (st.sent&&m!=='newpw'&&m!=='resend'?'<button class="sec" data-fxm="resend">لم يصلني الرابط؟ أعد الإرسال</button>':'')+
    '<button class="sec" data-fxx="1">'+(m==='newpw'?'إلغاء':fxIsGuest()?'المتابعة كزائر':'إغلاق')+'</button></div></div>'};
  const go=async()=>{if(st.busy)return;const g=id=>((d.querySelector(id)||{}).value||'');

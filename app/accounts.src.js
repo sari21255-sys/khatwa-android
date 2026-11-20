@@ -61,13 +61,13 @@ function fxAuth(mode,opt){opt=opt||{};fxAuthClose();
  const st={mode:mode,msg:opt.msg||'',err:opt.err||'',busy:0,email:opt.email||'',sent:opt.sent||0};
  const h=()=>{const m=st.mode;
   d.innerHTML='<div class="bg"></div><div class="in fxain"><div class="fxalg">'+SJLOGO+'</div><h1>'+T[m]+'</h1>'+
-   (fxAuthOk()?'':'<div class="fxamsg err">الحساب غير مفعّل في هذه النسخة: لم تُضبط خدمة المزامنة. تابع كزائر الآن.</div>')+
-   (m==='up'?'<label class="f">الاسم الظاهر<input id="fxa-n" maxlength="24" autocomplete="nickname" placeholder="الاسم"></label>':'')+
-   (m!=='newpw'?'<label class="f">البريد الإلكتروني<input id="fxa-e" type="email" dir="ltr" autocomplete="email" inputmode="email" value="'+esc(st.email)+'"></label>':'')+
-   (m==='in'||m==='up'||m==='newpw'?'<label class="f">'+(m==='newpw'?'كلمة المرور الجديدة':'كلمة المرور')+'<input id="fxa-p" type="password" dir="ltr" autocomplete="'+(m==='in'?'current-password':'new-password')+'" placeholder="6 أحرف فأكثر"></label>':'')+
+   (fxAuthOk()?'':'<div class="fxamsg">المزامنة بالحساب غير متاحة في هذه النسخة. بياناتك محفوظة على جهازك وتعمل كاملة بلا حساب.</div>')+
+   (!fxAuthOk()?'':m==='up'?'<label class="f">الاسم الظاهر<input id="fxa-n" maxlength="24" autocomplete="nickname" placeholder="الاسم"></label>':'')+
+   (!fxAuthOk()?'':m!=='newpw'?'<label class="f">البريد الإلكتروني<input id="fxa-e" type="email" dir="ltr" autocomplete="email" inputmode="email" value="'+esc(st.email)+'"></label>':'')+
+   (!fxAuthOk()?'':m==='in'||m==='up'||m==='newpw'?'<label class="f">'+(m==='newpw'?'كلمة المرور الجديدة':'كلمة المرور')+'<input id="fxa-p" type="password" dir="ltr" autocomplete="'+(m==='in'?'current-password':'new-password')+'" placeholder="6 أحرف فأكثر"></label>':'')+
    (st.msg?'<div class="fxamsg ok" role="status" id="fxa-msg">'+esc(st.msg)+'</div>':'')+(st.err?'<div class="fxamsg err" role="alert" id="fxa-err">'+esc(st.err)+'</div>':'')+
-   '<button class="btn fxago" id="fxa-go"'+(st.busy||!fxAuthOk()?' disabled':'')+'>'+(st.busy?'لحظة…':m==='in'?'دخول':m==='up'?'إنشاء الحساب':m==='reset'?'أرسل رابط الاستعادة':m==='newpw'?'حفظ كلمة المرور':'أعد إرسال الرابط')+'</button>'+
-   '<div class="fxalinks">'+(m==='in'?'<button class="sec" data-fxm="reset">نسيت كلمة المرور؟</button><button class="sec" data-fxm="up">إنشاء حساب</button>':m==='up'?'<button class="sec" data-fxm="in">لديّ حساب</button>':m==='reset'||m==='resend'?'<button class="sec" data-fxm="in">رجوع لتسجيل الدخول</button>':'')+
+   (!fxAuthOk()?'':'<button class="btn fxago" id="fxa-go"'+(st.busy?' disabled':'')+'>'+(st.busy?'لحظة…':m==='in'?'دخول':m==='up'?'إنشاء الحساب':m==='reset'?'أرسل رابط الاستعادة':m==='newpw'?'حفظ كلمة المرور':'أعد إرسال الرابط')+'</button>')+
+   '<div class="fxalinks">'+(!fxAuthOk()?'':m==='in'?'<button class="sec" data-fxm="reset">نسيت كلمة المرور؟</button><button class="sec" data-fxm="up">إنشاء حساب</button>':m==='up'?'<button class="sec" data-fxm="in">لديّ حساب</button>':m==='reset'||m==='resend'?'<button class="sec" data-fxm="in">رجوع لتسجيل الدخول</button>':'')+
    (st.sent&&m!=='newpw'&&m!=='resend'?'<button class="sec" data-fxm="resend">لم يصلني الرابط؟ أعد الإرسال</button>':'')+
    '<button class="sec" data-fxx="1">'+(m==='newpw'?'إلغاء':fxIsGuest()?'المتابعة كزائر':'إغلاق')+'</button></div></div>'};
  const go=async()=>{if(st.busy)return;const g=id=>((d.querySelector(id)||{}).value||'');

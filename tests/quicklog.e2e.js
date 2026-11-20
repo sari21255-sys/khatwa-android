@@ -421,4 +421,15 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   ok(same&&await an()===0,'إعادة رسم الصفحة نفسها بلا وميض ولا إعادة بناء للشريط السفلي');
   for(const t of ['train','me','ex','dash','food']){await p.click('#nav [data-v='+t+']');ok(await p.evaluate(x=>S.tab===x&&!S.sub&&document.querySelector('#nav .on').dataset.v===x,t),'التنقل إلى '+t+' يفتح جذر التبويب والشريط يطابقه')}
   ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
+ console.log('15) الثيمات الداكنة: الأدوات والإشعارات ونافذة الطعام مقروءة، وشاشة الدخول بلا نموذج دون خدمة');
+ {const {ctx,p}=await mk();await go(p,'dash');
+  for(const th of ['purple','blue','emerald','olive','black']){
+   const r=await p.evaluate(th=>{TH=th;applyTheme();const L=e=>{const m=getComputedStyle(e).backgroundColor.match(/[\d.]+/g).map(Number);return(.2126*m[0]+.7152*m[1]+.0722*m[2])/255};
+    const o={};S.tab='ex';S.sub='tools';render();const a=document.querySelector('.tool.tc');o.tool=L(a);
+    S.sub='nc';render();const n=document.querySelector('.ncr');o.nc=n?L(n):0;
+    S.tab='food';S.sub=null;render();fdOpen('lunch');render();const s=document.querySelector('.fps');o.sheet=s?L(s):1;UI.fds=null;render();return o},th);
+   ok(r.tool<.35&&r.nc<.35&&r.sheet<.35,'ثيم '+th+': أسطح داكنة لنصوص فاتحة',JSON.stringify(r))}
+  const g=await p.evaluate(()=>{ACT.fxin({dataset:{}});const d=document.querySelector('#fx-auth');return{inputs:d.querySelectorAll('input').length,go:!!d.querySelector('#fxa-go'),guest:!!d.querySelector('[data-fxx]')}});
+  ok(g.inputs===0&&!g.go&&g.guest,'بلا إعداد مزامنة: لا حقول ولا زر دخول، فقط المتابعة كزائر',JSON.stringify(g));
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
  await b.close();console.log(fail?'FAILED '+fail:'all PASS');process.exit(fail?1:0)})();
