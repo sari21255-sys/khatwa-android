@@ -263,7 +263,7 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
  console.log('8) الرئيسية: مشهد الوقت');
  {const mkAt=async(time,o)=>{o=o||{};const ctx=await b.newContext({viewport:{width:o.w||390,height:844},timezoneId:o.tz||'Asia/Riyadh',reducedMotion:o.rm?'reduce':'no-preference'});await ctx.clock.install({time:new Date(time)});const p=await ctx.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));
    await p.goto('file://'+file);await p.waitForFunction(()=>typeof scCard==='function');
-   await p.evaluate(g=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=30;S.prof.ht=178;S.prof.startW=85;S.prof.goalType='lose';S.prof.lvl='b';S.prof.eq='gym';S.prof.dpw=7;S.bw[TD()]=85;calcTargets();genPlan();const s=rdS();if(g){s.geo=1;s.cus=g}else{s.geo=0;s.cus=null}s.wxOn=1;s.sunOn=1;save()},o.geo===undefined?{n:'المدينة المنورة',lat:24.47,lon:39.61,tz:'Asia/Riyadh'}:o.geo);
+   await p.evaluate(g=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=30;S.prof.ht=178;S.prof.startW=85;S.prof.goalType='lose';S.prof.lvl='b';S.prof.eq='gym';S.prof.dpw=7;S.bw[TD()]=85;calcTargets();genPlan();const s=rdS();if(g){s.geo=1;s.cus=g}else{s.geo=0;s.cus=null}s.geoAsked=1;s.wxOn=1;s.sunOn=1;save()},o.geo===undefined?{n:'المدينة المنورة',lat:24.47,lon:39.61,tz:'Asia/Riyadh'}:o.geo);
    await p.reload();await p.waitForFunction(()=>typeof scCard==='function');await p.evaluate(()=>{S.tab='dash';S.sub=null;render()});await p.waitForTimeout(250);return{ctx,p}};
   const per=async t=>{const {ctx,p}=await mkAt(t);const r=await p.evaluate(()=>({per:document.getElementById('sc-per').textContent,cls:document.getElementById('sc-card').className}));await ctx.close();return r.per};
   const cases=[['2026-11-16T03:00:00+03:00','آخر الليل'],['2026-11-16T05:30:00+03:00','الفجر'],['2026-11-16T08:00:00+03:00','الصباح'],['2026-11-16T12:30:00+03:00','الظهر'],['2026-11-16T15:45:00+03:00','العصر'],['2026-11-16T17:20:00+03:00','الغروب'],['2026-11-16T19:30:00+03:00','الليل'],['2026-11-16T23:00:00+03:00','الليل'],['2026-11-17T02:30:00+03:00','آخر الليل']];
@@ -288,7 +288,7 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   {const {ctx,p}=await mkAt('2026-11-16T22:30:00+03:00');ok(await p.evaluate(()=>!!document.querySelector('.scmoon')&&!document.querySelector('.scsun')),'قمر ليلًا بلا شمس');
    const x1=await p.evaluate(()=>document.querySelector('.scmoon').getAttribute('transform'));await p.clock.fastForward(3*3600*1000);await p.waitForTimeout(100);
    const x2=await p.evaluate(()=>document.querySelector('.scmoon').getAttribute('transform'));ok(x1!==x2,'القمر يتحرك مع الوقت (تأثير بصري)');
-   ok(/تأثير بصري/.test(await txt(p)),'توضيح أن حركة القمر تأثير بصري');await ctx.close()}
+   await ctx.close()}
   /* تغيّر اليوم والوقت يحدّث المشهد */
   {const {ctx,p}=await mkAt('2026-11-16T16:50:00+03:00');const d1=await p.evaluate(()=>document.getElementById('hm-g').textContent+'|'+document.getElementById('sc-per').textContent);
    await p.clock.fastForward(2*3600*1000);await p.waitForTimeout(100);const d2=await p.evaluate(()=>document.getElementById('hm-g').textContent+'|'+document.getElementById('sc-per').textContent);ok(d1!==d2&&/الليل/.test(d2),'الفترة تتغير مع الوقت: '+d2);
@@ -313,9 +313,10 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
    const r=await p.evaluate(()=>({cls:document.getElementById('sc-card').classList.contains('sc-rm'),an:getComputedStyle(document.querySelector('.scstars i')).animationName}));ok(r.cls&&r.an==='none','تقليل الحركة: بلا رسوم متحركة',JSON.stringify(r));await ctx.close()}
   /* بلا موقع */
   {const {ctx,p}=await mkAt('2026-11-16T10:30:00+03:00',{geo:null});const t=await txt(p);
-   ok(/استخدم موقعي/.test(t)&&/اسمح بالموقع/.test(t)&&/تقريبي بحسب توقيت الجهاز/.test(t),'بلا موقع: حالة مفهومة وزر «استخدم موقعي»');
+   ok(await p.evaluate(()=>{const b=document.querySelector('#sc-loc');return !!b&&b.getAttribute('aria-label')==='استخدم موقعي'&&/حدّد موقعك/.test(b.textContent)&&!!b.querySelector('svg.hmgl')}),'بلا موقع: أيقونة موقع متوهجة بحالة مفهومة');
+   ok(!/تأثير بصري|تقريبي بحسب|اسمح بالموقع/.test(t),'لا إرشادات نصية داخل شاشة الشمس والقمر');
    ok(await p.evaluate(()=>!document.querySelector('.scchip')),'بلا موقع: لا مواعيد شروق وغروب مختلقة');
-   await p.evaluate(()=>{const s=rdS();s.geoDeny=1;render()});ok(/لم يُمنح إذن الموقع/.test(await txt(p)),'حالة رفض الإذن واضحة');
+   await p.evaluate(()=>{const s=rdS();s.geoDeny=1;render()});ok(/الموقع غير مفعّل/.test(await p.evaluate(()=>document.querySelector('#sc-loc').textContent)),'حالة رفض الإذن واضحة');
    ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}}
 
  console.log('9) زائر: حفظ تمرين وطعام وصورة ثم إغلاق وفتح، وترقية من النسخة السابقة');
@@ -382,4 +383,22 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   ok(Object.values(bg).every(x=>x.startsWith('rgba(0, 0, 0, 0)')),'الشعار والعبارة بلا إطار ولا خلفية: على خلفية الصفحة مباشرة',JSON.stringify(bg));
   ok(bg.white.split('|')[1]!==bg.black.split('|')[1]&&/rgb\(16, 16, 16\)/.test(bg.white.split('|')[1]),'لون الشعار والعبارة يتبع السمة (داكن على الأبيض)',bg.white);
   ok(await p.evaluate(()=>!document.querySelector('.smart svg')&&SJART===''),'أيقونة الحديد محذوفة من الرئيسية وشاشة الدخول');await ctx.close()}
+ console.log('12) الموقع والطقس تلقائيًا + اسم الموقع بجوار الأيقونة المتوهجة');
+ {const ctx=await b.newContext({viewport:{width:390,height:844},timezoneId:'Asia/Riyadh',permissions:['geolocation'],geolocation:{latitude:24.47,longitude:39.61}});await ctx.clock.install({time:new Date('2026-11-20T11:30:00+03:00')});
+  let hit=0;await ctx.route('**/api.open-meteo.com/**',r=>{hit++;const t=[];for(let h=0;h<72;h++){const d=new Date(Date.UTC(2026,10,19,21,0)+h*3600e3);t.push(d.toISOString().slice(0,13)+':00')}const n=t.length,f=v=>t.map(()=>v);r.fulfill({contentType:'application/json',body:JSON.stringify({hourly:{time:t.map(x=>x.replace(/T(\d\d)/,(m,hh)=>{const q=(+hh+3)%24;return 'T'+String(q).padStart(2,'0')})),temperature_2m:f(27.4),apparent_temperature:f(26),relative_humidity_2m:f(30),precipitation_probability:f(0),weather_code:f(0),wind_speed_10m:f(10),wind_gusts_10m:f(15),uv_index:f(5)}})})});
+  const p=await ctx.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));
+  await p.goto('file://'+file);await p.waitForFunction(()=>typeof hmAuto==='function');
+  await p.evaluate(()=>{S.prof.ob=1;S.prof.name='م';calcTargets();const s=rdS();s.geo=0;s.cus=null;s.wxOn=0;s.sunOn=0;S.tab='dash';S.sub=null;save()});await p.reload();await p.waitForFunction(()=>typeof hmAuto==='function');
+  await p.waitForFunction(()=>rdS().geo===1&&!!rdS().cus,null,{timeout:6000}).catch(()=>{});await p.waitForTimeout(800);
+  const r=await p.evaluate(()=>({geo:rdS().geo,wx:rdS().wxOn,sun:rdS().sunOn,loc:document.querySelector('#sc-loc').textContent.trim(),glow:!!document.querySelector('#sc-loc .hmgw svg.hmgl'),tp:(document.querySelector('.hmtp')||{}).textContent,u:rdS().units.t}));
+  ok(r.geo===1&&r.wx===1&&r.sun===1,'الموقع والطقس والشروق تتفعل تلقائيًا بعد منح الإذن',JSON.stringify(r));
+  ok(r.loc.length>1&&!/حدّد|غير مفعّل/.test(r.loc)&&r.glow,'اسم الموقع بجوار الأيقونة المتوهجة: '+r.loc);
+  ok(hit>=1&&/\d/.test(r.tp||''),'الحرارة تُجلب تلقائيًا وتظهر: '+r.tp+' (طلبات '+hit+')');
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
+ /* الرفض لا يتكرر طلبه */
+ {const ctx=await b.newContext({viewport:{width:390,height:844},timezoneId:'Asia/Riyadh'});await ctx.clock.install({time:new Date('2026-11-20T11:30:00+03:00')});const p=await ctx.newPage();
+  await p.addInitScript(()=>{window.__g=0;const o=navigator.geolocation.getCurrentPosition.bind(navigator.geolocation);navigator.geolocation.getCurrentPosition=(a,e)=>{window.__g++;e({code:1,message:'denied'})}});
+  await p.goto('file://'+file);await p.waitForFunction(()=>typeof hmAuto==='function');await p.evaluate(()=>{S.prof.ob=1;S.prof.name='م';calcTargets();S.tab='dash';S.sub=null;save()});
+  for(let i=0;i<3;i++){await p.reload();await p.waitForFunction(()=>typeof hmAuto==='function');await p.waitForTimeout(900)}
+  const n=await p.evaluate(()=>({g:window.__g,t:document.querySelector('#sc-loc').textContent.trim(),ask:rdS().geoAsked}));ok(n.ask===1&&/غير مفعّل|حدّد/.test(n.t),'بعد الرفض: حالة قصيرة والصلاحية لا تُطلب كل مرة',JSON.stringify(n));await ctx.close()}
  await b.close();console.log(fail?'FAILED '+fail:'all PASS');process.exit(fail?1:0)})();

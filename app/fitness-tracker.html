@@ -1517,6 +1517,17 @@ html body .smhero .smlg svg,html body .smhero .smtx{color:var(--sj-tx)}
 .hmrow{display:flex;align-items:center;gap:10px;background:var(--sj-s1);border:1px solid var(--sj-ln);border-radius:16px;padding:8px 10px;color:var(--sj-tx)}
 .hmrow .chip{min-width:44px;min-height:44px}
 @media (prefers-reduced-motion:reduce){.hmbar i,.hmtb i{transition:none}}
+
+.hmscin{background:linear-gradient(rgba(8,12,26,.86),rgba(8,12,26,.9));padding:10px 14px}
+.hmlc{display:inline-flex;align-items:center;gap:10px;background:none;border:0;color:#fff;font:inherit;min-height:44px;padding:0;cursor:pointer}
+.hmlc b{font-size:16px;font-weight:700}
+.hmgw{position:relative;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--sj-ac,#fff) 38%,transparent),transparent 70%);flex:none}
+.hmgw:before{content:"";position:absolute;inset:-4px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--sj-ac,#fff) 30%,transparent),transparent 68%);animation:hmpulse 2.8s ease-in-out infinite}
+.hmgl{position:relative;width:22px;height:22px;fill:none;stroke:var(--sj-ac,#fff);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 5px var(--sj-ac,#fff)) drop-shadow(0 0 10px var(--sj-ac,#fff))}
+.hmlc:not(.on) .hmgl{opacity:.75}.hmlc.busy .hmgw:before{animation-duration:1s}
+@keyframes hmpulse{0%,100%{opacity:.55;transform:scale(.92)}50%{opacity:1;transform:scale(1.12)}}
+@media (prefers-reduced-motion:reduce){.hmgw:before{animation:none}}
+html.sc-hid .hmgw:before{animation-play-state:paused}
 /*TRK-CSS-END*/
 </style>
 
@@ -8255,7 +8266,7 @@ function hmCells(st,M){const d=hmDate(st.now,st.c.tz),p=SCP[M.per],cur=st.has&&s
  const date='<div class="hmc hmdate" id="hm-date"><div class="hmwd" id="hm-wd">'+esc(d.g.weekday||'')+'</div><div class="hmbig num" id="hm-day">'+esc(d.g.day||'')+'</div>'+
   '<div class="hmh" id="sc-hijri">'+(d.h.day?esc(d.h.day+' '+d.h.month+' '+d.h.year+' هـ'):'')+'</div><div class="hmg" id="hm-g">'+esc((d.g.day||'')+' '+(d.g.month||'')+' '+(d.g.year||''))+'</div></div>';
  const time='<div class="hmc hmtime"><div class="hmk">'+scIc('clock')+'الوقت</div><b class="num hmclk" id="sc-time" data-rdclk>'+rdF(st.now,st.c.tz)+'</b><div class="hmper"><span id="sc-per-ic">'+scIc(p[1])+'</span><b id="sc-per">'+p[0]+'</b></div></div>';
- const wx=ok?'<div class="hmc hmwx" id="hm-wx"><div class="hmk">'+scIc(fxWxKind(cur.code)||'clear')+'الحرارة</div><b class="num hmtp">'+rdT(cur.temp)+'</b><div class="hmwl">'+esc(rdCode(cur.code))+' · محسوسة <span class="num">'+rdT(cur.feels)+'</span></div></div>'
+ const wx=ok?'<div class="hmc hmwx" id="hm-wx"><div class="hmk">'+scIc(fxWxKind(cur.code)||'clear')+'الحرارة</div><b class="num hmtp">'+rdT(cur.temp)+'</b><div class="hmwl">'+esc(rdCode(cur.code))+' · محسوسة <span class="num" dir="ltr">'+rdT(cur.feels)+'</span></div></div>'
   :'<div class="hmc hmwx" id="hm-wx"><div class="hmk">'+scIc('cloud')+'الحرارة</div><b class="num hmtp">—</b><div class="hmwl">'+(st.has?(sx==='expired'?'انتهت صلاحية التوقع':'لا يتوفر توقع محفوظ'):'حدّد موقعك لتظهر')+'</div></div>';
  return '<div class="hmgrid">'+date+time+wx+'</div>'}
 /* ---------- الصلاة ---------- */
@@ -8284,11 +8295,20 @@ function hmTick(){const el=document.getElementById('hm-pray');if(!el||document.h
  if(D.ci>=0){const x=D.ev[D.ci];set('hm-tl',hmClk(x.e-now).replace(/^0:/,''));const tb=document.getElementById('hm-tb');if(tb)tb.style.width=(Math.max(0,Math.min(1,(x.e-now)/Math.max(1,x.e-x.t)))*100).toFixed(1)+'%'}}
 setInterval(()=>{try{hmTick()}catch(e){lg(e)}},1000);
 /* ---------- المشهد بلا نصوص التاريخ والوقت (صارت خانات) ---------- */
+const HMGL='<svg class="hmgl" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6.5-5.6 6.5-11a6.5 6.5 0 1 0-13 0c0 5.4 6.5 11 6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
+function hmLoc(st){const s=st.s;let t=st.has?esc(st.c.n):s.geoBusy?'جارٍ التحديد…':s.geoDeny?'الموقع غير مفعّل':s.geoFail?'تعذّر التحديد':'حدّد موقعك';
+ return '<button class="hmlc'+(st.has?' on':'')+(s.geoBusy?' busy':'')+'" data-a="rdgeo" id="sc-loc" aria-label="استخدم موقعي"'+(s.geoBusy?' disabled':'')+'><span class="hmgw">'+HMGL+'</span><b>'+t+'</b></button>'}
 scCard=function(){const st=scState(),M=scModel(st);
  return '<div class="card scn fxscene sc-p-'+M.per+(scReduced()?' sc-rm':'')+'" id="sc-card" data-key="'+esc(M.key)+'" style="--sk1:'+scCss(M.sk.top)+';--sk2:'+scCss(M.sk.bot)+'" role="group" aria-label="'+esc(scAria(st,M))+'">'+scArt(st,M)+
-  '<div class="scin">'+scLocState(st)+(st.has?'':'<div class="row" style="margin-top:8px"><button class="btn sm" data-a="rdgeo"'+(st.s.geoBusy?' disabled':'')+'>'+scIc('pin')+(st.s.geoBusy?'جارٍ تحديد الموقع…':'استخدم موقعي')+'</button></div>')+
-  (st.has&&!st.s.geoBusy?'<div class="row" style="margin-top:8px;gap:8px;flex-wrap:wrap"><button class="chip" data-a="rdgeo">'+scIc('pin')+'استخدم موقعي</button></div>':'')+
-  (st.approx?'<div class="scs">المشهد تقريبي بحسب توقيت الجهاز. مواعيد الشروق والغروب تظهر عند تحديد الموقع.</div>':'<div class="scs scnote">حركة القمر ليلًا تأثير بصري وليست موضعًا فلكيًا.</div>')+'</div></div>'};
+  '<div class="scin hmscin">'+hmLoc(st)+'</div></div>'};
+/* تفعيل الموقع والطقس تلقائيًا عند استعمال التطبيق: مرة واحدة تُطلب الصلاحية، وبعد الرفض لا نكرر الطلب */
+async function hmAuto(){const s=rdS();if(smHasLoc()||s.geoBusy)return;
+ if(!s.wxOn||!s.sunOn){s.wxOn=1;s.sunOn=1;save()}
+ let state='';try{if(navigator.permissions&&navigator.permissions.query)state=(await navigator.permissions.query({name:'geolocation'})).state}catch(e){}
+ if(!navigator.geolocation&&!NAT)return;
+ if(state==='denied'){if(!s.geoDeny){s.geoDeny=1;save();render()}return}
+ if(state==='granted'){s.geoDeny=0;ACT.rdgeo();return}
+ if(s.geoAsked)return;s.geoAsked=1;save();ACT.rdgeo()}
 (()=>{const A=scApply;scApply=function(f){const r=A.apply(this,arguments);try{const st=scState(),d=hmDate(st.now,st.c.tz),set=(id,t)=>{const e=document.getElementById(id);if(e&&e.textContent!==t)e.textContent=t};
  set('hm-wd',d.g.weekday||'');set('hm-day',d.g.day||'');set('hm-g',(d.g.day||'')+' '+(d.g.month||'')+' '+(d.g.year||''));if(d.h.day)set('sc-hijri',d.h.day+' '+d.h.month+' '+d.h.year+' هـ')}catch(e){lg(e)}return r}})();
 /* ---------- الفاصل ---------- */
@@ -8324,7 +8344,7 @@ Object.assign(ACT,{
  hmmv:b=>{const L=hmList(),i=L.indexOf(b.dataset.v),j=i+(+b.dataset.d);if(i<0||j<0||j>=L.length)return false;const t=L[i];L[i]=L[j];L[j]=t;S.hmsc=L},
  hmrs:()=>{S.hmsc=null}});
 /* ---------- الصفحة ---------- */
-vDash=function(){const st=scState(),M=scModel(st);
+vDash=function(){const st=scState(),M=scModel(st);if(!UI._hmAuto){UI._hmAuto=1;setTimeout(()=>{try{hmAuto()}catch(e){lg(e)}},400)}
  return '<div class="smhm"><div class="smhero"><div class="smlg">'+SJLOGO+'</div><div class="smart">'+SJART+'</div><p class="smtx">سجلّك الرياضي في مكان واحد: تمارينك وأكلك ونموّك مع الأيام.</p></div>'+
   hmCells(st,M)+rdTodayCard()+hmPray()+hmDiv()+hmShort()+'</div>'};
 Object.assign(ENT,{'الوقت':'Time','الحرارة':'Temperature','مواقيت الصلاة':'Prayer times','اختصاراتي':'My shortcuts','تخصيص':'Customize','تم':'Done','متابعة الوزن':'Weight tracking','تسجيل وقت التمرين':'Log workout time','تسجيل طعام':'Log food','تسجيل الماء':'Log water','صور التقدّم':'Progress photos','تسجيل جري':'Log a run','بيانات الجسم':'Body data','الأوسمة':'Badges','الخطوات':'Steps','أضف اختصارًا':'Add a shortcut','استرجاع الاختصارات الافتراضية':'Restore default shortcuts','باقي على':'Time left until','متبقٍ':'Left','انتهى':'Ended','الجمعة':'Friday'});

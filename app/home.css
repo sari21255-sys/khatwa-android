@@ -52,3 +52,14 @@ html body .smhero .smlg svg,html body .smhero .smtx{color:var(--sj-tx)}
 .hmrow{display:flex;align-items:center;gap:10px;background:var(--sj-s1);border:1px solid var(--sj-ln);border-radius:16px;padding:8px 10px;color:var(--sj-tx)}
 .hmrow .chip{min-width:44px;min-height:44px}
 @media (prefers-reduced-motion:reduce){.hmbar i,.hmtb i{transition:none}}
+
+.hmscin{background:linear-gradient(rgba(8,12,26,.86),rgba(8,12,26,.9));padding:10px 14px}
+.hmlc{display:inline-flex;align-items:center;gap:10px;background:none;border:0;color:#fff;font:inherit;min-height:44px;padding:0;cursor:pointer}
+.hmlc b{font-size:16px;font-weight:700}
+.hmgw{position:relative;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--sj-ac,#fff) 38%,transparent),transparent 70%);flex:none}
+.hmgw:before{content:"";position:absolute;inset:-4px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--sj-ac,#fff) 30%,transparent),transparent 68%);animation:hmpulse 2.8s ease-in-out infinite}
+.hmgl{position:relative;width:22px;height:22px;fill:none;stroke:var(--sj-ac,#fff);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 5px var(--sj-ac,#fff)) drop-shadow(0 0 10px var(--sj-ac,#fff))}
+.hmlc:not(.on) .hmgl{opacity:.75}.hmlc.busy .hmgw:before{animation-duration:1s}
+@keyframes hmpulse{0%,100%{opacity:.55;transform:scale(.92)}50%{opacity:1;transform:scale(1.12)}}
+@media (prefers-reduced-motion:reduce){.hmgw:before{animation:none}}
+html.sc-hid .hmgw:before{animation-play-state:paused}
