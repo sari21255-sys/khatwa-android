@@ -10,3 +10,59 @@
 .qflt .chips{display:flex;flex-wrap:wrap;gap:6px}
 
 button[data-a=trkhub]{min-height:36px;display:inline-flex;align-items:center}
+
+/* ===== محرر الأداء بقوائم اختيار ===== */
+.qx .qrh,.qx .qrow{display:grid;grid-template-columns:50px minmax(0,1.9fr) minmax(0,.9fr) 40px;gap:6px;align-items:center}
+.qx .qrh{margin:8px 0 0;font-size:12px}
+.qx .qrow{margin:6px 0}
+.qx .qw{display:flex;gap:4px;min-width:0}
+.qx .qw .irsel{flex:1;min-width:0;padding-inline:6px}
+.qx .qw .irsel:last-child{flex:0 0 58px}
+.qx .qrow .irsel{min-height:44px;font-size:16px}
+.qx .qrow .chip{padding:0;min-width:40px;min-height:44px}
+.qx .qcnt .irsel{width:84px;flex:0 0 auto}
+.qx .qpre{margin:6px 0}
+/* ===== أرشيف تماريني ===== */
+.qth{flex:0 0 auto;width:56px;height:56px;border-radius:14px;overflow:hidden;display:grid;place-items:center;background:var(--sj-s2,rgba(127,127,127,.15));color:var(--sj-mu,inherit)}
+.qth.big{width:84px;height:84px}
+.qth img{width:100%;height:100%;object-fit:cover;display:block}
+.qth svg{width:26px;height:26px}
+.qar .qarh .qmax b,.qar .qarh .qlast b{color:var(--sj-tx,inherit)}
+.qar .qrr{display:grid;grid-template-columns:1.2fr 1.2fr .8fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--sj-ln,rgba(127,127,127,.2));align-items:center}
+.qar .qrh3{font-size:12px;border-bottom:1px solid var(--sj-ln,rgba(127,127,127,.3))}
+.qah .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.qlr{padding:8px 0;border-bottom:1px solid var(--sj-ln,rgba(127,127,127,.2))}
+.qph{align-items:center;flex-wrap:wrap}
+.qimgn{margin-top:6px;font-size:12px}
+.qcrop{margin:10px 0;padding:10px;border-radius:14px;border:1px solid var(--sj-ln,rgba(127,127,127,.3))}
+.qcrop canvas{display:block;width:100%;max-width:260px;aspect-ratio:1;margin:0 auto 8px;border-radius:14px;touch-action:none;background:#000}
+.qcrop input[type=range]{width:100%;min-height:32px}
+#q-man .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* ===== الخطة الحالية: يوم ← عضلة ← تمارين ===== */
+.qday{padding:0}
+.qday.sel{border-color:var(--sj-ac,currentColor)}
+.qdh,.qmh{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;color:inherit;font:inherit;text-align:start;min-height:52px;padding:12px 14px}
+.qdh .qdt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.qdh .qdt b{font-size:16px}
+.qchev{display:grid;place-items:center;transition:transform .15s}
+.qchev svg{width:18px;height:18px}
+[aria-expanded="true"]>.qchev{transform:rotate(90deg)}
+.qdb{padding:0 12px 12px}
+.qdact{margin:0 0 8px}
+.qms{margin-top:8px;border-radius:14px;border:1px solid var(--sj-ln,rgba(127,127,127,.25));overflow:hidden}
+.qmh{min-height:46px;padding:8px 12px;background:var(--sj-s2,rgba(127,127,127,.08))}
+.qmh b{flex:0 0 auto}
+.qmh small{flex:1}
+.qmb{padding:8px}
+.qmb .qx{margin:8px 0}
+.qme{margin:0 0 10px;padding:10px;border-radius:14px;border:1px solid var(--sj-ln,rgba(127,127,127,.3))}
+.qmel{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.qmec{display:flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border-radius:12px;border:1px solid var(--sj-ln,rgba(127,127,127,.3))}
+.qmec input{width:20px;height:20px}
+.qwarn{margin:8px 0;padding:10px;border-radius:12px;border:1px solid #d98c2b;background:rgba(217,140,43,.12)}
+.qpe{margin-top:8px;padding-top:8px;border-top:1px dashed var(--sj-ln,rgba(127,127,127,.3))}
+.qpe .qw{display:flex;gap:6px}
+.qpeb{flex:0 0 auto}
+.qax{margin:8px 0}
+.qdh:focus-visible,.qmh:focus-visible{outline:2px solid var(--sj-ac,currentColor);outline-offset:-2px}

@@ -1402,6 +1402,62 @@ html[data-sj] body #nav .pill2 button[data-v=me]>span{display:block!important;wi
 .qflt .chips{display:flex;flex-wrap:wrap;gap:6px}
 
 button[data-a=trkhub]{min-height:36px;display:inline-flex;align-items:center}
+
+/* ===== محرر الأداء بقوائم اختيار ===== */
+.qx .qrh,.qx .qrow{display:grid;grid-template-columns:50px minmax(0,1.9fr) minmax(0,.9fr) 40px;gap:6px;align-items:center}
+.qx .qrh{margin:8px 0 0;font-size:12px}
+.qx .qrow{margin:6px 0}
+.qx .qw{display:flex;gap:4px;min-width:0}
+.qx .qw .irsel{flex:1;min-width:0;padding-inline:6px}
+.qx .qw .irsel:last-child{flex:0 0 58px}
+.qx .qrow .irsel{min-height:44px;font-size:16px}
+.qx .qrow .chip{padding:0;min-width:40px;min-height:44px}
+.qx .qcnt .irsel{width:84px;flex:0 0 auto}
+.qx .qpre{margin:6px 0}
+/* ===== أرشيف تماريني ===== */
+.qth{flex:0 0 auto;width:56px;height:56px;border-radius:14px;overflow:hidden;display:grid;place-items:center;background:var(--sj-s2,rgba(127,127,127,.15));color:var(--sj-mu,inherit)}
+.qth.big{width:84px;height:84px}
+.qth img{width:100%;height:100%;object-fit:cover;display:block}
+.qth svg{width:26px;height:26px}
+.qar .qarh .qmax b,.qar .qarh .qlast b{color:var(--sj-tx,inherit)}
+.qar .qrr{display:grid;grid-template-columns:1.2fr 1.2fr .8fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--sj-ln,rgba(127,127,127,.2));align-items:center}
+.qar .qrh3{font-size:12px;border-bottom:1px solid var(--sj-ln,rgba(127,127,127,.3))}
+.qah .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.qlr{padding:8px 0;border-bottom:1px solid var(--sj-ln,rgba(127,127,127,.2))}
+.qph{align-items:center;flex-wrap:wrap}
+.qimgn{margin-top:6px;font-size:12px}
+.qcrop{margin:10px 0;padding:10px;border-radius:14px;border:1px solid var(--sj-ln,rgba(127,127,127,.3))}
+.qcrop canvas{display:block;width:100%;max-width:260px;aspect-ratio:1;margin:0 auto 8px;border-radius:14px;touch-action:none;background:#000}
+.qcrop input[type=range]{width:100%;min-height:32px}
+#q-man .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* ===== الخطة الحالية: يوم ← عضلة ← تمارين ===== */
+.qday{padding:0}
+.qday.sel{border-color:var(--sj-ac,currentColor)}
+.qdh,.qmh{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;color:inherit;font:inherit;text-align:start;min-height:52px;padding:12px 14px}
+.qdh .qdt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.qdh .qdt b{font-size:16px}
+.qchev{display:grid;place-items:center;transition:transform .15s}
+.qchev svg{width:18px;height:18px}
+[aria-expanded="true"]>.qchev{transform:rotate(90deg)}
+.qdb{padding:0 12px 12px}
+.qdact{margin:0 0 8px}
+.qms{margin-top:8px;border-radius:14px;border:1px solid var(--sj-ln,rgba(127,127,127,.25));overflow:hidden}
+.qmh{min-height:46px;padding:8px 12px;background:var(--sj-s2,rgba(127,127,127,.08))}
+.qmh b{flex:0 0 auto}
+.qmh small{flex:1}
+.qmb{padding:8px}
+.qmb .qx{margin:8px 0}
+.qme{margin:0 0 10px;padding:10px;border-radius:14px;border:1px solid var(--sj-ln,rgba(127,127,127,.3))}
+.qmel{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.qmec{display:flex;align-items:center;gap:6px;min-height:44px;padding:0 12px;border-radius:12px;border:1px solid var(--sj-ln,rgba(127,127,127,.3))}
+.qmec input{width:20px;height:20px}
+.qwarn{margin:8px 0;padding:10px;border-radius:12px;border:1px solid #d98c2b;background:rgba(217,140,43,.12)}
+.qpe{margin-top:8px;padding-top:8px;border-top:1px dashed var(--sj-ln,rgba(127,127,127,.3))}
+.qpe .qw{display:flex;gap:6px}
+.qpeb{flex:0 0 auto}
+.qax{margin:8px 0}
+.qdh:focus-visible,.qmh:focus-visible{outline:2px solid var(--sj-ac,currentColor);outline-offset:-2px}
 .bpdob select,.bpdob .irsel{min-width:0;flex:1;font-family:inherit;font-size:16px;min-height:44px}
 .bpdob .fxage{margin:10px 0}
 .bpinfo{margin:10px 0 0;text-align:center}
@@ -6880,10 +6936,8 @@ setTimeout(fxAutoSync,1500);
 /* قيم الوزن/التكرارات تُحفظ في حالة الجلسة لحظة الكتابة، فلا يمحوها أي إعادة رسم (مثل انتهاء طلب الطقس أثناء التمرين) */
 document.addEventListener('input',e=>{const t=e.target,U=UI.wk;if(!U||!t||(t.id!=='wk-w'&&t.id!=='wk-r'))return;if(t.value==='')return;const v=+String(t.value).replace(',','.');if(!isFinite(v))return;if(t.id==='wk-w')U.w=v;else U.r=v},true);
 
-/* وجهات الخدمات الفريدة: خطة التمارين والأجهزة داخل «التمرين»، وربط الساعات والخطوات داخل «التقدّم» */
+/* وجهات الخدمات الفريدة: خطة التمارين والأجهزة صارت داخل «خطتي» في التدريب، وربط الساعات والخطوات داخل «التقدّم» */
 (function(){const row=(k,n,t,v,d)=>'<button class="sjrow" data-a="sub" data-v="'+v+'">'+sjI(k,n)+'<span class="t">'+t+(d?'<small>'+d+'</small>':'')+'</span>'+ic('next')+'</button>';
- const VT=vTrain;vTrain=function(){const h=VT.apply(this,arguments);if(typeof h!=='string'||UI.ses||UI.sum||(UI.trk&&UI.trk!=='iron'&&UI.trk!=='hub'))return h;
-  return h+'<div class="sjsec">خطط ومكتبات</div>'+row('tr','list','خطة التمارين','plan','الأسبوع والتعديل')+row('tr','dumbbell','الأجهزة الرياضية','nau','دليل الأجهزة')};
  const VP=vPg;vPg=function(){const h=VP.apply(this,arguments);if(typeof h!=='string')return h;return h+'<div class="sjsec">مصادر البيانات</div>'+row('wt','watch','ربط الساعات والخطوات','link','Health Connect وعدّاد الهاتف')}})();
 
 /* ترجمات الإنجليزية للنصوص الجديدة */
@@ -7118,7 +7172,7 @@ setTimeout(()=>{try{const n=localStorage.getItem('fit_acct_note');if(n){localSto
    السجلات القديمة التي فيها ملخص فقط (S.done بلا حصة) تظهر كنقطة «ملخص تاريخي» بلا مجموعات.
    S.sxl : سجل الأحداث، كل حدث سجل مستقل لا يُعدَّل (فيتزامن مرة واحدة) ومرتبط بالحصة والمجموعة.
    S.xr  : سجل نسخ التمارين {xv:{n,en,g,s,q}}  ·  S.xmap : ربط المعرّفات القديمة بالنسخة  ·  S.xp : تمارين الحصص الحرة غير المسندة. */
-const IRM={chest:'الصدر',back:'الظهر',sho:'الأكتاف',bic:'البايسبس',tri:'الترايسبس',fore:'الساعد',core:'البطن',quad:'الفخذ الأمامي',ham:'الفخذ الخلفي',glu:'الأرداف',calf:'السمانة',add:'الفخذ الداخلي',hip:'الورك',trap:'الترابيس',lat:'الظهر العريض',full:'الجسم كاملًا'};
+const IRM={chest:'الصدر',back:'الظهر',sho:'الأكتاف',bic:'البايسبس',tri:'الترايسبس',fore:'الساعد',core:'البطن',quad:'الفخذ الأمامي',ham:'الفخذ الخلفي',glu:'الأرداف',calf:'السمانة',add:'الفخذ الداخلي',hip:'الورك',trap:'الترابيس',lat:'الظهر العريض',full:'الجسم كاملًا',legs:'الأرجل'};
 const irLbl=g=>IRM[g]||(g?String(g):'غير مصنّف');
 function irEns(){['sxl','xr','xmap','xp'].forEach(k=>{if(!S[k]||typeof S[k]!=='object'||Array.isArray(S[k]))S[k]={}})}
 const irSlug=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
@@ -7602,7 +7656,6 @@ function vPgs(){
  h+='<div class="jt"><div class="jtile"><b class="num">'+x.cur+'</b><span>'+ic('flame')+'<small>أيام متتالية</small></span></div><div class="jtile"><b class="num">'+F(Object.keys(S.done).length)+'</b><span>'+ic('dumbbell')+'<small>تمارين</small></span></div><div class="jtile"><b class="num">'+F(totalHours(),1)+'</b><span>'+ic('timer')+'<small>ساعات</small></span></div></div>';
  h+='<div class="card"><h2>'+ic('chart')+'الحصص المكتملة أسبوعيًا</h2><div class="bars">'+cnt.map((v,i)=>'<div class="bc'+(i===7&&v?' on':'')+'"><span class="num bv">'+(v||'')+'</span><div class="bw"><i style="height:'+Math.max(6,Math.round(v/mx*100))+'%"></i></div><small>'+lb[i]+'</small></div>').join('')+'</div></div>';
  h+='<button class="statcard" data-a="sub" data-v="prog"><div class="srings">'+ring([[c.steps,P.steps,'#e08aa0'],[c.kcal,P.kcal,'#9a2444'],[c.min,Math.ceil((+P.cardio||0)/7),'#f0f0f2']])+'</div><div class="t"><b>الإحصاءات</b><div class="mu">النشاط والنوم بالتفصيل</div></div>'+ic('next')+'</button>';
- h+='<button class="statcard" data-a="trk" data-v="iron"><div class="t"><b>تقدّم تمارين الحديد</b><div class="mu">رسوم الأوزان والعضلات من الحصص المكتملة</div></div>'+ic('next')+'</button>';
  try{h+=recoCard()}catch(e){}
  try{h+=tkLogCard(null)}catch(e){}
  return h}
@@ -7715,6 +7768,10 @@ function qSave(date,xv,name,rows){const now=Date.now(),have=qSets(date,xv);let n
   irLog('set+',{sid:s.id,k:x.k,xv:xv,n:name,i:q.i,w:q.w,r:q.r,pd:date});irRecon(s,x);n++});
  save();return n}
 
+/* ---------- صور التمارين: على هذا الجهاز فقط (مفتاح fit_xi) مثل ألبوم التقدّم؛ مصغّرة 320 بكسل مربّعة ---------- */
+let XI={};try{XI=JSON.parse(localStorage.getItem('fit_xi')||'{}')||{}}catch(e){XI={}}
+const xiSave=()=>{try{localStorage.setItem('fit_xi',JSON.stringify(XI));return true}catch(e){lg(e);return false}};
+
 /* ---------- الأرقام القياسية والأرقام العامة ---------- */
 function qMeta(xv,name){const m=irMeta(xv,name),r=(S.xr||{})[xv]||{};return Object.assign({},m,{lt:r.lt||(m.q==='bw'?'bw':(/مساعد/.test(m.n||name||'')?'as':'w'))})}
 function qWt(lt,w){w=+w||0;if(lt==='bw'||lt==='add')return w?('+'+F(w,2)+' كغ إضافي'):'وزن الجسم';if(lt==='as')return w?('مساعدة '+F(w,2)+' كغ'):'بلا مساعدة';return F(w,2)+' كغ'}
@@ -7722,7 +7779,7 @@ const qSet=(lt,q)=>qWt(lt,q.w)+' × '+F(q.r);
 /* أفضل: الأعلى وزنًا (الأقل مساعدةً للمساعَد)، وعند التساوي الأكثر تكرارًا */
 const qBetter=(lt,a,b)=>{if(!b)return true;const x=lt==='as'?-a.w:a.w,y=lt==='as'?-b.w:b.w;return x>y||(x===y&&a.r>b.r)};
 function qAll(){const H=irHist(),M={};
- const add=(xv,n)=>{if(!M[xv])M[xv]={xv:xv,n:n,meta:qMeta(xv,n),pts:[],plan:[],sets:[]};return M[xv]};
+ const add=(xv,n)=>{if(!M[xv])M[xv]={xv:xv,n:n,meta:qMeta(xv,n),pts:[],plan:[],sets:[],img:XI[xv]||'',cu:!!((S.xr||{})[xv]&&S.xr[xv].cu)};return M[xv]};
  Object.keys(H).forEach(xv=>{const e=add(xv,H[xv].n);e.pts=H[xv].pts});
  S.plan.forEach((p,d)=>p.ex.forEach(e=>{const xv=irXvOf({id:e.id,n:e.n});add(xv,e.n).plan.push(d)}));
  Object.keys(S.xr||{}).forEach(xv=>{if(S.xr[xv]&&S.xr[xv].n)add(xv,S.xr[xv].n)});
@@ -7735,7 +7792,7 @@ function qAll(){const H=irHist(),M={};
  return M}
 
 /* ---------- الواجهة ---------- */
-function qTabs(){const t=UI.qt||'cur';return '<div class="seg irtabs" role="tablist">'+[['cur','الخطة الحالية'],['all','الخطة الشاملة']].map(x=>'<button role="tab" aria-selected="'+(x[0]===t)+'" class="'+(x[0]===t?'on':'')+'" data-a="qtab" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'}
+function qTabs(){const t=UI.qt||'cur';return '<div class="seg irtabs" role="tablist">'+[['cur','الخطة الحالية'],['all','أرشيف تماريني']].map(x=>'<button role="tab" aria-selected="'+(x[0]===t)+'" class="'+(x[0]===t?'on':'')+'" data-a="qtab" data-v="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'}
 function qDateBar(){const d=qDate(),td=TD();
  let h='<div class="card qdate"><div class="row" style="gap:8px;flex-wrap:nowrap"><button class="chip" data-a="qday" data-v="1" aria-label="اليوم التالي">'+ic('back')+'</button><div style="flex:1;text-align:center"><b class="num">'+qFmt(d)+'</b>'+(d===td?'<span class="tag" style="margin-inline-start:6px">اليوم</span>':'')+'</div><button class="chip" data-a="qday" data-v="-1" aria-label="اليوم السابق">'+ic('next')+'</button></div>'+
   '<div class="row" style="gap:8px;margin-top:8px;flex-wrap:wrap"><button class="chip" data-a="qpick">'+ic('cal')+'اختيار تاريخ سابق</button>'+(d!==td?'<button class="chip" data-a="qtoday">العودة إلى اليوم</button>':'')+'</div>';
@@ -7754,58 +7811,172 @@ function qRefLast(xv,date,lt){let b=null;sxList().forEach(s=>{if(s.date>=date)re
 function qRefTx(b,lt){if(!b)return '<span class="mu">لا أداء سابقًا لهذا التمرين</span>';
  const a=b.sets||[];if(!a.length&&b.top)return '<span class="mu">آخر أداء: <b class="num">'+esc(qSet(lt,b.top))+'</b> · <span class="num">'+b.date+'</span> · ملخص تاريخي</span>';
  return '<span class="mu">آخر أداء <span class="num">'+b.date+'</span>: <b class="num">'+a.map(q=>esc(qSet(lt,q))).join(' · ')+'</b></span>'}
-function qEditor(date,xv,name,row,lt){const rows=UI.qrows||[],ref=qRefLast(xv,date,lt);
- let h='<div class="qed" id="q-editor">'+(ref&&(ref.sets||[]).length?'<div style="margin:4px 0"><button class="chip" data-a="qcopylast" data-v="'+esc(xv)+'">انسخ آخر أداء</button></div>':'');
- rows.forEach((q,i)=>{h+='<div class="qrow row" style="gap:6px;flex-wrap:nowrap" data-i="'+i+'"><span class="num mu" style="min-width:18px">'+(i+1)+'</span>'+
-  '<input class="irin num" dir="ltr" inputmode="decimal" enterkeyhint="next" data-qr="'+i+',w" placeholder="'+(lt==='bw'?'إضافي':lt==='as'?'مساعدة':'كغ')+'" value="'+esc(q.w===''?'':q.w)+'" aria-label="الوزن">'+
-  '<input class="irin num" dir="ltr" inputmode="numeric" enterkeyhint="'+(i===rows.length-1?'done':'next')+'" data-qr="'+i+',r" placeholder="'+(row&&row.r?row.r:'تكرار')+'" value="'+esc(q.r===''?'':q.r)+'" aria-label="التكرارات">'+
-  '<button class="chip" data-a="qrdup" data-i="'+i+'" aria-label="نسخ المجموعة">نسخ</button><button class="chip" data-a="qrdel" data-i="'+i+'" aria-label="حذف المجموعة">'+ic('x')+'</button></div>'});
+const qLim=(a,b)=>{const o=[];for(let i=a;i<=b;i++)o.push(i);return o};
+/* قوائم اختيار: الوزن بالكسور (كغ + ‎.00 ‎.25 ‎.50 ‎.75)، والتكرارات، وعدد المجموعات. لا لوحة مفاتيح عند التسجيل */
+function qWSel(attr,v,max){v=+v||0;const wh=Math.floor(v),fr=Math.round((v-wh)*100)/100,top=Math.max(max||300,wh);let a='',b='';
+ for(let k=0;k<=top;k++)a+='<option value="'+k+'"'+(k===wh?' selected':'')+'>'+k+'</option>';
+ const fs=[0,.25,.5,.75];if(fs.indexOf(fr)<0)fs.push(fr);fs.sort((x,y)=>x-y);
+ fs.forEach(f=>{b+='<option value="'+f+'"'+(f===fr?' selected':'')+'>'+f.toFixed(2).slice(1)+'</option>'});
+ return '<select class="irsel num" dir="ltr" '+attr.replace('@','w')+' aria-label="الوزن كغ">'+a+'</select><select class="irsel num" dir="ltr" '+attr.replace('@','f')+' aria-label="كسر الوزن">'+b+'</select>'}
+function qNSel(attr,v,a,b,lbl){v=Math.round(+v)||a;const top=Math.max(b,v);return '<select class="irsel num" dir="ltr" '+attr+' aria-label="'+lbl+'">'+qLim(a,top).map(k=>'<option value="'+k+'"'+(k===v?' selected':'')+'>'+k+'</option>').join('')+'</select>'}
+function qEditor(date,xv,name,row,lt){const rows=UI.qrows||[],ref=qRefLast(xv,date,lt),wl=lt==='bw'?'الإضافي كغ':lt==='as'?'المساعدة كغ':'الوزن كغ';
+ let h='<div class="qed" id="q-editor"><div class="row qcnt" style="gap:8px;flex-wrap:nowrap"><label class="mu" for="q-cnt">عدد المجموعات</label>'+qNSel('id="q-cnt"',rows.length,1,12,'عدد المجموعات')+'<span class="sp"></span>'+(ref&&(ref.sets||[]).length?'<button class="chip" data-a="qcopylast" data-v="'+esc(xv)+'">انسخ آخر أداء</button>':'')+'</div>'+
+  (UI.qpre===xv?'<div class="mu qpre">القيم معبّأة من آخر أداء للمراجعة. عدّلها ثم اضغط «حفظ الأداء».</div>':'')+
+  '<div class="qrh mu" aria-hidden="true"><span>المجموعة</span><span>'+wl+'</span><span>التكرارات</span><span></span></div>';
+ rows.forEach((q,i)=>{h+='<div class="qrow" data-i="'+i+'"><span class="num mu">'+(i+1)+'</span><span class="qw">'+qWSel('data-qr="'+i+',@"',q.w)+'</span>'+qNSel('data-qr="'+i+',r"',q.r,1,60,'التكرارات')+
+  '<button class="chip" data-a="qrdel" data-i="'+i+'" aria-label="حذف المجموعة '+(i+1)+'">'+ic('x')+'</button></div>'});
  h+='<div class="row qact" style="gap:8px;margin-top:8px;flex-wrap:wrap"><button class="chip" data-a="qradd">＋ مجموعة</button><span class="sp"></span><button class="chip" data-a="qxclose">إلغاء</button><button class="btn sm" data-a="qxsave" data-v="'+esc(xv)+'" data-n="'+esc(name)+'">حفظ الأداء</button></div></div>';
  return h}
-function qExCard(date,xv,name,row,idx,cnt){const lt=qMeta(xv,name).lt,sets=qSets(date,xv),open=UI.qx===xv,em=!!UI.qedm&&!open;
- let h='<div class="card qx" data-xv="'+esc(xv)+'"><div class="row" style="flex-wrap:nowrap;gap:8px"><b class="nm" style="flex:1;min-width:0">'+esc(name)+'</b>'+(row?'':'<span class="tag">خارج الجدول</span>')+'</div>';
+/* ---------- الخطة الحالية: يوم ← قسم عضلة ← تمارين ---------- */
+const QLEG=['quad','ham','glu','add','hip'],QSECS=['back','sho','legs','chest','bic','tri','core','calf','fore','full'];
+const qSec=g=>g?(QLEG.indexOf(g)>=0?'legs':g):'_';
+const qSecLbl=k=>k==='_'?'غير مصنّف':irLbl(k);
+const qSecShort=k=>{const l=qSecLbl(k);return /^ال\S+$/.test(l)?l.slice(2):l};
+const qExSec=e=>qSec(qMeta(irXvOf({id:e.id,n:e.n}),e.n).g);
+/* عضلات اليوم: المحفوظة بترتيبها ثم أي عضلة لتمرينها صف في اليوم (يُشتق للأيام القديمة بلا حقل mg) */
+function qDayMg(d){const p=S.plan[d],o=[];(Array.isArray(p.mg)?p.mg:[]).forEach(k=>{if(o.indexOf(k)<0)o.push(k)});p.ex.forEach(e=>{const k=qExSec(e);if(o.indexOf(k)<0)o.push(k)});return o}
+function qMgFix(d){const p=S.plan[d];if(!p)return;p.mg=qDayMg(d);if(p.mg.length)p.t=p.mg.map(qSecShort).join(' و')}
+const qCnt=n=>!n?'بلا تمارين':n===1?'تمرين واحد':n===2?'تمرينان':n<=10?F(n)+' تمارين':F(n)+' تمرينًا';
+const qDayTitle=d=>{const m=qDayMg(d);return DAYS[d]+' · '+(m.length?m.map(qSecShort).join(' و'):'لم يُحدّد')};
+function qWeekDate(d){const sd=qDate(),k=qDi(sd),x=new Date(sd+'T12:00:00');x.setDate(x.getDate()+d-k);return iso(x)}
+const qOpenDay=d=>UI.qdo&&UI.qdo[d]!==undefined?UI.qdo[d]:qDi(qDate())===d;
+const qOpenMu=(d,s)=>UI.qmo&&UI.qmo[d+'|'+s]!==undefined?UI.qmo[d+'|'+s]:true;
+function qExCard(date,xv,name,row,idx,cnt,pos){const lt=qMeta(xv,name).lt,sets=qSets(date,xv),open=UI.qx===xv&&(UI.qxdt||qDate())===date,pe=row&&UI.qpe===row.id&&!open;
+ let h='<div class="card qx" data-xv="'+esc(xv)+'"><div class="row" style="flex-wrap:nowrap;gap:8px"><b class="nm" style="flex:1;min-width:0">'+esc(name)+'</b>'+(row?'':'<span class="tag">خارج الجدول</span>')+(row&&!open?'<button class="chip qpeb'+(pe?' on':'')+'" data-a="qpe" data-v="'+esc(row.id)+'" aria-pressed="'+!!pe+'" aria-label="تعديل '+esc(name)+' في الجدول">'+(pe?'تم':'تعديل')+'</button>':'')+'</div>';
  if(row)h+='<div class="qpl"><span><small class="mu">المجموعات</small><b class="num">'+F(row.s)+'</b></span><span><small class="mu">التكرارات</small><b class="num">'+F(row.r)+'</b></span>'+(row.tw?'<span><small class="mu">الهدف</small><b class="num">'+esc(qWt(lt,row.tw))+'</b></span>':'')+'</div>';
  h+='<div class="qlastl">'+qRefTx(qRefLast(xv,date,lt),lt)+'</div>';
- if(sets.length&&!open)h+='<div class="qsaved" aria-label="أداء اليوم">'+sets.map((h2,i)=>'<span class="irset"><span class="num mu">'+(i+1)+'</span><b class="num">'+esc(qSet(lt,h2.q))+'</b></span>').join('')+'</div>';
+ if(sets.length&&!open)h+='<div class="qsaved" aria-label="أداء '+date+'">'+sets.map((h2,i)=>'<span class="irset"><span class="num mu">'+(i+1)+'</span><b class="num">'+esc(qSet(lt,h2.q))+'</b></span>').join('')+'</div>';
  if(open)h+=qEditor(date,xv,name,row,lt);
- else if(em){if(row){const di=qDi(date);h+='<div class="row qedt" style="gap:6px;margin-top:8px;flex-wrap:wrap"><button class="chip" data-a="qmv" data-d="'+di+'" data-i="'+idx+'" data-v="-1" aria-label="أعلى">↑</button><button class="chip" data-a="qmv" data-d="'+di+'" data-i="'+idx+'" data-v="1" aria-label="أسفل">↓</button>'+
-   '<select class="irsel" id="q-mvd-'+idx+'" aria-label="نقل إلى يوم">'+DAYS.map((x,d)=>'<option value="'+d+'"'+(d===di?' selected':'')+'>'+x+'</option>').join('')+'</select><button class="chip" data-a="qmvday" data-d="'+di+'" data-i="'+idx+'">نقل</button><button class="chip" data-a="qrm" data-d="'+di+'" data-i="'+idx+'">إزالة من الجدول</button></div>'}}
- else h+='<div class="row" style="gap:6px;margin-top:8px"><button class="btn sm" data-a="qxopen" data-v="'+esc(xv)+'" id="q-open-'+idx+'">'+(sets.length?'تعديل الأداء':'تسجيل الأداء')+'</button></div>';
+ else if(pe){const di=qDi(date);
+  h+='<div class="qpe" id="q-pe"><div class="g3"><label class="irf"><span class="mu">المجموعات</span>'+qNSel('id="qpe-s"',row.s,1,12,'المجموعات')+'</label><label class="irf"><span class="mu">التكرارات</span>'+qNSel('id="qpe-r"',row.r,1,60,'التكرارات')+'</label></div>'+
+   '<div class="mu" style="margin-top:8px">وزن الهدف كغ (0 = بلا هدف)</div><div class="row" style="gap:6px;flex-wrap:nowrap">'+qWSel('id="qpe-@"',row.tw||0)+'</div>'+
+   '<div class="row qedt" style="gap:6px;margin-top:8px;flex-wrap:wrap"><button class="chip" data-a="qmv2" data-d="'+di+'" data-i="'+idx+'" data-v="-1" aria-label="أعلى"'+(pos===0?' disabled':'')+'>↑</button><button class="chip" data-a="qmv2" data-d="'+di+'" data-i="'+idx+'" data-v="1" aria-label="أسفل"'+(pos===cnt-1?' disabled':'')+'>↓</button>'+
+   '<select class="irsel" id="q-mvd-'+idx+'" aria-label="نقل إلى يوم">'+DAYS.map((x,d)=>'<option value="'+d+'"'+(d===di?' selected':'')+'>'+x+'</option>').join('')+'</select><button class="chip" data-a="qmvday" data-d="'+di+'" data-i="'+idx+'">نقل</button></div>'+
+   '<div class="row" style="gap:8px;margin-top:8px"><button class="btn sm" data-a="qpesave" data-d="'+di+'" data-i="'+idx+'">حفظ التعديل</button><button class="chip" data-a="qrm" data-d="'+di+'" data-i="'+idx+'">إزالة من الجدول</button></div></div>'}
+ else if(date>TD())h+='<div class="mu" style="margin-top:8px">يوم قادم: يُسجَّل الأداء في موعده.</div>';
+ else h+='<div class="row" style="gap:6px;margin-top:8px"><button class="btn sm" data-a="qxopen" data-v="'+esc(xv)+'" data-d="'+qDi(date)+'" data-date="'+date+'" id="q-open-'+idx+'-'+qDi(date)+'">'+(sets.length?'تعديل الأداء':'تسجيل الأداء')+'</button></div>';
  return h+'</div>'}
-function qAddForm(date){const di=qDi(date),cust=Object.keys(S.xr||{}).filter(k=>k.indexOf('C.')===0).map(k=>S.xr[k].n);
- return '<div class="card" id="q-addf"><h2>'+ic('dumbbell')+'إضافة تمرين إلى '+DAYS[di]+'</h2><label class="f">التمرين من المكتبة أو تمارينك السابقة<input id="ir-an" list="qnames" placeholder="ابحث أو اكتب اسم التمرين" value="'+esc(irD('ir-an'))+'" autocomplete="off"></label>'+
-  '<div class="g3" style="margin:8px 0"><label class="irf"><span class="mu">مجموعات</span>'+irIn('ir-as','3','3')+'</label><label class="irf"><span class="mu">تكرارات</span>'+irIn('ir-ar','10','10')+'</label><label class="irf"><span class="mu">وزن الهدف</span>'+irIn('ir-aw','اختياري','')+'</label></div>'+
-  '<div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" data-a="qadd" data-d="'+di+'">إضافة إلى الجدول</button><button class="chip" data-a="qcust">تمرين مخصص</button></div>'+
-  '<datalist id="qnames">'+XL.map(x=>'<option value="'+esc(x.n)+'">').join('')+cust.map(n=>'<option value="'+esc(n)+'">').join('')+'</datalist></div>'}
-function qCustomForm(){return '<div class="card" id="q-cust"><h2>'+ic('plus')+'تمرين مخصص</h2><label class="f">الاسم<input id="qc-n" placeholder="مثال: سحب كابل بمقبض ضيق" value="'+esc(irD('qc-n'))+'" autocomplete="off"></label>'+
-  '<label class="f">العضلة الأساسية<select id="qc-g" class="irsel">'+Object.keys(IRM).map(k=>'<option value="'+k+'">'+IRM[k]+'</option>').join('')+'</select></label>'+
-  '<label class="f">نوع الحمل<select id="qc-t" class="irsel"><option value="w">وزن خارجي (كغ)</option><option value="bw">وزن الجسم أو إضافي</option><option value="as">مساعدة (جهاز مساعد)</option></select></label>'+
-  '<div class="row" style="gap:8px;margin-top:8px"><button class="btn" data-a="qcsave">حفظ التمرين</button><button class="chip" data-a="qccancel">إلغاء</button></div></div>'}
-function qCurTab(){const d=qDate(),di=qDi(d),p=S.plan[di]||{t:'',ex:[]};let h=qDateBar();
- h+='<div class="row" style="margin:10px 0;gap:8px"><span class="mu">'+(p.ex.length?esc(p.t||'تمرين اليوم'):'لا تمارين مجدولة لهذا اليوم')+'</span><span class="sp"></span>'+(p.ex.length?'<button class="chip'+(UI.qedm?' on':'')+'" data-a="qedm" aria-pressed="'+!!UI.qedm+'">'+(UI.qedm?'تم':'تعديل الجدول')+'</button>':'')+'<span class="tag" id="ir-sync">'+esc(irSyncTx())+'</span></div>';
- const inPlan=new Set();
- p.ex.forEach((e,i)=>{const xv=irXvOf({id:e.id,n:e.n});inPlan.add(xv);h+=qExCard(d,xv,e.n,e,i)});
- const extra=qDayEx(d);Object.keys(extra).filter(xv=>!inPlan.has(xv)).forEach(xv=>{h+=qExCard(d,xv,extra[xv].n,null,-1)});
- if(!p.ex.length&&!Object.keys(extra).length)h+='<div class="card mu">أضف تمرينًا إلى هذا اليوم ثم سجّل أداءه.</div>';
- return h+(UI.qcu?qCustomForm():qAddForm(d))}
+function qMePanel(d){const m=UI.qme,cur=qDayMg(d),all=QSECS.concat(cur.filter(k=>QSECS.indexOf(k)<0));
+ const lost=cur.filter(k=>m.sel.indexOf(k)<0),ex=S.plan[d].ex.filter(e=>lost.indexOf(qExSec(e))>=0);
+ let h='<div class="qme" id="q-me"><b>عضلات '+DAYS[d]+'</b><div class="mu">اختر عضلة أو أكثر. تبقى كل عضلة مرة واحدة في اليوم.</div><div class="qmel">'+all.map(k=>'<label class="qmec"><input type="checkbox" id="qme-'+k+'" data-k="'+k+'"'+(m.sel.indexOf(k)>=0?' checked':'')+'><span>'+esc(qSecLbl(k))+'</span></label>').join('')+'</div>';
+ if(m.conf&&ex.length)h+='<div class="qwarn" role="alert"><b>تنبيه قبل الإزالة</b><div>سيُزال من جدول '+DAYS[d]+' '+F(ex.length)+' تمرين: '+ex.map(e=>esc(e.n)).join('، ')+'.</div><div class="mu">تبقى هذه التمارين وسجلات أدائها السابقة في «أرشيف تماريني» وبتواريخها الأصلية.</div></div>';
+ return h+'<div class="row" style="gap:8px;margin-top:8px"><button class="btn sm" data-a="qmesave" data-d="'+d+'" id="q-me-save">'+(m.conf&&ex.length?'تأكيد وحفظ':'حفظ')+'</button><button class="chip" data-a="qmex">إلغاء</button></div></div>'}
+function qAxPanel(d,sec){const a=UI.qax;if(a.man)return qManualForm();
+ const q=irNorm(UI.qxq||'').toLowerCase(),M=qAll(),inDay=new Set(S.plan[d].ex.map(e=>irXvOf({id:e.id,n:e.n})));
+ const mt=s=>!q||irNorm(s).toLowerCase().indexOf(q)>=0;
+ const arch=Object.keys(M).map(k=>M[k]).filter(e=>qSec(e.meta.g)===sec&&!inDay.has(e.xv)&&mt(e.n)).sort((x,y)=>x.n<y.n?-1:1);
+ const lib=XL.filter(x=>qSec(x.g)===sec&&!M[irXv(x.n)]&&(mt(x.n)||String(x.e||'').toLowerCase().indexOf(q)>=0)).slice(0,20);
+ const row=(v,n,sub)=>'<div class="qlr row" style="gap:8px;flex-wrap:nowrap"><span style="flex:1;min-width:0"><b class="nm">'+esc(n)+'</b>'+(sub?'<div class="mu">'+sub+'</div>':'')+'</span><button class="chip" data-a="qpadd" data-d="'+d+'" data-v="'+esc(v)+'">أضف</button></div>';
+ let h='<div class="card qax" id="q-ax"><div class="row" style="gap:8px"><b>إضافة تمرين: '+esc(qSecLbl(sec))+'</b><span class="sp"></span><button class="chip" data-a="qaxx">إغلاق</button></div><input id="qxq" class="irin" placeholder="ابحث عن تمرين" value="'+esc(UI.qxq||'')+'" aria-label="بحث" autocomplete="off" style="margin:8px 0">';
+ h+='<div class="mu"><b>من أرشيف تماريني</b></div>'+(arch.length?arch.map(e=>row(e.xv,e.n,e.sets.length?'أقصى وزن '+esc(qWt(e.meta.lt,e.max.w)):'لم يُسجّل وزن بعد')).join(''):'<div class="mu">لا تمارين أخرى لهذه العضلة في أرشيفك.</div>');
+ h+='<div class="mu" style="margin-top:8px"><b>من قائمة التمارين</b></div>'+(lib.length?lib.map(x=>row('lib:'+x.id,x.n,'')).join(''):'<div class="mu">لا نتائج.</div>');
+ return h+'<div class="row" style="margin-top:10px"><button class="btn ghost" data-a="qaxm" data-d="'+d+'" data-v="'+sec+'" id="q-ax-man">إضافة يدوية بصورة</button></div></div>'}
+function qMuSec(d,date,sec){const p=S.plan[d],items=[];p.ex.forEach((e,i)=>{if(qExSec(e)===sec)items.push({e:e,i:i,xv:irXvOf({id:e.id,n:e.n})})});
+ const open=qOpenMu(d,sec),ax=UI.qax&&UI.qax.d===d&&UI.qax.sec===sec;
+ let h='<div class="qms" data-sec="'+sec+'"><button class="qmh" data-a="qmtog" data-d="'+d+'" data-v="'+sec+'" aria-expanded="'+open+'" id="q-mh-'+d+'-'+sec+'"><b>'+esc(qSecLbl(sec))+'</b><small class="mu num">'+qCnt(items.length)+'</small><span class="qchev">'+ic('next')+'</span></button>';
+ if(open){h+='<div class="qmb">';items.forEach((x,j)=>{h+=qExCard(date,x.xv,x.e.n,x.e,x.i,items.length,j)});
+  if(!items.length)h+='<div class="mu">أضف تمارين هذه العضلة.</div>';
+  h+=ax?qAxPanel(d,sec):'<div class="row" style="margin:8px 0"><button class="btn sm ghost" data-a="qaxo" data-d="'+d+'" data-v="'+sec+'" id="q-ax-'+d+'-'+sec+'">'+ic('plus')+'إضافة تمرين</button></div>';h+='</div>'}
+ return h+'</div>'}
+function qDayCard(d){const p=S.plan[d],date=qWeekDate(d),sel=qDi(qDate())===d,open=qOpenDay(d),mg=qDayMg(d),n=p.ex.length;
+ let h='<section class="card qday'+(sel?' sel':'')+'" data-d="'+d+'"><button class="qdh" data-a="qdtog" data-v="'+d+'" aria-expanded="'+open+'" id="q-dh-'+d+'"><span class="qdt"><b>'+esc(qDayTitle(d))+'</b><small class="mu num">'+date+(date===TD()?' · اليوم':'')+' · '+qCnt(n)+'</small></span><span class="qchev">'+ic('next')+'</span></button>';
+ if(open){h+='<div class="qdb">';
+  if(UI.qme&&UI.qme.d===d)h+=qMePanel(d);
+  else h+='<div class="row qdact" style="gap:8px;flex-wrap:wrap"><button class="chip" data-a="qmeo" data-d="'+d+'" id="q-me-'+d+'">'+(mg.length?'تعديل عضلات اليوم':'إضافة عضلة')+'</button>'+(mg.length?'<button class="chip" data-a="qmeo" data-d="'+d+'" data-add="1" id="q-meadd-'+d+'">＋ إضافة عضلة</button>':'')+'</div>';
+  mg.forEach(sec=>{h+=qMuSec(d,date,sec)});
+  const inP=new Set(p.ex.map(e=>irXvOf({id:e.id,n:e.n}))),extra=qDayEx(date),xs=Object.keys(extra).filter(xv=>!inP.has(xv));
+  if(xs.length){h+='<div class="qms"><div class="mu" style="margin:8px 0 4px"><b>أُدّيت خارج الجدول في '+date+'</b></div>';xs.forEach(xv=>{h+=qExCard(date,xv,extra[xv].n,null,-1)});h+='</div>'}
+  if(!mg.length&&!xs.length)h+='<div class="mu" style="margin:8px 0">لم تُحدَّد عضلات هذا اليوم بعد.</div>';
+  h+='</div>'}
+ return h+'</section>'}
+function qCurTab(){let h=qDateBar();
+ h+='<div class="row qall" style="margin:10px 0;gap:8px;flex-wrap:wrap"><button class="chip" data-a="qopenall" id="q-openall">فتح كامل الجدول</button><button class="chip" data-a="qcloseall" id="q-closeall">إغلاق كامل الجدول</button><span class="sp"></span><span class="tag" id="ir-sync">'+esc(irSyncTx())+'</span></div>';
+ for(let d=0;d<7;d++)h+=qDayCard(d);
+ return h}
+const qThumb=(e,big)=>'<span class="qth'+(big?' big':'')+'" aria-hidden="true">'+(e.img?'<img alt="" src="'+e.img+'">':ic('dumbbell'))+'</span>';
 function qAllTab(){const M=qAll(),g=UI.qg||'',s=irNorm(UI.qs||'').toLowerCase(),pl=!!UI.qpl;
  let L=Object.keys(M).map(k=>M[k]).filter(e=>(!g||(e.meta.g||'')===g)&&(!pl||e.plan.length)&&(!s||irNorm(e.n).toLowerCase().indexOf(s)>=0));
  const gs={};Object.keys(M).forEach(k=>{const x=M[k].meta.g||'';gs[x]=(gs[x]||0)+1});
- let h='<div class="card qflt"><input id="qs" class="irin" placeholder="ابحث في تمارينك" value="'+esc(UI.qs||'')+'" aria-label="بحث"><div class="chips" style="margin-top:8px"><button class="chip'+(!g?' on':'')+'" data-a="qgrp" data-v="">الكل</button>'+Object.keys(gs).sort().map(k=>'<button class="chip'+(g===k?' on':'')+'" data-a="qgrp" data-v="'+esc(k)+'">'+esc(irLbl(k))+'</button>').join('')+'</div><label class="row" style="gap:6px;margin-top:8px"><input type="checkbox" id="qpl" '+(pl?'checked':'')+'><span>ضمن الخطة الحالية فقط</span></label></div>';
- if(!L.length)return h+'<div class="card mu" id="q-all-empty">لا تمارين بعد. أضف تمرينًا إلى خطتك الحالية فيظهر هنا مرة واحدة.</div>';
+ let h=qArchHead();
+ h+='<div class="card qflt"><input id="qs" class="irin" placeholder="ابحث في أرشيف تماريني" value="'+esc(UI.qs||'')+'" aria-label="بحث"><div class="chips" style="margin-top:8px"><button class="chip'+(!g?' on':'')+'" data-a="qgrp" data-v="">الكل</button>'+Object.keys(gs).sort().map(k=>'<button class="chip'+(g===k?' on':'')+'" data-a="qgrp" data-v="'+esc(k)+'">'+esc(irLbl(k))+'</button>').join('')+'</div><label class="row" style="gap:6px;margin-top:8px"><input type="checkbox" id="qpl" '+(pl?'checked':'')+'><span>ضمن الخطة الحالية فقط</span></label></div>';
+ if(!L.length)return h+'<div class="card mu" id="q-all-empty">'+(Object.keys(M).length?'لا نتائج مطابقة.':'أرشيفك فارغ. أضف تمرينًا من القائمة أو يدويًا، أو أضف تمرينًا إلى خطتك الحالية فيظهر هنا مرة واحدة.')+'</div>';
  const by={};L.forEach(e=>{const k=e.meta.g||'';(by[k]=by[k]||[]).push(e)});
  Object.keys(by).sort((a,b)=>irLbl(a)<irLbl(b)?-1:1).forEach(k=>{h+='<div class="sechead"><h2>'+esc(irLbl(k))+'</h2></div>';by[k].sort((a,b)=>a.n<b.n?-1:1).forEach(e=>{h+=qAllRow(e)})});
  return h}
+/* رأس الأرشيف: إضافة تمرين من القائمة أو يدويًا */
+function qArchHead(){const m=UI.qadd;
+ let h='<div class="card qah"><div class="row" style="gap:8px;flex-wrap:wrap"><b>أضف تمرينًا إلى أرشيفك</b><span class="sp"></span>'+(m?'<button class="chip" data-a="qaddx">إغلاق</button>':'<button class="btn sm" data-a="qaddo" id="q-addarch">'+ic('plus')+'إضافة تمرين</button>')+'</div>';
+ if(m==='pick')h+='<div class="g2" style="margin-top:10px"><button class="btn ghost" data-a="qaddm" data-v="lib" id="q-add-lib">من قائمة التمارين</button><button class="btn ghost" data-a="qaddm" data-v="man" id="q-add-man">إضافة يدوية</button></div>';
+ h+='</div>';
+ if(m==='lib')h+=qLibPanel();else if(m==='man')h+=qManualForm();
+ return h}
+function qLibPanel(){const q=irNorm(UI.qlq||'').toLowerCase(),g=UI.qlg||'';
+ let L=XL.filter(x=>(!g||x.g===g)&&(!q||irNorm(x.n).toLowerCase().indexOf(q)>=0||String(x.e||'').toLowerCase().indexOf(q)>=0));const tot=L.length;L=L.slice(0,30);
+ let h='<div class="card" id="q-lib"><h2>'+ic('dumbbell')+'قائمة التمارين</h2><input id="qlq" class="irin" placeholder="ابحث عن تمرين" value="'+esc(UI.qlq||'')+'" aria-label="بحث في القائمة" autocomplete="off">'+
+  '<label class="f" style="margin-top:8px">العضلة<select id="qlg" class="irsel"><option value="">كل العضلات</option>'+Object.keys(IRM).map(k=>'<option value="'+k+'"'+(g===k?' selected':'')+'>'+IRM[k]+'</option>').join('')+'</select></label>'+
+  '<div class="mu" style="margin:6px 0">'+F(tot)+' تمرين'+(tot>30?' · أول 30، ضيّق البحث':'')+'</div>';
+ h+=L.map(x=>{const xv=irXv(x.n),has=!!(S.xr||{})[xv];return '<div class="qlr row" style="gap:8px;flex-wrap:nowrap"><span style="flex:1;min-width:0"><b class="nm">'+esc(x.n)+'</b><div class="mu">'+esc(irLbl(x.g))+'</div></span>'+(has?'<span class="tag">في أرشيفك</span>':'<button class="chip" data-a="qlibadd" data-v="'+x.id+'">أضف</button>')+'</div>'}).join('');
+ return h+'</div>'}
+const qMfNew=()=>({n:'',g:'chest',t:'w',s:3,r:10,w:'',pr:5,d:TD(),img:'',day:''});
+function qManualForm(){const m=UI.qmf||(UI.qmf=qMfNew()),ed=!!m.xv,lock=ed&&!(S.xr[m.xv]&&S.xr[m.xv].cu),ph=m.img?'<img alt="معاينة الصورة" src="'+m.img+'">':ic('dumbbell');
+ let h='<div class="card" id="q-man"><h2>'+ic('plus')+(ed?'تعديل التمرين':'إضافة يدوية')+'</h2>'+
+  '<label class="f">اسم التمرين<input id="qm-n" class="irin" placeholder="مثال: سحب كابل بمقبض ضيق" value="'+esc(m.n)+'"'+(ed?' readonly':'')+' autocomplete="off"></label>'+
+  '<label class="f">العضلة<select id="qm-g" class="irsel"'+(lock?' disabled':'')+'>'+Object.keys(IRM).map(k=>'<option value="'+k+'"'+(m.g===k?' selected':'')+'>'+IRM[k]+'</option>').join('')+'</select></label>'+
+  '<label class="f">نوع الحمل<select id="qm-t" class="irsel"'+(lock?' disabled':'')+'><option value="w"'+(m.t==='w'?' selected':'')+'>وزن خارجي (كغ)</option><option value="bw"'+(m.t==='bw'?' selected':'')+'>وزن الجسم أو إضافي</option><option value="as"'+(m.t==='as'?' selected':'')+'>مساعدة (جهاز مساعد)</option></select></label>'+
+  '<div class="mu" style="margin-top:10px">صورة التمرين</div><div class="row qph" style="gap:10px"><span class="qth big" id="qm-ph">'+ph+'</span><label class="chip" style="cursor:pointer">'+(m.img?'تغيير الصورة':'رفع صورة من الجهاز')+'<input id="qm-file" type="file" accept="image/*" hidden></label>'+(m.img?'<button class="chip" data-a="qmimgx">إزالة الصورة</button>':'')+'</div>'+
+  (UI.xcrop?qCropUi():'')+
+  '<div class="mu qimgn">تُحفظ الصورة على هذا الجهاز فقط، ولا تنتقل مع المزامنة.</div>'+
+  '<div class="g2" style="margin-top:10px"><label class="irf"><span class="mu">المجموعات</span>'+qNSel('id="qm-s"',m.s,1,12,'المجموعات')+'</label><label class="irf"><span class="mu">التكرارات</span>'+qNSel('id="qm-r"',m.r,1,60,'التكرارات')+'</label></div>';
+ if(!ed){const wo=m.w===''?'':Math.floor(+m.w||0),fr=m.w===''?0:Math.round(((+m.w||0)-Math.floor(+m.w||0))*100)/100;
+  let a='<option value=""'+(m.w===''?' selected':'')+'>بدون أداء سابق</option>',b='';for(let k=0;k<=300;k++)a+='<option value="'+k+'"'+(wo===k?' selected':'')+'>'+k+'</option>';
+  [0,.25,.5,.75].forEach(f=>{b+='<option value="'+f+'"'+(f===fr?' selected':'')+'>'+f.toFixed(2).slice(1)+'</option>'});
+  h+='<div class="mu" style="margin-top:10px">أقصى وزن سابق (اختياري)</div><div class="row" style="gap:6px;flex-wrap:nowrap"><select id="qm-w" class="irsel num" dir="ltr" aria-label="أقصى وزن سابق كغ">'+a+'</select><select id="qm-f" class="irsel num" dir="ltr" aria-label="كسر الوزن"'+(m.w===''?' disabled':'')+'>'+b+'</select><span class="mu">كغ</span></div>'+
+   (m.w===''?'<div class="mu">يظهر عندها «لم يُسجّل وزن بعد».</div>':'<label class="f" style="margin-top:8px">التكرارات بهذا الوزن'+qNSel('id="qm-pr"',m.pr,1,60,'التكرارات بهذا الوزن')+'</label><div class="mu" style="margin-top:8px">تاريخ رفع هذا الوزن</div>'+qDatePicker('qm-d',m.d,'',{y0:new Date().getFullYear()-10,y1:new Date().getFullYear(),desc:true})+'<div class="mu">يُحفظ سجل أداء تاريخيًا بهذا الوزن والتاريخ.</div>');
+  h+='<label class="f" style="margin-top:10px">إضافة إلى الجدول (اختياري)<select id="qm-day" class="irsel"><option value="">لا، أرشيف فقط</option>'+DAYS.map((x,d)=>'<option value="'+d+'"'+(String(m.day)===String(d)?' selected':'')+'>'+x+'</option>').join('')+'</select></label>'}
+ return h+'<div class="mu" id="qm-err" role="alert"></div><div class="row" style="gap:8px;margin-top:10px"><button class="btn" data-a="qmsave" id="qm-save">'+(ed?'حفظ التعديل':'حفظ التمرين')+'</button><button class="chip" data-a="qmcancel">إلغاء</button></div></div>'}
+/* قص الصورة: معاينة مربّعة 240 بكسل، تكبير وإزاحة بمنزلقين أو بسحب المعاينة؛ الناتج 320×320 JPEG */
+let XC={img:null};
+function qCropUi(){const c=UI.xcrop;return '<div class="qcrop" id="q-crop"><canvas id="xc-cv" width="240" height="240" aria-label="معاينة القص"></canvas>'+
+ '<label class="f">التكبير<input type="range" id="xc-z" min="1" max="3" step="0.05" value="'+c.z+'"></label><label class="f">أفقيًا<input type="range" id="xc-x" min="-1" max="1" step="0.02" value="'+c.x+'"></label><label class="f">رأسيًا<input type="range" id="xc-y" min="-1" max="1" step="0.02" value="'+c.y+'"></label>'+
+ '<div class="row" style="gap:8px;margin-top:6px"><button class="btn sm" data-a="xcok" id="xc-ok">اعتماد القص</button><button class="chip" data-a="xcx">إلغاء</button></div></div>'}
+function xcPaint(cv,B){const im=XC.img,c=UI.xcrop;if(!cv||!im||!c)return;const g=cv.getContext('2d'),s=B/Math.min(im.width,im.height)*c.z,dw=im.width*s,dh=im.height*s;
+ g.fillStyle='#000';g.fillRect(0,0,B,B);g.drawImage(im,(B-dw)/2-(dw-B)/2*c.x,(B-dh)/2-(dh-B)/2*c.y,dw,dh)}
+function xcDraw(){xcPaint(document.getElementById('xc-cv'),240)}
+function xcOut(){const cv=document.createElement('canvas');cv.width=cv.height=320;xcPaint(cv,320);return cv.toDataURL('image/jpeg',.78)}
+(()=>{const R=render;render=function(){const r=R.apply(this,arguments);try{xcDraw()}catch(e){}return r}})();
+function qXcLoad(f){const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{URL.revokeObjectURL(u);XC.img=im;UI.xcrop={z:1,x:0,y:0};render()};im.onerror=()=>{URL.revokeObjectURL(u);toast('تعذّرت قراءة الصورة')};im.src=u}
+function qMfRead(){const m=UI.qmf;if(!m)return;const v=id=>{const e=document.getElementById(id);return e?e.value:null};
+ const n=v('qm-n');if(n!==null)m.n=n;['g','t','day'].forEach(k=>{const x=v('qm-'+k);if(x!==null)m[k]=x});
+ const s=v('qm-s');if(s!==null)m.s=+s;const r=v('qm-r');if(r!==null)m.r=+r;const pr=v('qm-pr');if(pr!==null)m.pr=+pr;
+ const w=v('qm-w');if(w!==null){m.w=w===''?'':(+w+(+v('qm-f')||0))}
+ if(document.getElementById('qm-d-y'))m.d=qReadDate('qm-d')||m.d}
+document.addEventListener('change',e=>{const t=e.target;if(!t)return;
+ if(t.id==='qm-file'){if(t.files&&t.files[0])qXcLoad(t.files[0]);return}
+ if(t.id==='qlg'){UI.qlg=t.value;render();return}
+ if(t.type==='checkbox'&&t.id&&t.id.indexOf('qme-')===0&&UI.qme){const k=t.dataset.k,s=UI.qme.sel,i=s.indexOf(k);if(t.checked&&i<0)s.push(k);if(!t.checked&&i>=0)s.splice(i,1);UI.qme.conf=0;render();return}
+ if(t.id&&t.id.indexOf('qm-')===0&&UI.qmf){const was=UI.qmf.w;qMfRead();if(t.id==='qm-w'&&(was===''||UI.qmf.w==='')&&was!==UI.qmf.w)render()}},true);
+document.addEventListener('input',e=>{const t=e.target;if(!t||!t.id)return;
+ if(t.id==='qlq'){UI.qlq=t.value;const p=t.selectionStart;render();const n=document.getElementById('qlq');if(n){n.focus();try{n.setSelectionRange(p,p)}catch(x){}}}
+ else if(t.id==='qxq'){UI.qxq=t.value;const p=t.selectionStart;render();const n=document.getElementById('qxq');if(n){n.focus();try{n.setSelectionRange(p,p)}catch(x){}}}
+ else if(t.id==='qm-n'&&UI.qmf)UI.qmf.n=t.value;
+ else if((t.id==='xc-z'||t.id==='xc-x'||t.id==='xc-y')&&UI.xcrop){UI.xcrop[t.id.slice(3)]=+t.value;xcDraw()}},true);
+(()=>{let dr=null;document.addEventListener('pointerdown',e=>{const c=e.target;if(c&&c.id==='xc-cv'&&UI.xcrop){dr={x:e.clientX,y:e.clientY,cx:UI.xcrop.x,cy:UI.xcrop.y};try{c.setPointerCapture(e.pointerId)}catch(x){}}},true);
+ document.addEventListener('pointermove',e=>{if(!dr||!UI.xcrop||!XC.img)return;const cv=document.getElementById('xc-cv');if(!cv)return;const k=240/cv.getBoundingClientRect().width,im=XC.img,s=240/Math.min(im.width,im.height)*UI.xcrop.z,mx=(im.width*s-240)/2,my=(im.height*s-240)/2;
+  if(mx>1)UI.xcrop.x=Math.max(-1,Math.min(1,dr.cx-(e.clientX-dr.x)*k/mx));if(my>1)UI.xcrop.y=Math.max(-1,Math.min(1,dr.cy-(e.clientY-dr.y)*k/my));
+  ['x','y'].forEach(a=>{const i=document.getElementById('xc-'+a);if(i)i.value=UI.xcrop[a]});xcDraw()},true);
+ document.addEventListener('pointerup',()=>{dr=null},true)})();
 function qAllRow(e){const lt=e.meta.lt,on=UI.qe===e.xv;
- let h='<div class="card qar" data-xv="'+esc(e.xv)+'"><button class="qarh" data-a="qexp" data-v="'+esc(e.xv)+'" aria-expanded="'+on+'"><span class="row" style="gap:8px;flex-wrap:nowrap"><b class="nm" style="flex:1;min-width:0;text-align:start">'+esc(e.n)+'</b>'+(e.plan.length?'<span class="tag">في الخطة الحالية</span>':'')+'</span>';
- if(!e.sets.length)h+='<span class="mu">لم يُسجّل أداء بعد</span>';
- else{h+='<span class="mu qmax">أقصى وزن: <b class="num">'+esc(qWt(lt,e.max.w))+'</b> × <span class="num">'+F(e.max.r)+'</span> · <span class="num">'+e.max.date+'</span></span>'+
-  '<span class="mu qlast">آخر تسجيل <span class="num">'+e.lastDate+'</span>: <b class="num">'+F(e.last.length)+' '+(e.last.length===1?'مجموعة':'مجموعات')+'</b> · '+e.last.map(q=>esc(qSet(lt,q))).join(' · ')+'</span>'}
- h+='</button>';
- if(on){h+='<div class="qrec"><b>سجل الأرقام القياسية</b>';
-  if(!e.rec.length)h+='<div class="mu">لا أرقام بعد.</div>';else h+=e.rec.map(q=>'<div class="irset"><b class="num">'+esc(qSet(lt,q))+'</b><span class="sp"></span><span class="mu num">'+q.date+(q.leg?' · ملخص':'')+'</span></div>').join('');
-  h+='<div class="row" style="gap:8px;margin:8px 0;flex-wrap:wrap"><button class="chip" data-a="qfull" data-v="'+esc(e.xv)+'">'+(UI.qf===e.xv?'إخفاء كامل سجل الأداء':'كامل سجل الأداء')+'</button>'+
-   '<select class="irsel" id="q-addd" aria-label="اليوم">'+DAYS.map((x,d)=>'<option value="'+d+'"'+(d===qDi(qDate())?' selected':'')+'>'+x+'</option>').join('')+'</select><button class="chip" data-a="qaddto" data-v="'+esc(e.xv)+'">أضف إلى الجدول</button></div>';
+ let h='<div class="card qar" data-xv="'+esc(e.xv)+'"><button class="qarh" data-a="qexp" data-v="'+esc(e.xv)+'" aria-expanded="'+on+'"><span class="row" style="gap:10px;flex-wrap:nowrap;align-items:flex-start">'+qThumb(e)+'<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px"><span class="row" style="gap:6px;flex-wrap:nowrap"><b class="nm" style="flex:1;min-width:0;text-align:start">'+esc(e.n)+'</b>'+(e.plan.length?'<span class="tag">في الخطة الحالية</span>':'')+'</span>';
+ if(!e.sets.length)h+='<span class="mu qnone">لم يُسجّل وزن بعد</span>';
+ else{h+='<span class="mu qmax">أقصى وزن: <b class="num">'+esc(qWt(lt,e.max.w))+'</b> · <span class="num">'+e.max.date+'</span> · التكرارات <b class="num">'+F(e.max.r)+'</b></span>'+
+  '<span class="mu qlast">آخر أداء <span class="num">'+e.lastDate+'</span> · المجموعات <b class="num">'+F(e.last.length)+'</b> · التكرارات <b class="num">'+e.last.map(q=>F(q.r)).join('، ')+'</b></span>'}
+ h+='</span></span></button>';
+ if(on){h+='<div class="qrec"><b>تطوّر الأوزان القياسية</b>';
+  if(!e.rec.length)h+='<div class="mu qnone">لم يُسجّل وزن بعد</div>';
+  else h+='<div class="qrr qrh3 mu"><span>الوزن</span><span>التاريخ</span><span>التكرارات</span></div>'+e.rec.slice().reverse().map(q=>'<div class="qrr"><b class="num">'+esc(qWt(lt,q.w))+'</b><span class="num">'+q.date+(q.leg?' · ملخص':'')+'</span><span class="num">'+F(q.r)+'</span></div>').join('');
+  h+='<div class="row" style="gap:8px;margin:8px 0;flex-wrap:wrap"><button class="chip" data-a="qfull" data-v="'+esc(e.xv)+'">'+(UI.qf===e.xv?'إخفاء كامل سجل الأداء':'كامل سجل الأداء')+'</button><button class="chip" data-a="qxedit" data-v="'+esc(e.xv)+'">تعديل التمرين</button>'+
+   (!e.sets.length&&!e.plan.length?'<button class="chip" data-a="qxdel" data-v="'+esc(e.xv)+'">'+(UI.qxd===e.xv?'تأكيد الإزالة':'إزالة من الأرشيف')+'</button>':'')+'</div>'+
+   '<div class="row" style="gap:8px;margin:8px 0;flex-wrap:wrap"><select class="irsel" id="q-addd" aria-label="اليوم">'+DAYS.map((x,d)=>'<option value="'+d+'"'+(d===qDi(qDate())?' selected':'')+'>'+x+'</option>').join('')+'</select><button class="chip" data-a="qaddto" data-v="'+esc(e.xv)+'">أضف إلى الجدول</button></div>';
   if(UI.qf===e.xv)h+=qFullLog(e);
   const AR=irAtReps({pts:e.pts}),rs=Object.keys(AR).map(Number).sort((a,b)=>a-b);
   if(rs.length>0){const rsel=rs.indexOf(+UI.qr)>=0?+UI.qr:rs[rs.length-1],arr=AR[rsel];
@@ -7815,53 +7986,98 @@ function qAllRow(e){const lt=e.meta.lt,on=UI.qe===e.xv;
  return h+'</div>'}
 function qFullLog(e){const by={};e.sets.forEach(q=>{(by[q.date]=by[q.date]||[]).push(q)});
  return '<div class="qfull" id="q-full">'+Object.keys(by).sort().reverse().map(d=>'<div class="irdh num">'+d+'</div>'+by[d].map((q,i)=>'<div class="irset"><span class="num mu">'+(i+1)+'</span><b class="num">'+esc(qSet(e.meta.lt,q))+'</b>'+(q.leg?'<span class="mu">ملخص تاريخي</span>':'')+'<span class="sp"></span>'+(q.leg?'':'<button class="chip" data-a="qgoedit" data-d="'+d+'" data-v="'+esc(e.xv)+'">تعديل</button>')+'</div>').join('')).join('')+'</div>'}
+function qToolRow(ic0,tx,sub,a){return '<button class="sjrow" '+a+'>'+sjI('tr',ic0)+'<span class="t">'+tx+'<small>'+sub+'</small></span>'+ic('next')+'</button>'}
+/* كل ما يخص التدريب في مكان واحد: الخطة الحالية، أرشيف تماريني، ثم الأدوات (الجدول، التقدّم، السجل، الأجهزة) */
 function qIronView(){irEns();const t=UI.qt||'cur';
- if(t==='prog'||t==='log'){UI.irt=t;return trkBack()+'<div class="row" style="margin:0 0 8px"><button class="chip" data-a="qtab" data-v="cur">'+ic('back')+'العودة إلى خطتي</button></div><h1>'+(t==='prog'?'التقدّم':'سجل الأحداث')+'</h1><div id="ir-body">'+(t==='prog'?irProgTab():irLogTab())+'</div>'}
+ if(t==='prog'||t==='log'){UI.irt=t;return trkBack()+'<div class="row" style="margin:0 0 8px"><button class="chip" data-a="qtab" data-v="cur">'+ic('back')+'العودة إلى خطتي</button></div><h1>'+(t==='prog'?'التقدّم والأوزان القياسية':'سجل الأداء والأحداث')+'</h1><div id="ir-body">'+(t==='prog'?irProgTab():irLogTab())+'</div>'}
  return trkBack()+'<h1>خطتي</h1>'+qTabs()+'<div id="ir-body">'+(t==='all'?qAllTab():qCurTab())+'</div>'+
-  '<div class="row" style="margin:14px 0;gap:8px;justify-content:center;flex-wrap:wrap"><button class="chip" data-a="qtab" data-v="prog">التقدّم والرسوم</button><button class="chip" data-a="qtab" data-v="log">سجل الأحداث</button></div>'}
+  '<div class="sjsec">أدوات التدريب</div>'+qToolRow('cal','إنشاء الجدول وتعديله','الأيام والتمارين والمجموعات','data-a="sub" data-v="plan" id="q-t-plan"')+qToolRow('chart','التقدّم والأوزان القياسية','رسوم التمارين والعضلات','data-a="qtab" data-v="prog" id="q-t-prog"')+qToolRow('box','سجل الأداء','كل الأحداث والتعديلات','data-a="qtab" data-v="log" id="q-t-log"')+qToolRow('dumbbell','الأجهزة الرياضية','دليل الأجهزة','data-a="sub" data-v="nau" id="q-t-nau"')}
 vIron=qIronView;
 
 /* ---------- الأوامر ---------- */
-function qOpenEd(xv,date){const sets=qSets(date,xv);UI.qx=xv;UI.qrows=sets.length?sets.map(h=>({i:sxSid(h.q),w:h.q.w||'',r:h.q.r})):[{w:'',r:''}]}
+function qOpenEd(xv,date){const sets=qSets(date,xv);UI.qx=xv;UI.qpre=null;
+ if(sets.length){UI.qrows=sets.map(h=>({i:sxSid(h.q),w:+h.q.w||0,r:h.q.r}));return}
+ const ref=qRefLast(xv,date),row=qRowFor(date,xv),ra=(ref&&ref.sets)||[],n=Math.max(1,Math.min(12,(row&&+row.s)||ra.length||3));
+ UI.qrows=Array.from({length:n},(_,i)=>{const b=ra[i]||ra[ra.length-1];return{w:b?(+b.w||0):(row&&+row.tw||0),r:b?b.r:((row&&+row.r)||10)}});
+ if(ra.length)UI.qpre=xv}
 Object.assign(ACT,{
- qtab:b=>{UI.qt=b.dataset.v;UI.qx=null;UI.qcu=0;window.scrollTo(0,0)},
+ qtab:b=>{UI.qt=b.dataset.v;UI.qx=null;UI.qcu=0;UI.qadd=null;UI.qmf=null;UI.xcrop=null;window.scrollTo(0,0)},
  qday:b=>{const d=new Date(qDate()+'T12:00:00');d.setDate(d.getDate()+(+b.dataset.v));const x=iso(d);if(x>TD()){toast('لا يمكن التسجيل في تاريخ قادم');return false}UI.qd=x;UI.qx=null;UI.qdp=0},
  qtoday:()=>{UI.qd=TD();UI.qx=null;UI.qdp=0},
  qpick:()=>{UI.qdp=!UI.qdp},
  qdgo:()=>{const x=qReadDate('qd');if(!x)return false;if(x>TD()){toast('لا يمكن التسجيل في تاريخ قادم');return false}UI.qd=x;UI.qdp=0;UI.qx=null},
- qxopen:b=>{qOpenEd(b.dataset.v,qDate())},
- qedm:()=>{UI.qedm=!UI.qedm;if(UI.qedm){UI.qx=null;UI.qrows=null}},
+ qxopen:b=>{const dt=b.dataset.date||qDate();if(dt>TD()){toast('لا يمكن التسجيل في تاريخ قادم');return false}UI.qxdt=dt;UI.qpe=null;qOpenEd(b.dataset.v,dt)},
  qxclose:()=>{UI.qx=null;UI.qrows=null;return},
- qradd:()=>{const r=UI.qrows||(UI.qrows=[]),l=r[r.length-1]||{w:'',r:''};r.push({w:l.w,r:l.r})},
+ qradd:()=>{const r=UI.qrows||(UI.qrows=[]),l=r[r.length-1]||{w:0,r:10};if(r.length>=12){toast('الحد الأقصى 12 مجموعة');return false}r.push({w:l.w,r:l.r})},
  qrdup:b=>{const r=UI.qrows,i=+b.dataset.i;if(!r||!r[i])return false;r.splice(i+1,0,{w:r[i].w,r:r[i].r})},
- qrdel:b=>{const r=UI.qrows,i=+b.dataset.i;if(!r||!r[i])return false;r.splice(i,1);if(!r.length)r.push({w:'',r:''})},
- qcopylast:b=>{const ref=qRefLast(b.dataset.v,qDate());if(!ref||!(ref.sets||[]).length)return false;UI.qrows=ref.sets.map(q=>({w:q.w||'',r:q.r}))},
+ qrdel:b=>{const r=UI.qrows,i=+b.dataset.i;if(!r||!r[i])return false;r.splice(i,1);if(!r.length)r.push({w:0,r:10})},
+ qcopylast:b=>{const ref=qRefLast(b.dataset.v,UI.qxdt||qDate());if(!ref||!(ref.sets||[]).length)return false;UI.qrows=ref.sets.map(q=>({w:+q.w||0,r:q.r}));UI.qpre=b.dataset.v},
  qxsave:b=>{const xv=b.dataset.v,name=b.dataset.n,rows=(UI.qrows||[]).map(q=>({i:q.i,w:qNum(q.w),r:Math.round(qNum(q.r))}));
   if(!rows.some(q=>q.r>0)&&!rows.some(q=>q.i)){toast('أدخل التكرارات لمجموعة واحدة على الأقل');return false}
-  const n=qSave(qDate(),xv,name,rows);UI.qx=null;UI.qrows=null;toast(n?'حُفظ الأداء':'لا تغيير')},
- qmv:b=>{const d=+b.dataset.d,i=+b.dataset.i,j=i+(+b.dataset.v),a=S.plan[d].ex;if(j<0||j>=a.length)return false;const t=a[i];a[i]=a[j];a[j]=t},
+  const n=qSave(UI.qxdt||qDate(),xv,name,rows);UI.qx=null;UI.qrows=null;toast(n?'حُفظ الأداء':'لا تغيير')},
  qmvday:b=>{const d=+b.dataset.d,i=+b.dataset.i,to=+(document.getElementById('q-mvd-'+i)||{}).value;if(to===d||isNaN(to))return false;const e=S.plan[d].ex[i];if(!e)return false;
-  if(irPlanHas(to,irXvOf({id:e.id,n:e.n}))){toast('التمرين موجود في اليوم الآخر');return false}S.plan[d].ex.splice(i,1);S.plan[to].ex.push(e);irLog('asg',{xv:irXvOf({id:e.id,n:e.n}),n:e.n,d:to,plan:1,pd:TD(),id:e.id});toast('نُقل إلى '+DAYS[to])},
- qrm:b=>{ACT.irrm(b)},
- qadd:b=>{const name=irNorm(irTxt('ir-an')),sets=Math.round(irNum('ir-as'))||3,reps=Math.round(irNum('ir-ar'))||10,w=irNum('ir-aw'),d=+b.dataset.d;if(!name){toast('اكتب اسم التمرين');return false}
-  const r=irPlanAdd(d,name,sets,reps,w);if(!r.dup)irLog('ex+',{xv:r.xv,n:name,d:d,plan:1,pd:TD(),id:r.e.id});irClr('ir-a');toast(r.dup?'التمرين موجود في هذا اليوم':'أُضيف إلى الجدول وإلى الخطة الشاملة')},
- qcust:()=>{UI.qcu=1},qccancel:()=>{UI.qcu=0},
- qcsave:()=>{const n=irNorm(irTxt('qc-n')),g=(document.getElementById('qc-g')||{}).value||'',t=(document.getElementById('qc-t')||{}).value||'w';if(!n){toast('اكتب اسم التمرين');return false}
-  if(irLib(n)){toast('هذا التمرين موجود في المكتبة. اختره من القائمة');return false}const xv=irXv(n);irEns();
-  if(S.xr[xv]&&S.xr[xv].cu){toast('هذا التمرين المخصص موجود');return false}
-  S.xr[xv]={n:n,g:g,s:[],q:t==='bw'?'bw':'',en:'',lt:t,cu:1,at:Date.now()};irClr('qc-');UI.qcu=0;toast('أُضيف تمرين مخصص إلى الخطة الشاملة')},
+  if(irPlanHas(to,irXvOf({id:e.id,n:e.n}))){toast('التمرين موجود في اليوم الآخر');return false}qMgFix(d);S.plan[d].ex.splice(i,1);S.plan[to].ex.push(e);qMgFix(to);UI.qpe=null;irLog('asg',{xv:irXvOf({id:e.id,n:e.n}),n:e.n,d:to,plan:1,pd:TD(),id:e.id});toast('نُقل إلى '+DAYS[to])},
+ qrm:b=>{qMgFix(+b.dataset.d);UI.qpe=null;return ACT.irrm(b)},
+ qaddo:()=>{UI.qadd='pick'},qaddx:()=>{UI.qadd=null;UI.qmf=null;UI.xcrop=null;XC.img=null},
+ qaddm:b=>{UI.qadd=b.dataset.v;if(b.dataset.v==='man'&&!UI.qmf)UI.qmf=qMfNew()},
+ qcust:()=>{UI.qt='all';UI.qadd='man';UI.qmf=qMfNew();window.scrollTo(0,0)},
+ qlibadd:b=>{const x=XL.find(a=>a.id===b.dataset.v);if(!x)return false;const xv=irXv(x.n);irEns();if(S.xr[xv]){toast('موجود في أرشيفك');return false}irReg(xv,x.n);UI.qe=xv;toast('أُضيف إلى أرشيف تماريني: '+x.n)},
+ qmimgx:()=>{qMfRead();if(UI.qmf)UI.qmf.img=''},
+ xcok:()=>{if(!UI.qmf||!XC.img)return false;qMfRead();UI.qmf.img=xcOut();UI.xcrop=null;XC.img=null},
+ xcx:()=>{UI.xcrop=null;XC.img=null},
+ qmcancel:()=>{UI.qadd=null;UI.qax=null;UI.qmf=null;UI.xcrop=null;XC.img=null},
+ qxedit:b=>{const xv=b.dataset.v,m=qMeta(xv,(qAll()[xv]||{}).n),r=(S.xr||{})[xv]||{};UI.qadd='man';UI.qmf={xv:xv,n:m.n,g:m.g||'chest',t:m.lt||'w',s:r.ds||3,r:r.dr||10,w:'',pr:5,d:TD(),img:XI[xv]||'',day:''};window.scrollTo(0,0)},
+ qxdel:b=>{const xv=b.dataset.v;if(UI.qxd!==xv){UI.qxd=xv;return}const e=qAll()[xv];if(!e||e.sets.length||e.plan.length){UI.qxd=null;toast('لا يمكن إزالة تمرين له أداء أو في الجدول');return false}
+  delete S.xr[xv];delete XI[xv];xiSave();UI.qxd=null;UI.qe=null;toast('أُزيل من الأرشيف')},
+ qmsave:()=>{qMfRead();const m=UI.qmf;if(!m)return false;const er=msg=>{const e=document.getElementById('qm-err');if(e)e.textContent=msg;toast(msg);return false};
+  const name=irNorm(m.n);irEns();
+  if(m.xv){const r=S.xr[m.xv]||(irReg(m.xv,m.n),S.xr[m.xv]);r.ds=m.s;r.dr=m.r;if(r.cu){r.g=m.g;r.lt=m.t;r.q=m.t==='bw'?'bw':''}
+   if(m.img)XI[m.xv]=m.img;else delete XI[m.xv];if(!xiSave())return er('مساحة التخزين ممتلئة، احذف بعض الصور');UI.qe=m.xv;UI.qadd=null;UI.qmf=null;toast('حُفظ التعديل');return}
+  if(!name)return er('اكتب اسم التمرين');
+  if(irLib(name))return er('هذا التمرين موجود في القائمة. اختره من «من قائمة التمارين»');
+  const xv=irXv(name);if(S.xr[xv])return er('هذا التمرين موجود في أرشيفك');
+  let date=m.d||TD(),hasW=m.w!=='';if(hasW&&date>TD())return er('لا يمكن اختيار تاريخ مستقبلي');
+  S.xr[xv]={n:name,g:m.g,s:[],q:m.t==='bw'?'bw':'',en:'',lt:m.t,cu:1,at:Date.now(),ds:m.s,dr:m.r};
+  if(m.img){XI[xv]=m.img;if(!xiSave()){delete XI[xv];delete S.xr[xv];return er('مساحة التخزين ممتلئة، احذف بعض الصور')}}
+  if(hasW)qSave(date,xv,name,[{w:+m.w||0,r:m.pr||5}]);
+  if(m.day!==''){const r=irPlanAdd(+m.day,name,m.s,m.r,0);if(!r.dup)irLog('ex+',{xv:xv,n:name,d:+m.day,plan:1,pd:TD(),id:r.e.id})}
+  if(m.day!=='')qMgFix(+m.day);UI.qe=xv;UI.qg='';UI.qs='';UI.qpl=false;UI.qadd=null;UI.qax=null;UI.qmf=null;toast('أُضيف إلى أرشيف تماريني'+(m.day!==''?' وإلى '+DAYS[+m.day]:''))},
+ qdtog:b=>{const d=+b.dataset.v;UI.qdo=UI.qdo||{};UI.qdo[d]=!qOpenDay(d);UI.qx=null;UI.qpe=null},
+ qmtog:b=>{const k=b.dataset.d+'|'+b.dataset.v;UI.qmo=UI.qmo||{};UI.qmo[k]=!qOpenMu(+b.dataset.d,b.dataset.v)},
+ qopenall:()=>{UI.qdo={};UI.qmo={};for(let d=0;d<7;d++){UI.qdo[d]=true;qDayMg(d).forEach(s=>{UI.qmo[d+'|'+s]=true})}},
+ qcloseall:()=>{UI.qdo={};UI.qmo={};UI.qx=null;UI.qpe=null;UI.qax=null;UI.qme=null;for(let d=0;d<7;d++){UI.qdo[d]=false;qDayMg(d).forEach(s=>{UI.qmo[d+'|'+s]=false})}},
+ qpe:b=>{UI.qpe=UI.qpe===b.dataset.v?null:b.dataset.v;UI.qx=null},
+ qpesave:b=>{const d=+b.dataset.d,i=+b.dataset.i,e=S.plan[d].ex[i],v=id=>+(document.getElementById(id)||{}).value||0;if(!e)return false;
+  e.s=v('qpe-s')||e.s;e.r=v('qpe-r')||e.r;const w=v('qpe-w')+v('qpe-f');if(w>0)e.tw=w;else delete e.tw;UI.qpe=null;toast('حُفظ تعديل التمرين في الجدول')},
+ qmv2:b=>{const d=+b.dataset.d,i=+b.dataset.i,v=+b.dataset.v,a=S.plan[d].ex;if(!a[i])return false;const sec=qExSec(a[i]);let k=i+v;while(k>=0&&k<a.length&&qExSec(a[k])!==sec)k+=v;if(k<0||k>=a.length)return false;const x=a[i];a[i]=a[k];a[k]=x;qMgFix(d)},
+ qmeo:b=>{const d=+b.dataset.d;UI.qme={d:d,sel:qDayMg(d).slice(),conf:0};UI.qax=null},
+ qmex:()=>{UI.qme=null},
+ qmesave:b=>{const m=UI.qme;if(!m)return false;const d=m.d,p=S.plan[d],cur=qDayMg(d),sel=m.sel.slice(),rem=cur.filter(k=>sel.indexOf(k)<0),lost=p.ex.filter(e=>rem.indexOf(qExSec(e))>=0);
+  if(lost.length&&!m.conf){m.conf=1;return}
+  p.ex=p.ex.filter(e=>lost.indexOf(e)<0);p.mg=cur.filter(k=>sel.indexOf(k)>=0).concat(sel.filter(k=>cur.indexOf(k)<0));p.t=p.mg.map(qSecShort).join(' و')||p.t;
+  lost.forEach(e=>irLog('ex-',{xv:irXvOf({id:e.id,n:e.n}),n:e.n,d:d,plan:1,pd:TD()}));
+  UI.qme=null;UI.qpe=null;UI.qx=null;toast(lost.length?'حُفظت العضلات وأُزيلت '+lost.length+' تمرين من الجدول':'حُفظت عضلات اليوم')},
+ qaxo:b=>{UI.qax={d:+b.dataset.d,sec:b.dataset.v};UI.qxq='';UI.qx=null},
+ qaxx:()=>{UI.qax=null;UI.qmf=null;UI.xcrop=null;XC.img=null},
+ qaxm:b=>{UI.qax={d:+b.dataset.d,sec:b.dataset.v,man:1};UI.qmf=Object.assign(qMfNew(),{g:b.dataset.v==='legs'?'quad':b.dataset.v,day:String(+b.dataset.d)})},
+ qpadd:b=>{const d=+b.dataset.d,v=b.dataset.v;let name;if(v.indexOf('lib:')===0){const x=XL.find(a=>a.id===v.slice(4));if(!x)return false;name=x.n}else{const e=qAll()[v];if(!e)return false;name=e.n}
+  const xv=irXv(name),xr=(S.xr||{})[xv]||{};qMgFix(d);const r=irPlanAdd(d,name,xr.ds||3,xr.dr||10,0);
+  if(r.dup){toast('التمرين موجود في هذا اليوم');return false}irLog('ex+',{xv:r.xv,n:name,d:d,plan:1,pd:TD(),id:r.e.id});qMgFix(d);UI.qax=null;toast('أُضيف إلى '+DAYS[d]+' وإلى أرشيف تماريني')},
  qgrp:b=>{UI.qg=b.dataset.v},
  qexp:b=>{UI.qe=UI.qe===b.dataset.v?null:b.dataset.v;UI.qf=null;UI.qr=null},
  qfull:b=>{UI.qf=UI.qf===b.dataset.v?null:b.dataset.v},
  qrep:b=>{UI.qr=+b.dataset.v},
- qaddto:b=>{const xv=b.dataset.v,e=qAll()[xv],d=+(document.getElementById('q-addd')||{}).value;if(!e||isNaN(d))return false;const r=irPlanAdd(d,e.n,3,10,0);
+ qaddto:b=>{const xv=b.dataset.v,e=qAll()[xv],d=+(document.getElementById('q-addd')||{}).value;if(!e||isNaN(d))return false;const xr=(S.xr||{})[xv]||{};qMgFix(d);const r=irPlanAdd(d,e.n,xr.ds||3,xr.dr||10,0);qMgFix(d);
   if(!r.dup)irLog('ex+',{xv:xv,n:e.n,d:d,plan:1,pd:TD(),id:r.e.id});toast(r.dup?'التمرين موجود في هذا اليوم':'أُضيف إلى '+DAYS[d])},
- qgoedit:b=>{UI.qt='cur';UI.qd=b.dataset.d;UI.qdp=0;qOpenEd(b.dataset.v,b.dataset.d);window.scrollTo(0,0)}});
+ qgoedit:b=>{UI.qt='cur';UI.qd=b.dataset.d;UI.qdp=0;UI.qxdt=b.dataset.d;qOpenEd(b.dataset.v,b.dataset.d);window.scrollTo(0,0)}});
 document.addEventListener('input',e=>{const t=e.target;if(!t)return;
- if(t.dataset&&t.dataset.qr&&UI.qrows){const p=t.dataset.qr.split(','),r=UI.qrows[+p[0]];if(r)r[p[1]]=t.value}
- else if(t.id==='qs'){UI.qs=t.value;const p=t.selectionStart;render();const n=document.getElementById('qs');if(n){n.focus();try{n.setSelectionRange(p,p)}catch(x){}}}
+ if(t.id==='qs'){UI.qs=t.value;const p=t.selectionStart;render();const n=document.getElementById('qs');if(n){n.focus();try{n.setSelectionRange(p,p)}catch(x){}}}
  else if(t.id&&t.id.indexOf('qc-')===0&&t.tagName==='INPUT'){UI.ird=UI.ird||{};UI.ird[t.id]=t.value}},true);
-document.addEventListener('change',e=>{const t=e.target;if(t&&t.id==='qpl'){UI.qpl=t.checked;render()}},true);
+document.addEventListener('change',e=>{const t=e.target;if(!t)return;
+ if(t.id==='qpl'){UI.qpl=t.checked;render();return}
+ if(t.id==='q-cnt'&&UI.qrows){const n=+t.value,r=UI.qrows;while(r.length>n)r.pop();while(r.length<n){const l=r[r.length-1]||{w:0,r:10};r.push({w:l.w,r:l.r})}render();return}
+ if(t.tagName==='SELECT'&&t.dataset&&t.dataset.qr&&UI.qrows){const i=+t.dataset.qr.split(',')[0],r=UI.qrows[i],row=t.closest('.qrow');if(!r||!row)return;
+  const q=a=>row.querySelector('[data-qr="'+i+','+a+'"]');r.w=(+q('w').value||0)+(+q('f').value||0);r.r=+q('r').value}},true);
 
 /* ---------- لا بدء ولا استئناف ولا إنهاء: كل المداخل القديمة تفتح خطتي ---------- */
 function qGoPlan(date){S.tab='train';S.sub=null;UI.trk='irs';UI.qt='cur';UI.qd=date||TD();UI.qx=null;UI.qdp=0;UI.ses=null;UI.sum=null;window.scrollTo(0,0)}

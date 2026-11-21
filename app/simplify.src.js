@@ -189,7 +189,6 @@ function vPgs(){
  h+='<div class="jt"><div class="jtile"><b class="num">'+x.cur+'</b><span>'+ic('flame')+'<small>أيام متتالية</small></span></div><div class="jtile"><b class="num">'+F(Object.keys(S.done).length)+'</b><span>'+ic('dumbbell')+'<small>تمارين</small></span></div><div class="jtile"><b class="num">'+F(totalHours(),1)+'</b><span>'+ic('timer')+'<small>ساعات</small></span></div></div>';
  h+='<div class="card"><h2>'+ic('chart')+'الحصص المكتملة أسبوعيًا</h2><div class="bars">'+cnt.map((v,i)=>'<div class="bc'+(i===7&&v?' on':'')+'"><span class="num bv">'+(v||'')+'</span><div class="bw"><i style="height:'+Math.max(6,Math.round(v/mx*100))+'%"></i></div><small>'+lb[i]+'</small></div>').join('')+'</div></div>';
  h+='<button class="statcard" data-a="sub" data-v="prog"><div class="srings">'+ring([[c.steps,P.steps,'#e08aa0'],[c.kcal,P.kcal,'#9a2444'],[c.min,Math.ceil((+P.cardio||0)/7),'#f0f0f2']])+'</div><div class="t"><b>الإحصاءات</b><div class="mu">النشاط والنوم بالتفصيل</div></div>'+ic('next')+'</button>';
- h+='<button class="statcard" data-a="trk" data-v="iron"><div class="t"><b>تقدّم تمارين الحديد</b><div class="mu">رسوم الأوزان والعضلات من الحصص المكتملة</div></div>'+ic('next')+'</button>';
  try{h+=recoCard()}catch(e){}
  try{h+=tkLogCard(null)}catch(e){}
  return h}

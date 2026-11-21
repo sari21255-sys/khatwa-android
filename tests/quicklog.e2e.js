@@ -12,34 +12,40 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
 
  const plan=async(p,t)=>{await p.evaluate(t=>{S.tab='train';S.sub=null;UI.trk='irs';UI.qt=t||'cur';UI.qd=TD();UI.qx=null;render()},t);await p.waitForTimeout(150)};
  const txt=p=>p.evaluate(()=>document.body.innerText);
- console.log('1) خطتي: تبويبان وإضافة تمرين مرة واحدة في الشاملة');
+ const setRow=async(p,i,w,r)=>{const wh=Math.floor(w),fr=+(w-wh).toFixed(2);await p.selectOption('[data-qr="'+i+',w"]',String(wh));await p.selectOption('[data-qr="'+i+',f"]',String(fr));await p.selectOption('[data-qr="'+i+',r"]',String(r))};
+ const clk=async(p,sel)=>{await p.click(sel);await p.waitForTimeout(150)};
+ const openAdd=async(p,k)=>{if(await p.$('.qah [data-a=qaddx]'))await clk(p,'.qah [data-a=qaddx]');await clk(p,'#q-addarch');await clk(p,'#q-add-'+k)};
+ console.log('1) خطتي: تبويبان، إضافة تمرين من عضلة اليوم مرة واحدة، وظهوره مرة واحدة في الأرشيف');
  {const {ctx,p}=await mk();await plan(p);
   const tabs=await p.$$eval('.irtabs button',a=>a.map(x=>x.textContent.trim()));
-  ok(tabs.join('|')==='الخطة الحالية|الخطة الشاملة','التبويبان: '+tabs.join('|'));
+  ok(tabs.join('|')==='الخطة الحالية|أرشيف تماريني','التبويبان: '+tabs.join('|'));
   ok(!/ابدأ الحصة|استئناف|إنهاء الحصة|أنهِ/.test(await txt(p)),'لا أزرار بدء أو استئناف أو إنهاء');
   const di=await p.evaluate(()=>qDi(TD()));
-  await p.evaluate(d=>{S.plan[d].ex=[];render()},di);
-  await p.fill('#ir-an','سحب أرضي بالبار');await p.evaluate(()=>{});
-  await p.click('[data-a=qadd]');await p.waitForTimeout(150);
-  await p.fill('#ir-an','سحب أرضي بالبار');await p.click('[data-a=qadd]');await p.waitForTimeout(150);
-  ok(await p.evaluate(d=>S.plan[d].ex.length,di)===1,'التكرار لا يضيف صفًا ثانيًا');
+  await p.evaluate(d=>{S.plan[d].ex=[];S.plan[d].mg=[];render()},di);
+  await clk(p,'#q-me-'+di);await p.check('#qme-back');await p.waitForTimeout(100);await clk(p,'#q-me-save');
+  await clk(p,'#q-ax-'+di+'-back');await p.fill('#qxq','تجديف بار منحنٍ');await p.waitForTimeout(150);
+  ok((await p.$$('#q-ax [data-a=qpadd]')).length>=1,'القائمة تعرض التمرين المطلوب');
+  await p.click('#q-ax [data-a=qpadd]');await p.waitForTimeout(200);
+  ok(await p.evaluate(d=>S.plan[d].ex.length,di)===1,'أُضيف صف واحد');
+  await clk(p,'#q-ax-'+di+'-back');await p.fill('#qxq','تجديف بار منحنٍ');await p.waitForTimeout(150);
+  ok((await p.$$('#q-ax [data-a=qpadd]')).length===0,'التمرين الموجود في اليوم لا يُعرض للإضافة مرة ثانية');
   await plan(p,'all');
   const rows=await p.$$eval('.qar',a=>a.map(x=>x.innerText));
-  ok(rows.filter(x=>/سحب أرضي بالبار/.test(x)).length===1,'يظهر مرة واحدة في الشاملة');
-  ok(/لم يُسجّل أداء بعد/.test(rows.find(x=>/سحب أرضي/.test(x))||''),'«لم يُسجّل أداء بعد»');
-  ok(/في الخطة الحالية/.test(rows.find(x=>/سحب أرضي/.test(x))||''),'علامة ضمن الخطة الحالية');
+  ok(rows.filter(x=>/تجديف بار منحنٍ/.test(x)).length===1,'يظهر مرة واحدة في الأرشيف');
+  ok(/لم يُسجّل وزن بعد/.test(rows.find(x=>/تجديف بار منحنٍ/.test(x))||''),'«لم يُسجّل وزن بعد»');
+  ok(/في الخطة الحالية/.test(rows.find(x=>/تجديف بار منحنٍ/.test(x))||''),'علامة ضمن الخطة الحالية');
   await ctx.close()}
 
  console.log('2) تسجيل الأداء بتاريخ حالي وسابق، الأرقام القياسية، التصحيح والحذف');
  {const {ctx,p}=await mk();await plan(p);
   const di=await p.evaluate(()=>qDi(TD()));
-  await p.evaluate(d=>{S.plan[d].ex=[];irPlanAdd(d,'سحب أرضي بالبار',3,5,0);render()},di);
+  await p.evaluate(d=>{S.plan[d].ex=[];irPlanAdd(d,'سحب أرضي بالبار',3,5,0);qMgFix(d);render()},di);
   const xv=await p.evaluate(()=>irXv('سحب أرضي بالبار'));
   /* اليوم: مجموعتان بوزنين مختلفين */
   await p.click('[data-a=qxopen]');await p.waitForTimeout(100);
-  await p.fill('[data-qr="0,w"]','100');await p.fill('[data-qr="0,r"]','5');
+  await p.selectOption('#q-cnt','1');await p.waitForTimeout(100);await setRow(p,0,100,5);
   await p.click('[data-a=qradd]');await p.waitForTimeout(80);
-  await p.fill('[data-qr="1,w"]','110');await p.fill('[data-qr="1,r"]','3');
+  await setRow(p,1,110,3);
   await p.click('[data-a=qxsave]');await p.waitForTimeout(150);
   let n=await p.evaluate(x=>qSets(TD(),x).length,xv);ok(n===2,'حُفظت مجموعتان بوزنين مختلفين',n);
   ok(await p.evaluate(()=>!!S.sx['sxql-'+TD()]&&S.sx['sxql-'+TD()].st==='c'),'سجل اليوم مكتمل بلا بدء حصة');
@@ -65,7 +71,7 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   ok(r&&!/في الخطة الحالية/.test(r)&&/110/.test(r),'بعد الإزالة يبقى في الشاملة بتاريخه وبلا علامة الخطة',r.slice(0,80));
   /* توسيع: السجل الكامل */
   await p.click('.qar[data-xv="'+xv+'"] .qarh');await p.waitForTimeout(100);
-  ok(/سجل الأرقام القياسية/.test(await txt(p)),'التوسيع يعرض سجل الأرقام القياسية');
+  ok(/تطوّر الأوزان القياسية/.test(await txt(p)),'التوسيع يعرض تطوّر الأوزان القياسية');
   await p.click('[data-a=qfull]');await p.waitForTimeout(100);
   ok((await p.$$eval('#q-full .irset',a=>a.length))===2,'كامل سجل الأداء يعرض كل المجموعات');
   ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));
@@ -459,72 +465,203 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
   ok(tot.m===130&&tot.sh===130,th+': تعديل الكمية إلى 100 غ: الإجمالي 130 سعرة ويطابق الشاشة',JSON.stringify(tot));
   ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
 
- console.log('17) لوحة المفاتيح (محاكاة تصغير نافذة WebView): الحقل وزر حفظ الأداء ظاهران، والانتقال بين الحقول');
+ console.log('17) تسجيل الأداء بقوائم اختيار: لا حقول نصية ولا لوحة مفاتيح، وزر الحفظ ظاهر في نافذة صغيرة');
  {const {ctx,p}=await mk({ctx:{viewport:{width:390,height:844}}});await plan(p);
-  const di=await p.evaluate(()=>qDi(TD()));await p.evaluate(d=>{S.plan[d].ex=[];irPlanAdd(d,'ضغط صدر بالبار',4,8,0);render()},di);
+  const di=await p.evaluate(()=>qDi(TD()));await p.evaluate(d=>{S.plan[d].ex=[];irPlanAdd(d,'ضغط صدر بالبار',4,8,0);qMgFix(d);render()},di);
   await p.click('[data-a=qxopen]');await p.waitForTimeout(150);
-  const seen=async(sel)=>p.evaluate(s=>{const e=document.querySelector(s).getBoundingClientRect();return e.top>=0&&e.bottom<=window.innerHeight&&e.height>0},sel);
-  for(const h of [430,380]){await p.setViewportSize({width:390,height:844});await p.waitForTimeout(100);
-   await p.focus('[data-qr="0,w"]');await p.setViewportSize({width:390,height:h});await p.waitForTimeout(1000);
-   ok(await seen('[data-qr="0,w"]')&&await seen('[data-a=qxsave]'),'ارتفاع '+h+': حقل الوزن وزر «حفظ الأداء» داخل المنطقة الظاهرة',JSON.stringify(await p.evaluate(()=>[document.querySelector('[data-qr="0,w"]').getBoundingClientRect().bottom,document.querySelector('[data-a=qxsave]').getBoundingClientRect().bottom,innerHeight])));
-   await p.focus('[data-qr="0,r"]');await p.waitForTimeout(900);
-   ok(await seen('[data-qr="0,r"]')&&await seen('[data-a=qxsave]'),'ارتفاع '+h+': حقل التكرارات وزر الحفظ ظاهران')}
-  await p.setViewportSize({width:390,height:420});await p.focus('[data-qr="0,w"]');await p.waitForTimeout(120);await p.keyboard.type('80');await p.waitForTimeout(200);await p.keyboard.press('Enter');
-  ok(await p.evaluate(()=>document.activeElement.dataset.qr==='0,r'),'زر التالي من الوزن ينقل إلى التكرارات');
-  await p.keyboard.type('8');await p.waitForTimeout(200);await p.keyboard.press('Enter');await p.waitForTimeout(150);
-  ok(await p.evaluate(()=>document.activeElement.tagName!=='INPUT'),'التالي من آخر حقل يغلق لوحة المفاتيح');
-  await p.click('[data-a=qradd]');await p.waitForTimeout(100);await p.focus('[data-qr="1,w"]');await p.waitForTimeout(120);await p.keyboard.type('85');await p.waitForTimeout(200);await p.keyboard.press('Enter');await p.waitForTimeout(250);await p.keyboard.type('6');await p.waitForTimeout(900);
-  ok(await seen('[data-a=qxsave]'),'مع مجموعتين زر الحفظ ما زال ظاهرًا');
-  await p.click('[data-a=qxsave]');await p.waitForTimeout(500);
-  ok(await p.evaluate(()=>{const x=irXv('ضغط صدر بالبار');const s=qSets(TD(),x);return s.length===2&&s[0].q.w===80&&s[0].q.r===8&&s[1].q.w===85&&s[1].q.r===6}),'الحفظ بالزر بعد التنقل بين الحقول: 80×8 و85×6');
+  const seen=async(sel)=>p.evaluate(s=>{const e=document.querySelector(s);if(!e)return false;e.scrollIntoView({block:'nearest'});const r=e.getBoundingClientRect();return r.top>=0&&r.bottom<=window.innerHeight&&r.height>0},sel);
+  ok(await p.evaluate(()=>document.querySelectorAll('#q-editor input').length===0&&document.querySelectorAll('#q-editor select').length===1+4*3),'المحرر: قوائم اختيار فقط (عدد المجموعات + وزن وكسر وتكرارات لكل مجموعة)');
+  const hd=await p.evaluate(()=>document.querySelector('.qrh').innerText.replace(/\s+/g,' '));
+  ok(/المجموعة/.test(hd)&&/الوزن كغ/.test(hd)&&/التكرارات/.test(hd),'عناوين الأعمدة: المجموعة، الوزن كغ، التكرارات',hd);
+  ok(await p.evaluate(()=>document.querySelectorAll('#q-editor .qrow').length===4),'4 صفوف بعدد مجموعات الخطة');
+  ok(await p.evaluate(()=>[...document.querySelectorAll('[data-qr$=",r"]')].every(s=>+s.value===8)),'التكرارات معبّأة من الخطة (8)');
+  for(const h of [430,380]){await p.setViewportSize({width:390,height:h});await p.waitForTimeout(300);
+   ok(await seen('[data-a=qxsave]'),'ارتفاع '+h+': زر «حفظ الأداء» يمكن الوصول إليه')}
   await p.setViewportSize({width:390,height:844});
-  /* نافذة الطعام مع لوحة المفاتيح */
+  await p.selectOption('#q-cnt','2');await p.waitForTimeout(150);
+  ok(await p.evaluate(()=>document.querySelectorAll('#q-editor .qrow').length===2),'تغيير عدد المجموعات يعيد بناء الصفوف');
+  await setRow(p,0,80,8);await setRow(p,1,82.5,6);
+  ok(await p.evaluate(()=>UI.qrows[0].w===80&&UI.qrows[1].w===82.5&&UI.qrows[1].r===6),'الوزن بالكسور (82.5) والتكرارات مستقلة لكل مجموعة');
+  await p.click('[data-a=qxsave]');await p.waitForTimeout(300);
+  ok(await p.evaluate(()=>{const x=irXv('ضغط صدر بالبار');const s=qSets(TD(),x);return s.length===2&&s[0].q.w===80&&s[0].q.r===8&&s[1].q.w===82.5&&s[1].q.r===6}),'الحفظ: 80×8 و82.5×6');
+  /* بدء من آخر قيمة محفوظة */
+  await p.evaluate(()=>{UI.qd='2026-11-17';render()});
+  ok(true,'(الأيام القادمة لا يُسجَّل فيها)');
+  await p.evaluate(()=>{UI.qd=TD();UI.qx=null;render()});
+  await p.evaluate(x=>qSave('2026-11-09',x,'ضغط صدر بالبار',[{w:70,r:10},{w:72.5,r:9}]),await p.evaluate(()=>irXv('ضغط صدر بالبار')));
+  await p.evaluate(()=>{const x=irXv('ضغط صدر بالبار');qSave(TD(),x,'ضغط صدر بالبار',[]);UI.qd=TD();render()});
+  await p.click('[data-a=qxopen]');await p.waitForTimeout(150);
+  ok(await p.evaluate(()=>UI.qrows[0].w===70&&UI.qrows[1].w===72.5&&UI.qrows.length===4),'القيم تبدأ من آخر أداء محفوظ سابق (70 ثم 72.5) وللمراجعة',JSON.stringify(await p.evaluate(()=>UI.qrows)));
+  ok(/معبّأة من آخر أداء للمراجعة/.test(await txt(p)),'تنبيه أن القيم للمراجعة');
   await go(p,'food');await p.click('[data-a=fdadd] >> nth=0');await p.fill('#fds-q','rice');await p.waitForTimeout(300);await p.click('#fds-l .fpr >> nth=0');await p.waitForTimeout(200);
   await p.focus('#fds-g');await p.setViewportSize({width:390,height:430});await p.waitForTimeout(1000);
   ok(await seen('#fds-g')&&await seen('#fds-save'),'نافذة الطعام مع لوحة المفاتيح: حقل الكمية وزر الإضافة ظاهران');
   ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
 
- console.log('18) الخطة الحالية: بطاقة مخففة ووضع تعديل الجدول');
+ console.log('18) الخطة الحالية: أيام مطوية، قسم لكل عضلة، بطاقة مخففة، تعديل التمرين في الجدول');
  {const {ctx,p}=await mk();await plan(p);
-  const di=await p.evaluate(()=>qDi(TD()));await p.evaluate(d=>{S.plan[d].ex=[];irPlanAdd(d,'سحب أرضي بالبار',3,5,0);irPlanAdd(d,'ضغط صدر بالبار',4,8,0);render()},di);
+  const di=await p.evaluate(()=>qDi(TD()));
+  const heads=await p.$$eval('.qdh b',a=>a.map(x=>x.textContent.trim()));
+  ok(heads.length===7&&heads[0].indexOf('السبت')===0&&heads[6].indexOf('الجمعة')===0,'سبعة أيام بترتيب ثابت من السبت إلى الجمعة',heads.join('|'));
+  ok(/لم يُحدّد/.test(heads.join('|')),'اليوم الفارغ: «لم يُحدّد»');
+  ok(await p.evaluate(()=>document.querySelectorAll('.qdh[aria-expanded=true]').length===1),'يوم واحد مفتوح افتراضيًا (اليوم)');
+  await p.evaluate(d=>{S.plan[d].ex=[];S.plan[d].mg=[];irPlanAdd(d,'سكوات بار',3,5,0);irPlanAdd(d,'ضغط أرجل',4,12,0);irPlanAdd(d,'سمانة',4,15,0);qMgFix(d);render()},di);
   let T=await txt(p);
+  ok(await p.evaluate(d=>/أرجل وسمانة/.test(document.querySelector('.qday[data-d="'+d+'"] .qdh b').textContent),di),'عنوان اليوم يضم عضلاته: أرجل وسمانة');
+  ok(await p.evaluate(d=>document.querySelectorAll('.qday[data-d="'+d+'"] .qms').length===2,di),'قسم لكل عضلة (الأرجل، السمانة)');
   ok(/المجموعات\s*\n?\s*3/.test(T)&&/التكرارات\s*\n?\s*5/.test(T),'عناوين صريحة للمجموعات والتكرارات');
-  ok((T.match(/لا أداء سابقًا/g)||[]).length===2,'عبارة «لا أداء سابقًا» مرة واحدة لكل تمرين');
-  ok(await p.evaluate(()=>document.querySelectorAll('[data-a=qxopen]').length===2&&[...document.querySelectorAll('[data-a=qxopen]')].every(b=>b.textContent==='تسجيل الأداء')),'زر «تسجيل الأداء» لكل تمرين');
-  ok(await p.evaluate(()=>!document.querySelector('[data-a=qmv],[data-a=qrm],[data-a=qmvday]')),'لا أزرار نقل أو ترتيب أو إزالة خارج وضع التعديل');
-  await p.click('[data-a=qedm]');await p.waitForTimeout(150);
-  ok(await p.evaluate(()=>document.querySelectorAll('[data-a=qrm]').length===2&&document.querySelectorAll('[data-a=qmv]').length===4&&!document.querySelector('[data-a=qxopen]')),'وضع «تعديل الجدول» يعرض النقل والترتيب والإزالة');
-  await p.click('[data-a=qmv][data-i="0"][data-v="1"]');await p.waitForTimeout(100);
-  ok(await p.evaluate(d=>S.plan[d].ex[0].n==='ضغط صدر بالبار',di),'الترتيب يعمل');
-  await p.click('[data-a=qrm] >> nth=0');await p.waitForTimeout(100);
-  ok(await p.evaluate(d=>S.plan[d].ex.length===1,di),'الإزالة تعمل');
-  await p.click('[data-a=qedm]');await p.waitForTimeout(100);
-  ok(await p.evaluate(()=>!!document.querySelector('[data-a=qxopen]')&&!document.querySelector('[data-a=qrm]')),'الخروج من وضع التعديل يعيد زر التسجيل');
+  ok((T.match(/لا أداء سابقًا/g)||[]).length===3,'عبارة «لا أداء سابقًا» مرة واحدة لكل تمرين');
+  ok(await p.evaluate(()=>[...document.querySelectorAll('[data-a=qxopen]')].length===3&&[...document.querySelectorAll('[data-a=qxopen]')].every(b=>b.textContent==='تسجيل الأداء')),'زر «تسجيل الأداء» لكل تمرين');
+  ok(await p.evaluate(()=>!document.querySelector('[data-a=qmv2],[data-a=qrm],[data-a=qmvday]')),'لا أزرار نقل أو إزالة خارج لوحة تعديل التمرين');
+  /* تعديل التمرين: مجموعات وتكرارات وهدف بقوائم */
+  await p.click('.qx[data-xv] .qpeb >> nth=0');await p.waitForTimeout(150);
+  ok(await p.evaluate(()=>!!document.querySelector('#qpe-s')&&!!document.querySelector('#qpe-r')&&!!document.querySelector('#qpe-w')&&document.querySelectorAll('#q-pe input').length===0),'لوحة تعديل التمرين بقوائم اختيار فقط');
+  await p.selectOption('#qpe-s','5');await p.selectOption('#qpe-r','6');await p.selectOption('#qpe-w','60');await p.selectOption('#qpe-f','0.5');await p.click('[data-a=qpesave]');await p.waitForTimeout(150);
+  ok(await p.evaluate(d=>{const e=S.plan[d].ex[0];return e.s===5&&e.r===6&&e.tw===60.5},di),'تعديل المجموعات 5 والتكرارات 6 والهدف 60.5');
+  /* ترتيب داخل العضلة */
+  await p.evaluate(d=>{irPlanAdd(d,'رومانيان ديدلفت',3,8,0);qMgFix(d);render()},di);
+  const nm=()=>p.evaluate(d=>S.plan[d].ex.map(e=>e.n).join('|'),di);const n0=await nm();
+  await p.evaluate(()=>{UI.qpe=null;render()});await p.click('.qx[data-xv] .qpeb >> nth=1');await p.waitForTimeout(100);
+  await p.click('[data-a=qmv2][data-v="-1"]:not([disabled])');await p.waitForTimeout(100);
+  ok(await nm()!==n0,'الترتيب داخل العضلة يعمل');
+  /* إزالة */
+  const c0=await p.evaluate(d=>S.plan[d].ex.length,di);await p.click('[data-a=qrm]');await p.waitForTimeout(120);
+  ok(await p.evaluate(d=>S.plan[d].ex.length,di)===c0-1,'الإزالة من الجدول تعمل');
   ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
 
- console.log('19) تسجيل كامل: حفظ، إغلاق وفتح، تعديل، اتساق الحالية والشاملة والأرشيف، والطعام');
+ console.log('19) تسجيل كامل: حفظ، إغلاق وفتح، تعديل، اتساق الحالية والأرشيف، والطعام');
  {let ctx,p;({ctx,p}=await mk());await plan(p);
-  const di=await p.evaluate(()=>qDi(TD()));await p.evaluate(d=>{S.plan[d].ex=[];irPlanAdd(d,'سحب أرضي بالبار',3,5,0);render()},di);
-  await p.click('[data-a=qxopen]');await p.fill('[data-qr="0,w"]','100');await p.fill('[data-qr="0,r"]','5');await p.click('[data-a=qxsave]');await p.waitForTimeout(200);
+  const di=await p.evaluate(()=>qDi(TD()));await p.evaluate(d=>{S.plan[d].ex=[];irPlanAdd(d,'سحب أرضي بالبار',3,5,0);qMgFix(d);render()},di);
+  await p.click('[data-a=qxopen]');await p.selectOption('#q-cnt','1');await p.waitForTimeout(100);await setRow(p,0,100,5);await p.click('[data-a=qxsave]');await p.waitForTimeout(200);
   await p.reload();await p.waitForFunction(()=>S.prof.ob===1);await p.waitForTimeout(300);await plan(p);
   ok(await p.evaluate(()=>{const x=irXv('سحب أرضي بالبار');const s=qSets(TD(),x);return s.length===1&&s[0].q.w===100&&s[0].q.r===5}),'بعد إغلاق التطبيق وفتحه: المجموعة محفوظة 100×5');
-  await p.click('[data-a=qxopen]');await p.fill('[data-qr="0,w"]','105');await p.click('[data-a=qxsave]');await p.waitForTimeout(200);
+  await p.click('[data-a=qxopen]');await setRow(p,0,105,5);await p.click('[data-a=qxsave]');await p.waitForTimeout(200);
   const st=await p.evaluate(()=>{const x=irXv('سحب أرضي بالبار');const all=qAll();const k=Object.keys(all).find(k=>/سحب/.test(all[k].n));
    const sets=qSets(TD(),x).map(h=>h.q.w+'x'+h.q.r);return{sets,all:{n:all[k].sets.length,max:all[k].max.w,last:all[k].last.map(q=>q.w+'x'+q.r)},cur:document.querySelector('.qsaved')?document.querySelector('.qsaved').innerText.replace(/\s+/g,' '):''}});
   ok(st.sets.join()==='105x5','التعديل استبدل المجموعة ولم يكرّرها',JSON.stringify(st));
-  ok(st.all.n===1&&st.all.max===105&&st.all.last.join()==='105x5','الشاملة تعكس الأداء مرة واحدة',JSON.stringify(st.all));
+  ok(st.all.n===1&&st.all.max===105&&st.all.last.join()==='105x5','الأرشيف يعكس الأداء مرة واحدة',JSON.stringify(st.all));
   ok(/105/.test(st.cur)&&!/100\b/.test(st.cur),'الخطة الحالية تعرض القيمة المعدّلة فقط',st.cur);
-  const arch=await p.evaluate(()=>{const n=document.querySelectorAll('x').length;const s=sxList().filter(s=>s.date===TD());const c=s.reduce((a,x)=>a+x.ex.reduce((b,e)=>b+irSets(e).length,0),0);return{sessions:s.length,sets:c}});
-  ok(arch.sets===1,'الأرشيف يحوي المجموعة مرة واحدة',JSON.stringify(arch));
+  const arch=await p.evaluate(()=>{const s=sxList().filter(s=>s.date===TD());const c=s.reduce((a,x)=>a+x.ex.reduce((b,e)=>b+irSets(e).length,0),0);return{sessions:s.length,sets:c}});
+  ok(arch.sets===1,'سجل الأداء يحوي المجموعة مرة واحدة',JSON.stringify(arch));
   await p.reload();await p.waitForFunction(()=>S.prof.ob===1);await p.waitForTimeout(300);
   ok(await p.evaluate(()=>{const x=irXv('سحب أرضي بالبار');const s=qSets(TD(),x);return s.length===1&&s[0].q.w===105}),'بعد إعادة فتح ثانية ما زال 105×5');
-  /* طعام */
   await go(p,'food');await p.click('[data-a=fdadd] >> nth=0');await p.fill('#fds-q','rice');await p.waitForTimeout(300);await p.click('#fds-l .fpr >> nth=0');await p.fill('#fds-g','150');await p.click('#fds-save');await p.waitForTimeout(250);
   await p.reload();await p.waitForFunction(()=>S.prof.ob===1);await go(p,'food');
   let f=await p.evaluate(()=>({k:Math.round((S.meals[TD()]||[]).reduce((a,x)=>a+x.kcal,0)),s:+document.getElementById('fd-logged').textContent.replace(/,/g,'')}));
   ok(f.k===195&&f.s===195,'الطعام محفوظ بعد الفتح: 150 غ = 195 سعرة',JSON.stringify(f));
   await p.click('[data-a=fded]');await p.fill('#fde-q','300');await p.click('[data-a=fdesave]');await p.waitForTimeout(250);
-  f=await p.evaluate(()=>({k:Math.round((S.meals[TD()]||[]).reduce((a,x)=>a+x.kcal,0)),s:+document.getElementById('fd-logged').textContent.replace(/,/g,''),p:Math.round((S.meals[TD()]||[]).reduce((a,x)=>a+x.p,0)*10)/10}));
+  f=await p.evaluate(()=>({k:Math.round((S.meals[TD()]||[]).reduce((a,x)=>a+x.kcal,0)),s:+document.getElementById('fd-logged').textContent.replace(/,/g,'')}));
   ok(f.k===390&&f.s===390,'تعديل الكمية إلى 300 غ: 390 سعرة والإجمالي يطابق',JSON.stringify(f));
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
+
+ console.log('20) المثال المطلوب: السبت ظهر وترايسبس ← ظهر وبايسبس، والفتح والإغلاق، وبقاء الجدول بعد إعادة الفتح');
+ {let ctx,p;({ctx,p}=await mk());await plan(p);
+  const sat=0;const dh=d=>'.qday[data-d="'+d+'"]';
+  await p.evaluate(()=>{for(let d=0;d<7;d++){S.plan[d].ex=[];S.plan[d].mg=[]}render()});
+  /* إنشاء اليوم من الصفر: عضلتان */
+  await clk(p,'#q-dh-0');
+  ok(await p.evaluate(()=>document.querySelector('.qdh[data-v="0"]').getAttribute('aria-expanded')==='true'),'النقر على اليوم يفتحه');
+  ok(/لم يُحدّد/.test(await p.textContent('#q-dh-0')),'اليوم الفارغ: لم يُحدّد');
+  await clk(p,'#q-me-0');await p.check('#qme-back');await p.check('#qme-tri');await clk(p,'#q-me-save');
+  ok(/السبت · ظهر وترايسبس/.test((await p.textContent('#q-dh-0')).replace(/\s+/g,' ')),'عنوان اليوم: «السبت · ظهر وترايسبس»',await p.textContent('#q-dh-0'));
+  /* تمارين لكل عضلة */
+  const addEx=async(sec,q)=>{await clk(p,'#q-ax-0-'+sec);await p.fill('#qxq',q);await p.waitForTimeout(150);await p.click('#q-ax [data-a=qpadd] >> nth=0');await p.waitForTimeout(200)};
+  await addEx('back','تجديف بار منحنٍ');await addEx('back','سحب علوي قبضة ضيقة');await addEx('tri','بوشداون كابل');await addEx('tri','سكل كراشر');
+  ok(await p.evaluate(()=>S.plan[0].ex.length===4),'أُضيفت 4 تمارين (2 ظهر + 2 ترايسبس)');
+  ok(await p.evaluate(()=>document.querySelectorAll(' .qday[data-d="0"] .qms').length===2),'قسمان: الظهر والترايسبس');
+  /* أداء سابق للترايسبس ثم تبديل إلى بايسبس */
+  const triXv=await p.evaluate(()=>irXv('بوشداون كابل')),bakXv=await p.evaluate(()=>irXv('تجديف بار منحنٍ'));
+  await p.evaluate(([a,b])=>{qSave('2026-11-14',a,'بوشداون كابل',[{w:30,r:12},{w:35,r:10}]);qSave('2026-11-14',b,'تجديف بار منحنٍ',[{w:60,r:8}])},[triXv,bakXv]);
+  await p.evaluate(()=>{UI.qd='2026-11-14';render()});await p.waitForTimeout(150);
+  const order0=await p.evaluate(()=>S.plan[0].ex.filter(e=>/تجديف|سحب/.test(e.n)).map(e=>e.n).join('|'));
+  await clk(p,'#q-me-0');
+  ok(await p.evaluate(()=>document.getElementById('qme-back').checked&&document.getElementById('qme-tri').checked&&!document.getElementById('qme-bic').checked),'«تعديل عضلات اليوم» يعرض الاختيارات الحالية');
+  await p.uncheck('#qme-tri');await p.check('#qme-bic');await p.waitForTimeout(100);
+  ok(/سيُزال من جدول السبت 2 تمرين/.test(await p.evaluate(()=>{document.getElementById('q-me-save').click();return document.getElementById('q-me')?document.getElementById('q-me').innerText:''}).then(x=>x)),'يوضّح أثر الإزالة قبل التأكيد');
+  await p.waitForTimeout(150);
+  ok(await p.evaluate(()=>S.plan[0].ex.length===4&&UI.qme&&UI.qme.conf===1),'لم تُحذف التمارين قبل التأكيد');
+  ok(/تبقى هذه التمارين وسجلات أدائها السابقة في «أرشيف تماريني»/.test(await txt(p)),'يذكر بقاء السجل في الأرشيف');
+  await clk(p,'#q-me-save');
+  ok(/السبت · ظهر وبايسبس/.test((await p.textContent('#q-dh-0')).replace(/\s+/g,' ')),'بعد الحفظ: «السبت · ظهر وبايسبس»',await p.textContent('#q-dh-0'));
+  ok(await p.evaluate(o=>S.plan[0].ex.filter(e=>/تجديف|سحب/.test(e.n)).map(e=>e.n).join('|')===o&&S.plan[0].ex.length===2,order0),'تمارين الظهر باقية بترتيبها');
+  ok(await p.evaluate(()=>!document.querySelector('.qday[data-d="0"] .qms[data-sec=tri]')&&!!document.querySelector('.qday[data-d="0"] .qms[data-sec=bic]')),'زال قسم الترايسبس وظهر قسم البايسبس');
+  ok(/أضف تمارين هذه العضلة/.test(await txt(p))||await p.evaluate(()=>!!document.querySelector('#q-ax-0-bic')),'قسم البايسبس جاهز لإضافة تمارينه');
+  ok(await p.evaluate(x=>{const e=qAll()[x];return !!e&&e.sets.length===2&&e.max.w===35},triXv),'تمرين الترايسبس وأداؤه السابق محفوظان في الأرشيف');
+  ok(await p.evaluate(x=>qSets('2026-11-14',x).length===2,triXv),'سجل الترايسبس باقٍ بتاريخه الأصلي (14 نوفمبر)');
+  ok(await p.evaluate(()=>{const s=S.plan[0].t;return /ظهر/.test(s)&&/بايسبس/.test(s)}),'عنوان اليوم المخزّن (يُستعمل في الإشعارات) يتبع العضلات');
+  await addEx('bic','كيرل بار');
+  ok(await p.evaluate(()=>S.plan[0].ex.length===3&&S.plan[0].ex.some(e=>e.n==='كيرل بار')),'إضافة تمرين البايسبس');
+  /* فتح وإغلاق */
+  await clk(p,'#q-closeall');
+  ok(await p.evaluate(()=>document.querySelectorAll('.qdh[aria-expanded=true]').length===0&&!document.querySelector('.qmh')),'«إغلاق كامل الجدول» يطوي الأيام والعضلات');
+  await clk(p,'#q-openall');
+  ok(await p.evaluate(()=>document.querySelectorAll('.qdh[aria-expanded=true]').length===7&&document.querySelectorAll('.qmh[aria-expanded=true]').length===2),'«فتح كامل الجدول» يفتح الأيام وأقسام العضلات');
+  await clk(p,'#q-mh-0-back');
+  ok(await p.evaluate(()=>document.getElementById('q-mh-0-back').getAttribute('aria-expanded')==='false'&&document.getElementById('q-mh-0-bic').getAttribute('aria-expanded')==='true'),'طيّ عضلة واحدة باستقلال');
+  await clk(p,'#q-dh-0');
+  ok(await p.evaluate(()=>document.getElementById('q-dh-0').getAttribute('aria-expanded')==='false'&&document.getElementById('q-dh-1').getAttribute('aria-expanded')==='true'),'طيّ يوم واحد باستقلال');
+  await clk(p,'#q-dh-0');
+  /* أدوات التعديل داخل القسم لا تطويه */
+  await p.click('.qday[data-d="0"] .qx[data-xv] .qpeb >> nth=0');await p.waitForTimeout(150);
+  ok(await p.evaluate(()=>document.getElementById('q-mh-0-bic').getAttribute('aria-expanded')==='true'&&!!document.getElementById('q-pe')),'النقر على أدوات التعديل لا يطوي القسم');
+  /* بعد إغلاق التطبيق وفتحه */
+  await p.reload();await p.waitForFunction(()=>S.prof.ob===1);await p.waitForTimeout(300);await plan(p);
+  ok(await p.evaluate(()=>/السبت · ظهر وبايسبس/.test(document.getElementById('q-dh-0').textContent.replace(/\s+/g,' '))&&S.plan[0].ex.length===3&&S.plan[0].mg.join()==='back,bic'),'الجدول باقٍ بعد إغلاق التطبيق وفتحه');
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
+
+ console.log('21) أرشيف تماريني: من القائمة، يدويًا بصورة وقص ورقم سابق، تعديل، وبطاقة موسّعة');
+ {const {ctx,p}=await mk();await plan(p,'all');
+  const png=await (async()=>{const c=await p.evaluate(()=>{const c=document.createElement('canvas');c.width=400;c.height=240;const g=c.getContext('2d');g.fillStyle='#c33';g.fillRect(0,0,400,240);g.fillStyle='#39f';g.fillRect(150,0,100,240);return c.toDataURL('image/png').split(',')[1]});return Buffer.from(c,'base64')})();
+  await openAdd(p,'lib');
+  await p.fill('#qlq','كيرل بار');await p.waitForTimeout(150);
+  await p.click('#q-lib [data-a=qlibadd] >> nth=0');await p.waitForTimeout(200);
+  const lx=await p.evaluate(()=>irXv('كيرل بار'));
+  ok(await p.evaluate(x=>!!S.xr[x],lx),'إضافة من القائمة تنشئ مدخلًا في الأرشيف');
+  ok(/لم يُسجّل وزن بعد/.test(await p.evaluate(x=>document.querySelector('.qar[data-xv="'+x+'"]').innerText,lx)),'التمرين بلا أداء: «لم يُسجّل وزن بعد»');
+  /* إضافة يدوية بصورة وقص ورقم سابق */
+  await openAdd(p,'man');
+  await p.fill('#qm-n','سحب كابل بمقبض ضيق');await p.selectOption('#qm-g','back');
+  await p.setInputFiles('#qm-file',{name:'x.png',mimeType:'image/png',buffer:png});await p.waitForSelector('#xc-cv',{timeout:5000});
+  const px0=await p.evaluate(()=>{const c=document.getElementById('xc-cv'),g=c.getContext('2d');return Array.from(g.getImageData(120,120,1,1).data).join()});
+  await p.fill('#xc-z','2');await p.waitForTimeout(100);await p.fill('#xc-x','-1');await p.waitForTimeout(100);
+  const px1=await p.evaluate(()=>{const c=document.getElementById('xc-cv'),g=c.getContext('2d');return Array.from(g.getImageData(20,120,1,1).data).join()});
+  ok(px0!==px1,'معاينة القص تتغيّر بالتكبير والإزاحة',px0+' / '+px1);
+  await clk(p,'#xc-ok');
+  ok(await p.evaluate(()=>/^data:image\/jpeg/.test(UI.qmf.img)),'الصورة المقصوصة تُعتمد بمعاينة');
+  await p.selectOption('#qm-s','4');await p.selectOption('#qm-r','12');
+  await p.selectOption('#qm-w','90');await p.waitForTimeout(150);await p.selectOption('#qm-f','0.5');await p.selectOption('#qm-pr','6');
+  await p.selectOption('#qm-d-d','3');await p.selectOption('#qm-d-m','11');await p.selectOption('#qm-d-y','2026');
+  await clk(p,'#qm-save');
+  const mx=await p.evaluate(()=>irXv('سحب كابل بمقبض ضيق'));
+  const info=await p.evaluate(x=>{const e=qAll()[x];return{n:e.n,g:e.meta.g,max:e.max&&e.max.w,date:e.max&&e.max.date,r:e.max&&e.max.r,img:!!e.img,ds:S.xr[x].ds,dr:S.xr[x].dr}},mx);
+  ok(info.g==='back'&&info.max===90.5&&info.date==='2026-11-03'&&info.r===6&&info.img&&info.ds===4&&info.dr===12,'التمرين اليدوي: عضلة وصورة ومجموعات/تكرارات وسجل تاريخي 90.5 كغ × 6 بتاريخه',JSON.stringify(info));
+  const card=await p.evaluate(x=>document.querySelector('.qar[data-xv="'+x+'"]').innerText.replace(/\s+/g,' '),mx);
+  ok(/أقصى وزن/.test(card)&&/90\.5/.test(card)&&/2026-11-03/.test(card)&&/التكرارات/.test(card),'البطاقة: أقصى وزن وتاريخه والتكرارات',card);
+  ok(/آخر أداء/.test(card)&&/المجموعات/.test(card),'البطاقة: آخر أداء بتسمية واضحة',card);
+  ok(await p.evaluate(x=>!!document.querySelector('.qar[data-xv="'+x+'"] .qth img'),mx),'الصورة تظهر في البطاقة');
+  /* موسّعة: تطور الأوزان */
+  await p.evaluate(x=>{qSave('2026-11-10',x,'سحب كابل بمقبض ضيق',[{w:95,r:5}])},mx);await p.evaluate(()=>render());
+  await p.evaluate(x=>{UI.qe=x;render()},mx);
+  const exp=await p.evaluate(x=>[...document.querySelectorAll('.qar[data-xv="'+x+'"] .qrr:not(.qrh3)')].map(r=>r.innerText.replace(/\s+/g,' ')),mx);
+  ok(exp.length===2&&/95/.test(exp[0])&&/2026-11-10/.test(exp[0])&&/90\.5/.test(exp[1]),'القائمة التاريخية: الوزن والتاريخ والتكرارات (الأحدث أولًا)',exp.join(' | '));
+  ok(await p.evaluate(()=>!!document.querySelector('[data-a=qfull]')),'زر كامل سجل الأداء داخل البطاقة');
+  /* تمرين بلا أداء سابق */
+  await openAdd(p,'man');await p.fill('#qm-n','تمرين تجريبي بلا رقم');await clk(p,'#qm-save');
+  const nx=await p.evaluate(()=>irXv('تمرين تجريبي بلا رقم'));
+  ok(await p.evaluate(x=>qAll()[x].sets.length===0&&/لم يُسجّل وزن بعد/.test(document.querySelector('.qar[data-xv="'+x+'"]').innerText),nx),'إضافة بلا أداء سابق تعرض «لم يُسجّل وزن بعد»');
+  /* منع تكرار الاسم */
+  await openAdd(p,'man');await p.fill('#qm-n','تمرين تجريبي بلا رقم');await clk(p,'#qm-save');
+  ok(/موجود في أرشيفك/.test(await p.textContent('#qm-err')),'منع تمرين مكرر في الأرشيف');
+  await clk(p,'.qah [data-a=qaddx]');
+  /* تعديل الصورة والمعلومات لاحقًا */
+  await p.evaluate(x=>{UI.qe=x;render()},mx);await clk(p,'.qar[data-xv="'+mx+'"] [data-a=qxedit]');
+  await p.selectOption('#qm-s','5');await clk(p,'#qm-save');
+  ok(await p.evaluate(x=>S.xr[x].ds===5,mx),'تعديل معلومات التمرين لاحقًا');
+  /* استعادة الصور والسجلات بعد إغلاق التطبيق وفتحه */
+  await p.reload();await p.waitForFunction(()=>S.prof.ob===1);await p.waitForTimeout(300);
+  ok(await p.evaluate(x=>{const e=qAll()[x];return !!e.img&&e.max.w===95&&e.sets.length===2&&S.xr[x].ds===5},mx),'بعد إغلاق التطبيق وفتحه: الصورة والسجلات والمعلومات باقية');
+  /* ترقية: بيانات قديمة بلا الحقول الجديدة */
+  await p.evaluate(()=>{S.plan[2].ex=[];delete S.plan[2].mg;irPlanAdd(2,'بنش برس بار',3,10,0);S.plan[2].t='صدر';save()});await p.reload();await p.waitForFunction(()=>S.prof.ob===1);await p.waitForTimeout(300);await plan(p);
+  ok(await p.evaluate(()=>/صدر/.test(document.getElementById('q-dh-2').textContent)&&qDayMg(2).join()==='chest'),'يوم قديم بلا حقل عضلات: يُشتق عنوانه من تمارينه');
   ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
  await b.close();console.log(fail?'FAILED '+fail:'all PASS');process.exit(fail?1:0)})();

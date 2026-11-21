@@ -263,10 +263,8 @@ setTimeout(fxAutoSync,1500);
 /* قيم الوزن/التكرارات تُحفظ في حالة الجلسة لحظة الكتابة، فلا يمحوها أي إعادة رسم (مثل انتهاء طلب الطقس أثناء التمرين) */
 document.addEventListener('input',e=>{const t=e.target,U=UI.wk;if(!U||!t||(t.id!=='wk-w'&&t.id!=='wk-r'))return;if(t.value==='')return;const v=+String(t.value).replace(',','.');if(!isFinite(v))return;if(t.id==='wk-w')U.w=v;else U.r=v},true);
 
-/* وجهات الخدمات الفريدة: خطة التمارين والأجهزة داخل «التمرين»، وربط الساعات والخطوات داخل «التقدّم» */
+/* وجهات الخدمات الفريدة: خطة التمارين والأجهزة صارت داخل «خطتي» في التدريب، وربط الساعات والخطوات داخل «التقدّم» */
 (function(){const row=(k,n,t,v,d)=>'<button class="sjrow" data-a="sub" data-v="'+v+'">'+sjI(k,n)+'<span class="t">'+t+(d?'<small>'+d+'</small>':'')+'</span>'+ic('next')+'</button>';
- const VT=vTrain;vTrain=function(){const h=VT.apply(this,arguments);if(typeof h!=='string'||UI.ses||UI.sum||(UI.trk&&UI.trk!=='iron'&&UI.trk!=='hub'))return h;
-  return h+'<div class="sjsec">خطط ومكتبات</div>'+row('tr','list','خطة التمارين','plan','الأسبوع والتعديل')+row('tr','dumbbell','الأجهزة الرياضية','nau','دليل الأجهزة')};
  const VP=vPg;vPg=function(){const h=VP.apply(this,arguments);if(typeof h!=='string')return h;return h+'<div class="sjsec">مصادر البيانات</div>'+row('wt','watch','ربط الساعات والخطوات','link','Health Connect وعدّاد الهاتف')}})();
 
 /* ترجمات الإنجليزية للنصوص الجديدة */
