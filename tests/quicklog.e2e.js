@@ -469,11 +469,11 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
    ok(await seen('[data-qr="0,w"]')&&await seen('[data-a=qxsave]'),'ارتفاع '+h+': حقل الوزن وزر «حفظ الأداء» داخل المنطقة الظاهرة',JSON.stringify(await p.evaluate(()=>[document.querySelector('[data-qr="0,w"]').getBoundingClientRect().bottom,document.querySelector('[data-a=qxsave]').getBoundingClientRect().bottom,innerHeight])));
    await p.focus('[data-qr="0,r"]');await p.waitForTimeout(900);
    ok(await seen('[data-qr="0,r"]')&&await seen('[data-a=qxsave]'),'ارتفاع '+h+': حقل التكرارات وزر الحفظ ظاهران')}
-  await p.setViewportSize({width:390,height:420});await p.focus('[data-qr="0,w"]');await p.keyboard.type('80');await p.waitForTimeout(200);await p.keyboard.press('Enter');
+  await p.setViewportSize({width:390,height:420});await p.focus('[data-qr="0,w"]');await p.waitForTimeout(120);await p.keyboard.type('80');await p.waitForTimeout(200);await p.keyboard.press('Enter');
   ok(await p.evaluate(()=>document.activeElement.dataset.qr==='0,r'),'زر التالي من الوزن ينقل إلى التكرارات');
   await p.keyboard.type('8');await p.waitForTimeout(200);await p.keyboard.press('Enter');await p.waitForTimeout(150);
   ok(await p.evaluate(()=>document.activeElement.tagName!=='INPUT'),'التالي من آخر حقل يغلق لوحة المفاتيح');
-  await p.click('[data-a=qradd]');await p.waitForTimeout(100);await p.focus('[data-qr="1,w"]');await p.keyboard.type('85');await p.waitForTimeout(200);await p.keyboard.press('Enter');await p.waitForTimeout(250);await p.keyboard.type('6');await p.waitForTimeout(900);
+  await p.click('[data-a=qradd]');await p.waitForTimeout(100);await p.focus('[data-qr="1,w"]');await p.waitForTimeout(120);await p.keyboard.type('85');await p.waitForTimeout(200);await p.keyboard.press('Enter');await p.waitForTimeout(250);await p.keyboard.type('6');await p.waitForTimeout(900);
   ok(await seen('[data-a=qxsave]'),'مع مجموعتين زر الحفظ ما زال ظاهرًا');
   await p.click('[data-a=qxsave]');await p.waitForTimeout(500);
   ok(await p.evaluate(()=>{const x=irXv('ضغط صدر بالبار');const s=qSets(TD(),x);return s.length===2&&s[0].q.w===80&&s[0].q.r===8&&s[1].q.w===85&&s[1].q.r===6}),'الحفظ بالزر بعد التنقل بين الحقول: 80×8 و85×6');
