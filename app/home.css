@@ -108,3 +108,23 @@ html[data-theme="dark"] body .x2m .tr{background:rgba(255,255,255,.12)}
 .sjwel.fxauth .fxalinks .sec[data-fxm="up"],.sjwel.fxauth .fxalinks .sec[data-fxm="in"]{order:-1;min-height:54px;border-radius:999px;background:#000;border:1px solid rgba(255,255,255,.2);color:#fff;text-decoration:none;font-size:17px;font-weight:600;display:flex;align-items:center;justify-content:center}
 .sjwel.fxauth .fxalinks .sec{font-size:14px;color:rgba(255,255,255,.65)}
 .sjwel.fxauth .fxamsg{border-radius:16px}
+/* ===== نافذة الطعام: معتمة وتتبع السمة، بلا ظهور للخلفية ===== */
+body.shopen #nav{display:none}
+.dro.fpo{background:rgba(0,0,0,.66);-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-theme="light"] .dro.fpo{background:rgba(0,0,0,.45)}
+html[data-theme="light"] body .fps{background:#fff!important;color:#0b0b0b;-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 -10px 40px rgba(0,0,0,.25)}
+html[data-theme="light"] body .fps .fpr{border-bottom-color:#e6e6e6!important}
+html[data-theme="dark"] body .fps{background:var(--sj-s1)!important}
+.fps{max-height:92vh;overflow-y:auto;overscroll-behavior:contain}
+.fps .fpq .lc small{color:color-mix(in srgb,var(--c,#555) 62%,#000)}
+html[data-theme="dark"] body .fps .fpq .lc small,html[data-theme="dark"] body .lc small{color:color-mix(in srgb,var(--c,#aaa) 55%,#fff);background:color-mix(in srgb,var(--c,#555) 24%,var(--sj-s1))}
+html[data-theme="dark"] body .lc.inl{background:rgba(255,255,255,.07)}
+.fps input:focus,.fps input:focus-visible{outline:0!important;box-shadow:0 0 0 2px var(--sj-ac,#888)}
+/* لوحة المفاتيح: مساحة تمرير إضافية أسفل الصفحة */
+body.kbd2 #app{padding-bottom:46vh}
+/* الخطة الحالية */
+.qx .qpl{display:flex;gap:18px;margin:8px 0 2px;flex-wrap:wrap}
+.qx .qpl span{display:flex;flex-direction:column;gap:2px;min-width:64px}
+.qx .qpl small{font-size:12px}.qx .qpl b{font-size:19px}
+.qx .qlastl{margin:6px 0}
+.qx .qedt{padding-top:6px;border-top:1px dashed var(--sj-ln,#8883)}

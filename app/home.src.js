@@ -94,4 +94,17 @@ vDash=function(){const st=scState(),M=scModel(st);if(!UI._hmAuto){UI._hmAuto=1;s
   hmCells(st,M)+rdTodayCard()+hmPray()+hmDiv()+hmShort()+'</div>'};
 Object.assign(ENT,{'الوقت':'Time','الحرارة':'Temperature','مواقيت الصلاة':'Prayer times','اختصاراتي':'My shortcuts','تخصيص':'Customize','تم':'Done','متابعة الوزن':'Weight tracking','تسجيل وقت التمرين':'Log workout time','تسجيل طعام':'Log food','تسجيل الماء':'Log water','صور التقدّم':'Progress photos','تسجيل جري':'Log a run','بيانات الجسم':'Body data','الأوسمة':'Badges','الخطوات':'Steps','أضف اختصارًا':'Add a shortcut','استرجاع الاختصارات الافتراضية':'Restore default shortcuts','باقي على':'Time left until','متبقٍ':'Left','انتهى':'Ended','الجمعة':'Friday'});
 /* تنقّل سلس: يتحرّك المحتوى (ظهور خفيف) عند تغيّر الصفحة فقط، لا عند كل إعادة رسم */
-(()=>{const R=render;let K='';render=function(){try{const k=S.tab+'|'+(S.sub||'')+'|'+(UI.trk||'')+'|'+(UI.qt||'');const a=document.getElementById('app');if(a)a.classList.toggle('sjnv',k!==K);K=k}catch(e){}return R.apply(this,arguments)}})();
+(()=>{const R=render;let K='';render=function(){try{const k=S.tab+'|'+(S.sub||'')+'|'+(UI.trk||'')+'|'+(UI.qt||'');const a=document.getElementById('app');if(a)a.classList.toggle('sjnv',k!==K);K=k}catch(e){}const r=R.apply(this,arguments);try{document.body.classList.toggle('shopen',!!document.querySelector('.fpo'))}catch(e){}return r}})();
+
+/* لوحة المفاتيح داخل Android WebView: يبقى الحقل وزر الحفظ ظاهرين، والانتقال بين الحقول بزر التالي */
+(()=>{const vis=()=>window.visualViewport?window.visualViewport.height:window.innerHeight;
+ const isF=el=>!!(el&&el.matches&&el.matches('.qed input,#fds-g,.fps input'));
+ function reveal(el){try{const sheet=el.closest('.fps'),box=el.closest('.qed,.fpd')||sheet||el,act=box.querySelector('.qact')||box.querySelector('#fds-save');
+  if(sheet){(act||el).scrollIntoView({block:'nearest'});el.scrollIntoView({block:'nearest'});return}
+  const H=vis(),e=el.getBoundingClientRect(),tr=(act||el).getBoundingClientRect();let dy=0;if(tr.bottom>H-12)dy=tr.bottom-(H-12);if(e.top-dy<80)dy=Math.max(0,e.top-80);if(dy)window.scrollBy(0,dy)}catch(x){}}
+ document.addEventListener('focusin',e=>{const t=e.target;if(!isF(t))return;document.body.classList.add('kbd2');[150,400,800].forEach(ms=>setTimeout(()=>{if(document.activeElement===t)reveal(t)},ms))});
+ if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>{const a=document.activeElement;if(isF(a))reveal(a)});
+ window.addEventListener('resize',()=>{const a=document.activeElement;if(isF(a))setTimeout(()=>reveal(a),60)});
+ document.addEventListener('focusout',()=>setTimeout(()=>{const a=document.activeElement;if(!a||!a.matches||!a.matches('input,select,textarea'))document.body.classList.remove('kbd2')},180));
+ document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const t=e.target;if(!t||!t.matches||!t.matches('.qed input'))return;e.preventDefault();const all=[].slice.call(document.querySelectorAll('#q-editor input')),i=all.indexOf(t);if(i>=0&&i<all.length-1){all[i+1].focus()}else t.blur()});
+ document.addEventListener('focus',e=>{const t=e.target;if(t&&t.matches&&t.matches('.qed input')&&t.select)setTimeout(()=>{try{t.select()}catch(x){}},0)},true)})();

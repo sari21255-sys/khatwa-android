@@ -7,7 +7,7 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
  const mk=async(o)=>{o=o||{};const ctx=await b.newContext(Object.assign({viewport:{width:390,height:844},timezoneId:'Asia/Riyadh'},o.ctx||{}));
   if(o.native)await ctx.addInitScript(o.native);
   await ctx.clock.install({time:new Date('2026-11-16T10:00:00+03:00')});const p=await ctx.newPage();p.errs=[];p.on('pageerror',e=>p.errs.push(e.message));
-  await p.goto('file://'+file);await p.waitForFunction(()=>typeof qSave==='function');if(!o.noseed){await p.evaluate(seed);await p.reload();await p.waitForFunction(()=>S.prof.ob===1)}await p.waitForTimeout(300);return{ctx,p}};
+  await p.goto('file://'+file);try{await p.waitForFunction(()=>typeof qSave==='function',null,{timeout:8000})}catch(e){await p.reload();await p.waitForFunction(()=>typeof qSave==='function')}if(!o.noseed){for(let i=0;i<4;i++){await p.waitForTimeout(400);await p.evaluate(seed);await p.waitForTimeout(500);await p.reload();await p.waitForTimeout(600);if(await p.evaluate(()=>typeof S!=='undefined'&&S.prof.ob===1).catch(()=>false))break}await p.waitForFunction(()=>S.prof.ob===1)}await p.waitForTimeout(300);return{ctx,p}};
  const go=async(p,tab,sub)=>{await p.evaluate(([t,s])=>{S.tab=t;S.sub=s||null;UI.trk='hub';render()},[tab,sub]);await p.waitForTimeout(150)};
 
  const plan=async(p,t)=>{await p.evaluate(t=>{S.tab='train';S.sub=null;UI.trk='irs';UI.qt=t||'cur';UI.qd=TD();UI.qx=null;render()},t);await p.waitForTimeout(150)};
@@ -431,5 +431,100 @@ const seed=()=>{S.prof.ob=1;S.prof.name='مختبر';S.prof.sex='m';S.prof.age=3
    ok(r.tool<.35&&r.nc<.35&&r.sheet<.35,'ثيم '+th+': أسطح داكنة لنصوص فاتحة',JSON.stringify(r))}
   const g=await p.evaluate(()=>{ACT.fxin({dataset:{}});const d=document.querySelector('#fx-auth');return{inputs:d.querySelectorAll('input').length,go:!!d.querySelector('#fxa-go'),guest:!!d.querySelector('[data-fxx]')}});
   ok(g.inputs===0&&!g.go&&g.guest,'بلا إعداد مزامنة: لا حقول ولا زر دخول، فقط المتابعة كزائر',JSON.stringify(g));
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
+ console.log('16) نافذة الطعام: معتمة وتتبع السمة، بحث الأرز، اختيار وتعديل كمية (أسود وأبيض)');
+ for(const th of ['black','white']){
+  const {ctx,p}=await mk({native:'try{localStorage.setItem("fit_theme","'+th+'")}catch(e){}'});await go(p,'food');
+  await p.click('[data-a=fdadd] >> nth=0');await p.waitForSelector('#fds-q');await p.fill('#fds-q','rice');await p.waitForTimeout(400);
+  const nres=await p.evaluate(()=>document.querySelectorAll('#fds-l .fpr').length);ok(nres>=2,th+': البحث عن rice يعطي نتائج',nres);
+  await p.click('#fds-l .fpr >> nth=0');await p.waitForTimeout(250);
+  const r=await p.evaluate(()=>{const cr=(a,b)=>{const L=c=>{const m=c.match(/[\d.]+/g).map(Number);const x=m.slice(0,3).map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*x[0]+.7152*x[1]+.0722*x[2]};const l1=L(a),l2=L(b);return (Math.max(l1,l2)+.05)/(Math.min(l1,l2)+.05)};
+   const sh=document.querySelector('.fps'),cs=getComputedStyle(sh),bg=cs.backgroundColor,alpha=(bg.match(/[\d.]+/g)||[])[3];const o={alpha:alpha===undefined?1:+alpha};
+   const q=s=>{const e=document.querySelector(s);return e?cr(getComputedStyle(e).color,bg):0};
+   o.title=q('.fps b');o.row=q('.fpr b');o.qty=q('#fds-det b');o.lab=q('#fds-det label.f');
+   const inp=document.getElementById('fds-g');o.inp=cr(getComputedStyle(inp).color,getComputedStyle(inp).backgroundColor);
+   const lc=[...document.querySelectorAll('#fds-m .lc small')].map(e=>{const s=getComputedStyle(e);const bgc=s.backgroundColor;return cr(s.color,bgc.indexOf('rgba')===0&&/, 0\)/.test(bgc)?bg:bgc)});o.macro=Math.min.apply(null,lc);
+   const rc=sh.getBoundingClientRect();let leak=0;for(let i=0;i<40;i++){const x=rc.left+32+(rc.width-64)*((i*37)%40)/40,y=rc.top+32+(rc.height-64)*((i*53)%40)/40;const e=document.elementFromPoint(x,y);if(e&&!sh.contains(e))leak++}o.leak=leak;
+   o.navHidden=getComputedStyle(document.getElementById('nav')).display==='none';return o});
+  ok(r.alpha===1,th+': خلفية النافذة معتمة تمامًا',JSON.stringify(r));
+  ok(r.title>=4.5&&r.row>=4.5&&r.qty>=4.5&&r.lab>=4.5&&r.inp>=4.5&&r.macro>=3,th+': تباين العنوان والنتائج والكمية والمغذيات',JSON.stringify(r));
+  ok(r.leak===0&&r.navHidden,th+': لا يظهر محتوى الصفحة الخلفية ولا الشريط السفلي داخل النافذة');
+  ok(await p.evaluate(()=>+document.querySelector('#fds-m .lc b').textContent.replace(/,/g,'')===260),th+': 200 غ = 260 سعرة');
+  await p.fill('#fds-g','250');await p.waitForTimeout(200);
+  ok(await p.evaluate(()=>+document.querySelector('#fds-m .lc b').textContent.replace(/,/g,'')===325),th+': تعديل الكمية إلى 250 غ يعطي 325 سعرة');
+  await p.click('#fds-save');await p.waitForTimeout(250);
+  ok(await p.evaluate(()=>{const a=S.meals[TD()]||[];return a.length===1&&Math.round(a[0].kcal)===325&&!document.querySelector('.fps')}),th+': إضافة الطعام وإغلاق النافذة');
+  await p.click('[data-a=fded]');await p.fill('#fde-q','100');await p.click('[data-a=fdesave]');await p.waitForTimeout(250);
+  const tot=await p.evaluate(()=>({m:Math.round((S.meals[TD()]||[]).reduce((a,x)=>a+x.kcal,0)),sh:+document.getElementById('fd-logged').textContent.replace(/,/g,'')}));
+  ok(tot.m===130&&tot.sh===130,th+': تعديل الكمية إلى 100 غ: الإجمالي 130 سعرة ويطابق الشاشة',JSON.stringify(tot));
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
+
+ console.log('17) لوحة المفاتيح (محاكاة تصغير نافذة WebView): الحقل وزر حفظ الأداء ظاهران، والانتقال بين الحقول');
+ {const {ctx,p}=await mk({ctx:{viewport:{width:390,height:844}}});await plan(p);
+  const di=await p.evaluate(()=>qDi(TD()));await p.evaluate(d=>{S.plan[d].ex=[];irPlanAdd(d,'ضغط صدر بالبار',4,8,0);render()},di);
+  await p.click('[data-a=qxopen]');await p.waitForTimeout(150);
+  const seen=async(sel)=>p.evaluate(s=>{const e=document.querySelector(s).getBoundingClientRect();return e.top>=0&&e.bottom<=window.innerHeight&&e.height>0},sel);
+  for(const h of [430,380]){await p.setViewportSize({width:390,height:844});await p.waitForTimeout(100);
+   await p.focus('[data-qr="0,w"]');await p.setViewportSize({width:390,height:h});await p.waitForTimeout(1000);
+   ok(await seen('[data-qr="0,w"]')&&await seen('[data-a=qxsave]'),'ارتفاع '+h+': حقل الوزن وزر «حفظ الأداء» داخل المنطقة الظاهرة',JSON.stringify(await p.evaluate(()=>[document.querySelector('[data-qr="0,w"]').getBoundingClientRect().bottom,document.querySelector('[data-a=qxsave]').getBoundingClientRect().bottom,innerHeight])));
+   await p.focus('[data-qr="0,r"]');await p.waitForTimeout(900);
+   ok(await seen('[data-qr="0,r"]')&&await seen('[data-a=qxsave]'),'ارتفاع '+h+': حقل التكرارات وزر الحفظ ظاهران')}
+  await p.setViewportSize({width:390,height:420});await p.focus('[data-qr="0,w"]');await p.keyboard.type('80');await p.waitForTimeout(200);await p.keyboard.press('Enter');
+  ok(await p.evaluate(()=>document.activeElement.dataset.qr==='0,r'),'زر التالي من الوزن ينقل إلى التكرارات');
+  await p.keyboard.type('8');await p.waitForTimeout(200);await p.keyboard.press('Enter');await p.waitForTimeout(150);
+  ok(await p.evaluate(()=>document.activeElement.tagName!=='INPUT'),'التالي من آخر حقل يغلق لوحة المفاتيح');
+  await p.click('[data-a=qradd]');await p.waitForTimeout(100);await p.focus('[data-qr="1,w"]');await p.keyboard.type('85');await p.waitForTimeout(200);await p.keyboard.press('Enter');await p.waitForTimeout(250);await p.keyboard.type('6');await p.waitForTimeout(900);
+  ok(await seen('[data-a=qxsave]'),'مع مجموعتين زر الحفظ ما زال ظاهرًا');
+  await p.click('[data-a=qxsave]');await p.waitForTimeout(500);
+  ok(await p.evaluate(()=>{const x=irXv('ضغط صدر بالبار');const s=qSets(TD(),x);return s.length===2&&s[0].q.w===80&&s[0].q.r===8&&s[1].q.w===85&&s[1].q.r===6}),'الحفظ بالزر بعد التنقل بين الحقول: 80×8 و85×6');
+  await p.setViewportSize({width:390,height:844});
+  /* نافذة الطعام مع لوحة المفاتيح */
+  await go(p,'food');await p.click('[data-a=fdadd] >> nth=0');await p.fill('#fds-q','rice');await p.waitForTimeout(300);await p.click('#fds-l .fpr >> nth=0');await p.waitForTimeout(200);
+  await p.focus('#fds-g');await p.setViewportSize({width:390,height:430});await p.waitForTimeout(1000);
+  ok(await seen('#fds-g')&&await seen('#fds-save'),'نافذة الطعام مع لوحة المفاتيح: حقل الكمية وزر الإضافة ظاهران');
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
+
+ console.log('18) الخطة الحالية: بطاقة مخففة ووضع تعديل الجدول');
+ {const {ctx,p}=await mk();await plan(p);
+  const di=await p.evaluate(()=>qDi(TD()));await p.evaluate(d=>{S.plan[d].ex=[];irPlanAdd(d,'سحب أرضي بالبار',3,5,0);irPlanAdd(d,'ضغط صدر بالبار',4,8,0);render()},di);
+  let T=await txt(p);
+  ok(/المجموعات\s*\n?\s*3/.test(T)&&/التكرارات\s*\n?\s*5/.test(T),'عناوين صريحة للمجموعات والتكرارات');
+  ok((T.match(/لا أداء سابقًا/g)||[]).length===2,'عبارة «لا أداء سابقًا» مرة واحدة لكل تمرين');
+  ok(await p.evaluate(()=>document.querySelectorAll('[data-a=qxopen]').length===2&&[...document.querySelectorAll('[data-a=qxopen]')].every(b=>b.textContent==='تسجيل الأداء')),'زر «تسجيل الأداء» لكل تمرين');
+  ok(await p.evaluate(()=>!document.querySelector('[data-a=qmv],[data-a=qrm],[data-a=qmvday]')),'لا أزرار نقل أو ترتيب أو إزالة خارج وضع التعديل');
+  await p.click('[data-a=qedm]');await p.waitForTimeout(150);
+  ok(await p.evaluate(()=>document.querySelectorAll('[data-a=qrm]').length===2&&document.querySelectorAll('[data-a=qmv]').length===4&&!document.querySelector('[data-a=qxopen]')),'وضع «تعديل الجدول» يعرض النقل والترتيب والإزالة');
+  await p.click('[data-a=qmv][data-i="0"][data-v="1"]');await p.waitForTimeout(100);
+  ok(await p.evaluate(d=>S.plan[d].ex[0].n==='ضغط صدر بالبار',di),'الترتيب يعمل');
+  await p.click('[data-a=qrm] >> nth=0');await p.waitForTimeout(100);
+  ok(await p.evaluate(d=>S.plan[d].ex.length===1,di),'الإزالة تعمل');
+  await p.click('[data-a=qedm]');await p.waitForTimeout(100);
+  ok(await p.evaluate(()=>!!document.querySelector('[data-a=qxopen]')&&!document.querySelector('[data-a=qrm]')),'الخروج من وضع التعديل يعيد زر التسجيل');
+  ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
+
+ console.log('19) تسجيل كامل: حفظ، إغلاق وفتح، تعديل، اتساق الحالية والشاملة والأرشيف، والطعام');
+ {let ctx,p;({ctx,p}=await mk());await plan(p);
+  const di=await p.evaluate(()=>qDi(TD()));await p.evaluate(d=>{S.plan[d].ex=[];irPlanAdd(d,'سحب أرضي بالبار',3,5,0);render()},di);
+  await p.click('[data-a=qxopen]');await p.fill('[data-qr="0,w"]','100');await p.fill('[data-qr="0,r"]','5');await p.click('[data-a=qxsave]');await p.waitForTimeout(200);
+  await p.reload();await p.waitForFunction(()=>S.prof.ob===1);await p.waitForTimeout(300);await plan(p);
+  ok(await p.evaluate(()=>{const x=irXv('سحب أرضي بالبار');const s=qSets(TD(),x);return s.length===1&&s[0].q.w===100&&s[0].q.r===5}),'بعد إغلاق التطبيق وفتحه: المجموعة محفوظة 100×5');
+  await p.click('[data-a=qxopen]');await p.fill('[data-qr="0,w"]','105');await p.click('[data-a=qxsave]');await p.waitForTimeout(200);
+  const st=await p.evaluate(()=>{const x=irXv('سحب أرضي بالبار');const all=qAll();const k=Object.keys(all).find(k=>/سحب/.test(all[k].n));
+   const sets=qSets(TD(),x).map(h=>h.q.w+'x'+h.q.r);return{sets,all:{n:all[k].sets.length,max:all[k].max.w,last:all[k].last.map(q=>q.w+'x'+q.r)},cur:document.querySelector('.qsaved')?document.querySelector('.qsaved').innerText.replace(/\s+/g,' '):''}});
+  ok(st.sets.join()==='105x5','التعديل استبدل المجموعة ولم يكرّرها',JSON.stringify(st));
+  ok(st.all.n===1&&st.all.max===105&&st.all.last.join()==='105x5','الشاملة تعكس الأداء مرة واحدة',JSON.stringify(st.all));
+  ok(/105/.test(st.cur)&&!/100\b/.test(st.cur),'الخطة الحالية تعرض القيمة المعدّلة فقط',st.cur);
+  const arch=await p.evaluate(()=>{const n=document.querySelectorAll('x').length;const s=sxList().filter(s=>s.date===TD());const c=s.reduce((a,x)=>a+x.ex.reduce((b,e)=>b+irSets(e).length,0),0);return{sessions:s.length,sets:c}});
+  ok(arch.sets===1,'الأرشيف يحوي المجموعة مرة واحدة',JSON.stringify(arch));
+  await p.reload();await p.waitForFunction(()=>S.prof.ob===1);await p.waitForTimeout(300);
+  ok(await p.evaluate(()=>{const x=irXv('سحب أرضي بالبار');const s=qSets(TD(),x);return s.length===1&&s[0].q.w===105}),'بعد إعادة فتح ثانية ما زال 105×5');
+  /* طعام */
+  await go(p,'food');await p.click('[data-a=fdadd] >> nth=0');await p.fill('#fds-q','rice');await p.waitForTimeout(300);await p.click('#fds-l .fpr >> nth=0');await p.fill('#fds-g','150');await p.click('#fds-save');await p.waitForTimeout(250);
+  await p.reload();await p.waitForFunction(()=>S.prof.ob===1);await go(p,'food');
+  let f=await p.evaluate(()=>({k:Math.round((S.meals[TD()]||[]).reduce((a,x)=>a+x.kcal,0)),s:+document.getElementById('fd-logged').textContent.replace(/,/g,'')}));
+  ok(f.k===195&&f.s===195,'الطعام محفوظ بعد الفتح: 150 غ = 195 سعرة',JSON.stringify(f));
+  await p.click('[data-a=fded]');await p.fill('#fde-q','300');await p.click('[data-a=fdesave]');await p.waitForTimeout(250);
+  f=await p.evaluate(()=>({k:Math.round((S.meals[TD()]||[]).reduce((a,x)=>a+x.kcal,0)),s:+document.getElementById('fd-logged').textContent.replace(/,/g,''),p:Math.round((S.meals[TD()]||[]).reduce((a,x)=>a+x.p,0)*10)/10}));
+  ok(f.k===390&&f.s===390,'تعديل الكمية إلى 300 غ: 390 سعرة والإجمالي يطابق',JSON.stringify(f));
   ok(!p.errs.length,'لا أخطاء صفحة',p.errs.join('|'));await ctx.close()}
  await b.close();console.log(fail?'FAILED '+fail:'all PASS');process.exit(fail?1:0)})();

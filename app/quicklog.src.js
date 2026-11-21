@@ -81,23 +81,22 @@ function qRefTx(b,lt){if(!b)return '<span class="mu">لا أداء سابقًا 
  const a=b.sets||[];if(!a.length&&b.top)return '<span class="mu">آخر أداء: <b class="num">'+esc(qSet(lt,b.top))+'</b> · <span class="num">'+b.date+'</span> · ملخص تاريخي</span>';
  return '<span class="mu">آخر أداء <span class="num">'+b.date+'</span>: <b class="num">'+a.map(q=>esc(qSet(lt,q))).join(' · ')+'</b></span>'}
 function qEditor(date,xv,name,row,lt){const rows=UI.qrows||[],ref=qRefLast(xv,date,lt);
- let h='<div class="qed" id="q-editor"><div class="mu" style="margin:4px 0">'+qRefTx(ref,lt)+(ref&&(ref.sets||[]).length?' <button class="chip" data-a="qcopylast" data-v="'+esc(xv)+'">انسخ آخر أداء</button>':'')+'</div>';
+ let h='<div class="qed" id="q-editor">'+(ref&&(ref.sets||[]).length?'<div style="margin:4px 0"><button class="chip" data-a="qcopylast" data-v="'+esc(xv)+'">انسخ آخر أداء</button></div>':'');
  rows.forEach((q,i)=>{h+='<div class="qrow row" style="gap:6px;flex-wrap:nowrap" data-i="'+i+'"><span class="num mu" style="min-width:18px">'+(i+1)+'</span>'+
-  '<input class="irin num" dir="ltr" inputmode="decimal" data-qr="'+i+',w" placeholder="'+(lt==='bw'?'إضافي':lt==='as'?'مساعدة':'كغ')+'" value="'+esc(q.w===''?'':q.w)+'" aria-label="الوزن">'+
-  '<input class="irin num" dir="ltr" inputmode="numeric" data-qr="'+i+',r" placeholder="'+(row&&row.r?row.r:'تكرار')+'" value="'+esc(q.r===''?'':q.r)+'" aria-label="التكرارات">'+
+  '<input class="irin num" dir="ltr" inputmode="decimal" enterkeyhint="next" data-qr="'+i+',w" placeholder="'+(lt==='bw'?'إضافي':lt==='as'?'مساعدة':'كغ')+'" value="'+esc(q.w===''?'':q.w)+'" aria-label="الوزن">'+
+  '<input class="irin num" dir="ltr" inputmode="numeric" enterkeyhint="'+(i===rows.length-1?'done':'next')+'" data-qr="'+i+',r" placeholder="'+(row&&row.r?row.r:'تكرار')+'" value="'+esc(q.r===''?'':q.r)+'" aria-label="التكرارات">'+
   '<button class="chip" data-a="qrdup" data-i="'+i+'" aria-label="نسخ المجموعة">نسخ</button><button class="chip" data-a="qrdel" data-i="'+i+'" aria-label="حذف المجموعة">'+ic('x')+'</button></div>'});
- h+='<div class="row" style="gap:8px;margin-top:8px;flex-wrap:wrap"><button class="chip" data-a="qradd">＋ مجموعة</button><span class="sp"></span><button class="chip" data-a="qxclose">إلغاء</button><button class="btn sm" data-a="qxsave" data-v="'+esc(xv)+'" data-n="'+esc(name)+'">حفظ الأداء</button></div></div>';
+ h+='<div class="row qact" style="gap:8px;margin-top:8px;flex-wrap:wrap"><button class="chip" data-a="qradd">＋ مجموعة</button><span class="sp"></span><button class="chip" data-a="qxclose">إلغاء</button><button class="btn sm" data-a="qxsave" data-v="'+esc(xv)+'" data-n="'+esc(name)+'">حفظ الأداء</button></div></div>';
  return h}
-function qExCard(date,xv,name,row,idx,cnt){const lt=qMeta(xv,name).lt,sets=qSets(date,xv),open=UI.qx===xv;
- let h='<div class="card qx" data-xv="'+esc(xv)+'"><div class="row" style="flex-wrap:nowrap;gap:8px"><b class="nm" style="flex:1;min-width:0">'+esc(name)+'</b>'+(row?'<span class="mu num">'+row.s+'×'+row.r+(row.tw?' · هدف '+esc(qWt(lt,row.tw)):'')+'</span>':'<span class="tag">خارج الجدول</span>')+'</div>';
- h+='<div style="margin:4px 0">'+qRefTx(qRefLast(xv,date,lt),lt)+'</div>';
- if(sets.length&&!open)h+='<div class="qsaved">'+sets.map((h2,i)=>'<span class="irset"><span class="num mu">'+(i+1)+'</span><b class="num">'+esc(qSet(lt,h2.q))+'</b></span>').join('')+'</div>';
- else if(!open)h+='<div class="mu">لم يُسجَّل أداء لهذا اليوم</div>';
+function qExCard(date,xv,name,row,idx,cnt){const lt=qMeta(xv,name).lt,sets=qSets(date,xv),open=UI.qx===xv,em=!!UI.qedm&&!open;
+ let h='<div class="card qx" data-xv="'+esc(xv)+'"><div class="row" style="flex-wrap:nowrap;gap:8px"><b class="nm" style="flex:1;min-width:0">'+esc(name)+'</b>'+(row?'':'<span class="tag">خارج الجدول</span>')+'</div>';
+ if(row)h+='<div class="qpl"><span><small class="mu">المجموعات</small><b class="num">'+F(row.s)+'</b></span><span><small class="mu">التكرارات</small><b class="num">'+F(row.r)+'</b></span>'+(row.tw?'<span><small class="mu">الهدف</small><b class="num">'+esc(qWt(lt,row.tw))+'</b></span>':'')+'</div>';
+ h+='<div class="qlastl">'+qRefTx(qRefLast(xv,date,lt),lt)+'</div>';
+ if(sets.length&&!open)h+='<div class="qsaved" aria-label="أداء اليوم">'+sets.map((h2,i)=>'<span class="irset"><span class="num mu">'+(i+1)+'</span><b class="num">'+esc(qSet(lt,h2.q))+'</b></span>').join('')+'</div>';
  if(open)h+=qEditor(date,xv,name,row,lt);
- else{h+='<div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap"><button class="btn sm" data-a="qxopen" data-v="'+esc(xv)+'" id="q-open-'+idx+'">'+(sets.length?'تعديل الأداء':'تسجيل الأداء')+'</button>';
-  if(row){const di=qDi(date);h+='<button class="chip" data-a="qmv" data-d="'+di+'" data-i="'+idx+'" data-v="-1" aria-label="أعلى">↑</button><button class="chip" data-a="qmv" data-d="'+di+'" data-i="'+idx+'" data-v="1" aria-label="أسفل">↓</button>'+
-   '<select class="irsel" id="q-mvd-'+idx+'" aria-label="نقل إلى يوم">'+DAYS.map((x,d)=>'<option value="'+d+'"'+(d===di?' selected':'')+'>'+x+'</option>').join('')+'</select><button class="chip" data-a="qmvday" data-d="'+di+'" data-i="'+idx+'">نقل</button><button class="chip" data-a="qrm" data-d="'+di+'" data-i="'+idx+'">إزالة من الجدول</button>'}
-  h+='</div>'}
+ else if(em){if(row){const di=qDi(date);h+='<div class="row qedt" style="gap:6px;margin-top:8px;flex-wrap:wrap"><button class="chip" data-a="qmv" data-d="'+di+'" data-i="'+idx+'" data-v="-1" aria-label="أعلى">↑</button><button class="chip" data-a="qmv" data-d="'+di+'" data-i="'+idx+'" data-v="1" aria-label="أسفل">↓</button>'+
+   '<select class="irsel" id="q-mvd-'+idx+'" aria-label="نقل إلى يوم">'+DAYS.map((x,d)=>'<option value="'+d+'"'+(d===di?' selected':'')+'>'+x+'</option>').join('')+'</select><button class="chip" data-a="qmvday" data-d="'+di+'" data-i="'+idx+'">نقل</button><button class="chip" data-a="qrm" data-d="'+di+'" data-i="'+idx+'">إزالة من الجدول</button></div>'}}
+ else h+='<div class="row" style="gap:6px;margin-top:8px"><button class="btn sm" data-a="qxopen" data-v="'+esc(xv)+'" id="q-open-'+idx+'">'+(sets.length?'تعديل الأداء':'تسجيل الأداء')+'</button></div>';
  return h+'</div>'}
 function qAddForm(date){const di=qDi(date),cust=Object.keys(S.xr||{}).filter(k=>k.indexOf('C.')===0).map(k=>S.xr[k].n);
  return '<div class="card" id="q-addf"><h2>'+ic('dumbbell')+'إضافة تمرين إلى '+DAYS[di]+'</h2><label class="f">التمرين من المكتبة أو تمارينك السابقة<input id="ir-an" list="qnames" placeholder="ابحث أو اكتب اسم التمرين" value="'+esc(irD('ir-an'))+'" autocomplete="off"></label>'+
@@ -109,7 +108,7 @@ function qCustomForm(){return '<div class="card" id="q-cust"><h2>'+ic('plus')+'�
   '<label class="f">نوع الحمل<select id="qc-t" class="irsel"><option value="w">وزن خارجي (كغ)</option><option value="bw">وزن الجسم أو إضافي</option><option value="as">مساعدة (جهاز مساعد)</option></select></label>'+
   '<div class="row" style="gap:8px;margin-top:8px"><button class="btn" data-a="qcsave">حفظ التمرين</button><button class="chip" data-a="qccancel">إلغاء</button></div></div>'}
 function qCurTab(){const d=qDate(),di=qDi(d),p=S.plan[di]||{t:'',ex:[]};let h=qDateBar();
- h+='<div class="row" style="margin:10px 0;gap:8px"><span class="mu">'+(p.ex.length?esc(p.t||'تمرين اليوم'):'لا تمارين مجدولة لهذا اليوم')+'</span><span class="sp"></span><span class="tag" id="ir-sync">'+esc(irSyncTx())+'</span></div>';
+ h+='<div class="row" style="margin:10px 0;gap:8px"><span class="mu">'+(p.ex.length?esc(p.t||'تمرين اليوم'):'لا تمارين مجدولة لهذا اليوم')+'</span><span class="sp"></span>'+(p.ex.length?'<button class="chip'+(UI.qedm?' on':'')+'" data-a="qedm" aria-pressed="'+!!UI.qedm+'">'+(UI.qedm?'تم':'تعديل الجدول')+'</button>':'')+'<span class="tag" id="ir-sync">'+esc(irSyncTx())+'</span></div>';
  const inPlan=new Set();
  p.ex.forEach((e,i)=>{const xv=irXvOf({id:e.id,n:e.n});inPlan.add(xv);h+=qExCard(d,xv,e.n,e,i)});
  const extra=qDayEx(d);Object.keys(extra).filter(xv=>!inPlan.has(xv)).forEach(xv=>{h+=qExCard(d,xv,extra[xv].n,null,-1)});
@@ -157,6 +156,7 @@ Object.assign(ACT,{
  qpick:()=>{UI.qdp=!UI.qdp},
  qdgo:()=>{const x=qReadDate('qd');if(!x)return false;if(x>TD()){toast('لا يمكن التسجيل في تاريخ قادم');return false}UI.qd=x;UI.qdp=0;UI.qx=null},
  qxopen:b=>{qOpenEd(b.dataset.v,qDate())},
+ qedm:()=>{UI.qedm=!UI.qedm;if(UI.qedm){UI.qx=null;UI.qrows=null}},
  qxclose:()=>{UI.qx=null;UI.qrows=null;return},
  qradd:()=>{const r=UI.qrows||(UI.qrows=[]),l=r[r.length-1]||{w:'',r:''};r.push({w:l.w,r:l.r})},
  qrdup:b=>{const r=UI.qrows,i=+b.dataset.i;if(!r||!r[i])return false;r.splice(i+1,0,{w:r[i].w,r:r[i].r})},
